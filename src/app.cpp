@@ -2,6 +2,7 @@
 #include <imgui_internal.h>
 #include <IconsFontAwesome5.h>
 
+#include <pages/motion_profile.h>
 #include <pages/settings.h>
 
 App::App() { }
@@ -54,6 +55,7 @@ void App::present() {
 
   if (item_close)      menu_close();
 
+  if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_settings) SettingsPage::get()->present(&show_settings);
 
   switch (event_state) {

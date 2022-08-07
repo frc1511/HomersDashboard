@@ -1,4 +1,4 @@
-# include("${DASHBOARD_SRC_DIR}/platform/CMakeLists.txt")
+include("${DASHBOARD_SRC_DIR}/platform/CMakeLists.txt")
 include("${DASHBOARD_SRC_DIR}/pages/CMakeLists.txt")
 
 add_dashboard_sources(
