@@ -1,5 +1,6 @@
 #include <dashboard.h>
 #include <app.h>
+#include <user_data.h>
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -58,7 +59,7 @@ int main(int argc, char** argv) {
   // --- Initialize window ---
   
   GLFWwindow* window;
-  if (!(window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1511 Auto Planner", nullptr, nullptr))) {
+  if (!(window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "1511 Homer's Dashboard", nullptr, nullptr))) {
     exit(-1);
   }
   
@@ -81,7 +82,7 @@ int main(int argc, char** argv) {
   
   IMGUI_CHECKVERSION();
   
-  ImGui::CreateContext();
+  ImGuiContext* context = ImGui::CreateContext();
   
   ImGuiIO* io = &ImGui::GetIO();
   io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -89,6 +90,20 @@ int main(int argc, char** argv) {
   io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
   
   set_imgui_style();
+
+  // Setup user data.
+  ImGuiSettingsHandler ini_handler;
+  
+  ini_handler.ClearAllFn = UserData::clear_all;
+  ini_handler.ReadInitFn = UserData::read_init;
+  ini_handler.ReadOpenFn = UserData::read_open;
+  ini_handler.ReadLineFn = UserData::read_line;
+  ini_handler.ApplyAllFn = UserData::apply_all;
+  ini_handler.WriteAllFn = UserData::write_all;
+  
+  ini_handler.TypeName = USER_DATA_NAME;
+  ini_handler.TypeHash = ImHashStr(USER_DATA_NAME);
+  context->SettingsHandlers.push_back(ini_handler);
   
   // Setup OpenGL backend.
   ImGui_ImplGlfw_InitForOpenGL(window, true);

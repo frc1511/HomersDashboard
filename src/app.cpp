@@ -2,6 +2,8 @@
 #include <imgui_internal.h>
 #include <IconsFontAwesome5.h>
 
+#include <pages/settings.h>
+
 App::App() { }
 
 App::~App() { }
@@ -13,6 +15,10 @@ void App::init(GLFWwindow* win) {
 void App::present() {
   bool item_close = false;
 
+  static bool show_network_tables = false,
+              show_motion_profile = false,
+              show_settings = false;
+
 #ifdef DASHBOARD_MACOS
 # define CTRL_STR "Cmd+"
 # define CTRL_SHIFT_STR "Cmd+Shift+"
@@ -23,8 +29,23 @@ void App::present() {
   
   if (ImGui::BeginMenuBar()) {
     if (ImGui::BeginMenu("File")) {
-      ImGui::MenuItem(ICON_FA_WINDOW_CLOSE "  Close",   CTRL_STR "W",       &item_close);
+      ImGui::MenuItem(ICON_FA_WINDOW_CLOSE "  Close", CTRL_STR "W", &item_close);
       
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Tools")) {
+      ImGui::MenuItem(ICON_FA_TH_LIST "  Network Tables", nullptr, &show_network_tables);
+
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Diagnostics")) {
+      ImGui::MenuItem(ICON_FA_CHART_LINE "  Motion Profile", nullptr, &show_motion_profile);
+
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Settings")) {
+      ImGui::MenuItem(ICON_FA_COG "  Settings", nullptr, &show_settings);
+
       ImGui::EndMenu();
     }
     
@@ -32,6 +53,8 @@ void App::present() {
   }
 
   if (item_close)      menu_close();
+
+  if (show_settings) SettingsPage::get()->present(&show_settings);
 
   switch (event_state) {
     case EventState::NONE:
