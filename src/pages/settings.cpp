@@ -1,9 +1,7 @@
 #include <pages/settings.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/TableEntryListener.h>
 
-SettingsPage::SettingsPage() { }
+SettingsPage::SettingsPage()
+: sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")) { }
 
 SettingsPage::~SettingsPage() { }
 
@@ -19,7 +17,7 @@ void SettingsPage::present(bool* running) {
   
   if (ImGui::InputText("Team Number", number_buf, 9, ImGuiInputTextFlags_CharsDecimal)) {
     team_number = std::atol(number_buf);
-    nt::NetworkTableInstance::GetDefault().GetTable("robot")->GetInstance().SetServerTeam(team_number);
+    sd_table->GetInstance().SetServerTeam(team_number);
     std::cout << "Set team number to " << team_number << std::endl;
   }
   

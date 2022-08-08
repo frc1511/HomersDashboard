@@ -27,6 +27,10 @@
 #include <filesystem>
 #include <numeric>
 #include <variant>
+#include <chrono>
+#include <memory>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
+
+#include <fmt/core.h>

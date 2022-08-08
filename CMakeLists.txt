@@ -103,6 +103,7 @@ add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/glfw")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/imgui")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/IconFontCppHeaders")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/glad")
+add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/fmt")
 
 # WPILib Network Tables.
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -149,6 +150,7 @@ target_link_libraries(${PROJECT_NAME} glfw)
 target_link_libraries(${PROJECT_NAME} imgui)
 target_link_libraries(${PROJECT_NAME} icons_font_awesome)
 target_link_libraries(${PROJECT_NAME} glad)
+target_link_libraries(${PROJECT_NAME} fmt)
 target_link_libraries(${PROJECT_NAME} ntcore)
 
 if(DASHBOARD_MACOS)
