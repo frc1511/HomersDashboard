@@ -29,6 +29,8 @@
 #include <variant>
 #include <chrono>
 #include <memory>
+#include <map>
+#include <sstream>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>

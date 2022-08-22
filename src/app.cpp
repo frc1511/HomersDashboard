@@ -2,6 +2,7 @@
 #include <imgui_internal.h>
 #include <IconsFontAwesome5.h>
 
+#include <pages/auto_chooser.h>
 #include <pages/motion_profile.h>
 #include <pages/settings.h>
 
@@ -17,6 +18,7 @@ void App::present() {
   bool item_close = false;
 
   static bool show_network_tables = false,
+              show_auto_chooser = false,
               show_motion_profile = false,
               show_settings = false;
 
@@ -36,6 +38,7 @@ void App::present() {
     }
     if (ImGui::BeginMenu("Tools")) {
       ImGui::MenuItem(ICON_FA_TH_LIST "  Network Tables", nullptr, &show_network_tables);
+      ImGui::MenuItem(ICON_FA_BOLT "  Auto Chooser", nullptr, &show_auto_chooser);
 
       ImGui::EndMenu();
     }
@@ -55,6 +58,7 @@ void App::present() {
 
   if (item_close)      menu_close();
 
+  if (show_auto_chooser) AutoChooserPage::get()->present(&show_auto_chooser);
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_settings) SettingsPage::get()->present(&show_settings);
 

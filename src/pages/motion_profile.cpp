@@ -206,8 +206,6 @@ void MotionProfilePage::present(bool* running) {
     if (ImGui::BeginTabItem("File")) {
       profile_type = ProfileType::FILE;
 
-      static char file_path[256] = "";
-
       ImGui::Columns(2, nullptr, false);
       ImGui::SetColumnWidth(0, COL_WIDTH);
       ImGui::Text("File Path");
