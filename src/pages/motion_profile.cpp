@@ -138,7 +138,12 @@ void MotionProfilePage::present(bool* running) {
         record_end_time = std::chrono::high_resolution_clock::now();
         // Milliseconds since last recording iteration.
         double elapsed = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(record_end_time - record_last_time).count()) / 1e6;
-        if (elapsed >= recording_period) {
+        bool new_entry = elapsed >= recording_period;
+
+        // Seconds since start.
+        elapsed = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(record_end_time - record_start_time).count()) / 1e9;
+
+        if (new_entry) {
           if (recording_type == RecordingType::INTERVAL || (recording_type == RecordingType::AUTO && was_in_auto)) {
             double x = sd_table->GetNumber("DriveCSV_x_pos", 0.0);
             double y = sd_table->GetNumber("DriveCSV_y_pos", 0.0);
@@ -155,11 +160,6 @@ void MotionProfilePage::present(bool* running) {
 
           record_last_time = std::chrono::high_resolution_clock::now();
         }
-
-        fms_info_table->
-
-        // Seconds since start.
-        elapsed = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(record_end_time - record_start_time).count()) / 1e9;
 
         if (recording_type == RecordingType::INTERVAL) {
           if (elapsed > recording_interval) {
@@ -269,6 +269,8 @@ void MotionProfilePage::present(bool* running) {
       ImGui::Columns(1);
 
       ImGui::EndTabItem();
+
+      points = &file_points;
     }
 
     if (recording) {
@@ -276,8 +278,6 @@ void MotionProfilePage::present(bool* running) {
       ImGui::PopStyleVar();
     }
     ImGui::EndTabBar();
-
-    points = &file_points;
   }
 
   if (points) {
