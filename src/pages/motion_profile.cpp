@@ -147,15 +147,15 @@ void MotionProfilePage::present(bool* running) {
           if (recording_type == RecordingType::INTERVAL || (recording_type == RecordingType::AUTO && was_in_auto)) {
             double x = sd_table->GetNumber("DriveCSV_x_pos", 0.0);
             double y = sd_table->GetNumber("DriveCSV_y_pos", 0.0);
-            double dest_x = sd_table->GetNumber("DriveCSV_dest_x_pos", 0.0);
-            double dest_y = sd_table->GetNumber("DriveCSV_dest_y_pos", 0.0);
+            double t_x = sd_table->GetNumber("DriveCSV_t_x_pos", 0.0);
+            double t_y = sd_table->GetNumber("DriveCSV_t_y_pos", 0.0);
             double vel_x = sd_table->GetNumber("DriveCSV_x_vel", 0.0);
             double vel_y = sd_table->GetNumber("DriveCSV_y_vel", 0.0);
             double vel_theta = sd_table->GetNumber("DriveCSV_ang_vel", 0.0);
             double ang = sd_table->GetNumber("DriveCSV_ang", 0.0);
-            double dest_ang = sd_table->GetNumber("DriveCSV_dest_ang", 0.0);
+            double t_ang = sd_table->GetNumber("DriveCSV_t_ang", 0.0);
 
-            recorded_points.push_back(Point{ elapsed, x, y, dest_x, dest_y, vel_x, vel_y, vel_theta, ang, dest_ang });
+            recorded_points.push_back(Point{ elapsed, x, y, t_x, t_y, vel_x, vel_y, vel_theta, ang, t_ang });
           }
 
           record_last_time = std::chrono::high_resolution_clock::now();
