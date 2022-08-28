@@ -9,7 +9,7 @@
 AutoChooserPage::AutoChooserPage()
 : sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")) {
   
-  sd_table->AddEntryListener(
+  mode_listener = sd_table->AddEntryListener(
     "thunderdashboard_auto_list",
     // Updates the auto modes when the list entry is changed.
     [&](nt::NetworkTable*, std::string_view, nt::NetworkTableEntry, std::shared_ptr<nt::Value> value, int) -> void {
@@ -30,7 +30,7 @@ AutoChooserPage::AutoChooserPage()
   );
 }
 
-AutoChooserPage::~AutoChooserPage() { }
+AutoChooserPage::~AutoChooserPage() = default;
 
 void AutoChooserPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);

@@ -6,6 +6,7 @@
 #include <pages/motion_profile.h>
 #include <pages/intake_camera.h>
 #include <pages/limelight.h>
+#include <pages/blinky_blinky.h>
 #include <pages/settings.h>
 
 App::App() { }
@@ -27,6 +28,7 @@ void App::present() {
               show_motion_profile = false,
               show_intake_camera = false,
               show_limelight = false,
+              show_blinky_blinky = false,
               show_settings = false;
 
   bool was_showing_intake_camera = show_intake_camera,
@@ -51,6 +53,7 @@ void App::present() {
       ImGui::MenuItem(ICON_FA_LEMON "  Limelight", nullptr, &show_limelight);
       ImGui::MenuItem(ICON_FA_TH_LIST "  Network Tables", nullptr, &show_network_tables);
       ImGui::MenuItem(ICON_FA_BOLT "  Auto Chooser", nullptr, &show_auto_chooser);
+      ImGui::MenuItem(ICON_FA_LIGHTBULB "  Blinky Blinky", nullptr, &show_blinky_blinky);
 
       ImGui::EndMenu();
     }
@@ -74,6 +77,7 @@ void App::present() {
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_intake_camera) IntakeCameraPage::get()->present(&show_intake_camera);
   if (show_limelight) LimelightPage::get()->present(&show_limelight);
+  if (show_blinky_blinky) BlinkyBlinkyPage::get()->present(&show_blinky_blinky);
   if (show_settings) SettingsPage::get()->present(&show_settings);
 
   if (show_intake_camera != was_showing_intake_camera) {

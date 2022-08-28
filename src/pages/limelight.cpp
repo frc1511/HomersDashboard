@@ -13,6 +13,8 @@ void LimelightPage::present(bool* running) {
     return;
   }
 
+  focused = ImGui::IsWindowFocused();
+
   unsigned int tex(get_frame_texture());
   double ar(get_frame_aspect_ratio());
 
