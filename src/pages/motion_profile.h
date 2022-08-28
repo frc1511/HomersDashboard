@@ -51,13 +51,13 @@ private:
     double time;
     double x;
     double y;
-    double dest_x;
-    double dest_y;
+    double t_x;
+    double t_y;
     double vel_x;
     double vel_y;
     double vel_theta;
     double ang;
-    double dest_ang;
+    double t_ang;
   };
 
   std::vector<Point> recorded_points;

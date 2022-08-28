@@ -246,15 +246,15 @@ void MotionProfilePage::present(bool* running) {
               double time(get_num()); ++file_iter;
               double x(get_num()); ++file_iter;
               double y(get_num()); ++file_iter;
-              double dest_x(get_num()); ++file_iter;
-              double dest_y(get_num()); ++file_iter;
+              double t_x(get_num()); ++file_iter;
+              double t_y(get_num()); ++file_iter;
               double vel_x(get_num()); ++file_iter;
               double vel_y(get_num()); ++file_iter;
               double vel_theta(get_num()); ++file_iter;
               double ang(get_num()); ++file_iter;
-              double dest_ang(get_num()); ++file_iter;
+              double t_ang(get_num()); ++file_iter;
 
-              file_points.push_back(Point{ time, x, y, dest_x, dest_y, vel_x, vel_y, vel_theta, ang, dest_ang });
+              file_points.push_back(Point{ time, x, y, t_x, t_y, vel_x, vel_y, vel_theta, ang, t_ang });
             }
           }
         }
@@ -343,8 +343,6 @@ void MotionProfilePage::present_graph() {
 
   ImGui::Separator();
 
-  const ImGuiStyle& style(ImGui::GetStyle());
-  const ImGuiIO& io(ImGui::GetIO());
   ImDrawList* draw_list(ImGui::GetWindowDrawList());
   ImGuiWindow* win(ImGui::GetCurrentWindow());
   if (win->SkipItems) return;
@@ -374,12 +372,12 @@ void MotionProfilePage::present_graph() {
 
   // --- Plot the data ---
 
-  double min_time(0.0f), max_time(1.0f),
-         min_x, max_x, min_y, max_y,
-         min_target_x, max_target_x, min_target_y, max_target_y,
-         min_vel_x, max_vel_x, min_vel_y, max_vel_y,
-         min_vel_theta, max_vel_theta,
-         min_ang, max_ang, min_target_ang, max_target_ang;
+  double min_time(0.0), max_time(1.0),
+         min_x(0.0), max_x(0.0), min_y(0.0), max_y(0.0),
+         min_target_x(0.0), max_target_x(0.0), min_target_y(0.0), max_target_y(0.0),
+         min_vel_x(0.0), max_vel_x(0.0), min_vel_y(0.0), max_vel_y(0.0),
+         min_vel_theta(0.0), max_vel_theta(0.0),
+         min_ang(0.0), max_ang(0.0), min_target_ang(0.0), max_target_ang(0.0);
 
   for (auto it(points->cbegin()); it != points->cend(); ++it) {
     auto [time, x, y, target_x, target_y, vel_x, vel_y, vel_theta, ang, target_ang] = *it;
@@ -396,26 +394,21 @@ void MotionProfilePage::present_graph() {
       min_target_ang = max_target_ang = target_ang;
     }
     else {
-      min_time = std::min(min_time, time);
-      max_time = std::max(max_time, time);
-      min_x = std::min(min_x, x);
-      max_x = std::max(max_x, x);
-      min_y = std::min(min_y, y);
-      max_y = std::max(max_y, y);
-      min_target_x = std::min(min_target_x, target_x);
-      max_target_x = std::max(max_target_x, target_x);
-      min_target_y = std::min(min_target_y, target_y);
-      max_target_y = std::max(max_target_y, target_y);
-      min_vel_x = std::min(min_vel_x, vel_x);
-      max_vel_x = std::max(max_vel_x, vel_x);
-      min_vel_y = std::min(min_vel_y, vel_y);
-      max_vel_y = std::max(max_vel_y, vel_y);
-      min_vel_theta = std::min(min_vel_theta, vel_theta);
-      max_vel_theta = std::max(max_vel_theta, vel_theta);
-      min_ang = std::min(min_ang, ang);
-      max_ang = std::max(max_ang, ang);
-      min_target_ang = std::min(min_target_ang, target_ang);
-      max_target_ang = std::max(max_target_ang, target_ang);
+      auto recalc_bounds = [&](double& min, double& max, double val) {
+        min = std::min(min, val);
+        max = std::max(max, val);
+      };
+
+      recalc_bounds(min_time, max_time, time);
+      recalc_bounds(min_x, max_x, x);
+      recalc_bounds(min_y, max_y, y);
+      recalc_bounds(min_target_x, max_target_x, target_x);
+      recalc_bounds(min_target_y, max_target_y, target_y);
+      recalc_bounds(min_vel_x, max_vel_x, vel_x);
+      recalc_bounds(min_vel_y, max_vel_y, vel_y);
+      recalc_bounds(min_vel_theta, max_vel_theta, vel_theta);
+      recalc_bounds(min_ang, max_ang, ang);
+      recalc_bounds(min_target_ang, max_target_ang, target_ang);
     }
   }
 
@@ -429,30 +422,38 @@ void MotionProfilePage::present_graph() {
   if (graph_type == 0) {
     std::vector<double> max_values;
     std::vector<double> min_values;
-    if (show_x_pos) { max_values.push_back(max_x); min_values.push_back(min_x); }
-    if (show_y_pos) { max_values.push_back(max_y); min_values.push_back(min_y); }
-    if (show_target_x_pos) { max_values.push_back(max_target_x); min_values.push_back(min_target_x); }
-    if (show_target_y_pos) { max_values.push_back(max_target_y); min_values.push_back(min_target_y); }
-    if (show_x_vel) { max_values.push_back(max_vel_x); min_values.push_back(min_vel_x); }
-    if (show_y_vel) { max_values.push_back(max_vel_y); min_values.push_back(min_vel_y); }
-    if (show_ang_vel) { max_values.push_back(max_vel_theta); min_values.push_back(min_vel_theta); }
-    if (show_ang) { max_values.push_back(max_ang); min_values.push_back(min_ang); }
-    if (show_target_ang) { max_values.push_back(max_target_ang); min_values.push_back(min_target_ang); }
+
+    auto add_bounds = [&](bool cond, double min, double max) {
+      if (cond) {
+        min_values.push_back(min);
+        max_values.push_back(max);
+      }
+    };
+
+    add_bounds(show_x_pos, min_x, max_x);
+    add_bounds(show_y_pos, min_y, max_y);
+    add_bounds(show_target_x_pos, min_target_x, max_target_x);
+    add_bounds(show_target_y_pos, min_target_y, max_target_y);
+    add_bounds(show_x_vel, min_vel_x, max_vel_x);
+    add_bounds(show_y_vel, min_vel_y, max_vel_y);
+    add_bounds(show_ang_vel, min_vel_theta, max_vel_theta);
+    add_bounds(show_ang, min_ang, max_ang);
+    add_bounds(show_target_ang, min_target_ang, max_target_ang);
 
     if (max_values.empty()) { max_values.push_back(1.0); }
     if (min_values.empty()) { min_values.push_back(0.0); }
 
     double max_val = *std::max_element(max_values.begin(), max_values.end()),
-          min_val = *std::min_element(min_values.begin(), min_values.end());
+           min_val = *std::min_element(min_values.begin(), min_values.end());
 
     if (max_val == min_val) { max_val += 1.0; }
 
     // --- Draw axes ---
 
     auto min_time_str = fmt::format("{:.2f}", min_time),
-        max_time_str = fmt::format("{:.2f}", max_time),
-        min_val_str = fmt::format("{:.2f}", min_val),
-        max_val_str = fmt::format("{:.2f}", max_val);
+         max_time_str = fmt::format("{:.2f}", max_time),
+         min_val_str = fmt::format("{:.2f}", min_val),
+         max_val_str = fmt::format("{:.2f}", max_val);
 
     draw_list->AddText(ImVec2(bb.Min.x + 30.0f, bb.Max.y - 20.0f), ImGui::GetColorU32(ImGuiCol_Text), min_time_str.c_str());
     draw_list->AddText(ImVec2(bb.Max.x - (6.0f * max_time_str.length()), bb.Max.y - 20.0f), ImGui::GetColorU32(ImGuiCol_Text), max_time_str.c_str());
@@ -484,15 +485,15 @@ void MotionProfilePage::present_graph() {
         }
       };
 
-      if (show_x_pos) { plot_time(x, ImColor(1.0f, 0.0f, 0.0f)); }
-      if (show_y_pos) { plot_time(y, ImColor(1.0f, 0.64f, 0.0f)); }
-      if (show_target_x_pos) { plot_time(target_x, ImColor(1.0f, 1.0f, 0.0f)); }
-      if (show_target_y_pos) { plot_time(target_y, ImColor(0.0f, 1.0f, 0.0f)); }
-      if (show_x_vel) { plot_time(vel_x, ImColor(0.0f, 0.6f, 0.6f)); }
-      if (show_y_vel) { plot_time(vel_y, ImColor(0.0f, 0.0f, 1.0f)); }
-      if (show_ang_vel) { plot_time(vel_theta, ImColor(0.9f, 0.9f, 0.98f)); }
-      if (show_ang) { plot_time(ang, ImColor(1.0f, 0.0f, 1.0f)); }
-      if (show_target_ang) { plot_time(target_ang, ImColor(1.0f, 0.75f, 0.8f)); }
+      if (show_x_pos)        { plot_time(x,          ImColor(1.0f, 0.0f, 0.0f));  }
+      if (show_y_pos)        { plot_time(y,          ImColor(1.0f, 0.64f, 0.0f)); }
+      if (show_target_x_pos) { plot_time(target_x,   ImColor(1.0f, 1.0f, 0.0f));  }
+      if (show_target_y_pos) { plot_time(target_y,   ImColor(0.0f, 1.0f, 0.0f));  }
+      if (show_x_vel)        { plot_time(vel_x,      ImColor(0.0f, 0.6f, 0.6f));  }
+      if (show_y_vel)        { plot_time(vel_y,      ImColor(0.0f, 0.0f, 1.0f));  }
+      if (show_ang_vel)      { plot_time(vel_theta,  ImColor(0.9f, 0.9f, 0.98f)); }
+      if (show_ang)          { plot_time(ang,        ImColor(1.0f, 0.0f, 1.0f));  }
+      if (show_target_ang)   { plot_time(target_ang, ImColor(1.0f, 0.75f, 0.8f)); }
     }
   }
   else if (graph_type == 1) {
@@ -534,26 +535,25 @@ void MotionProfilePage::present_graph() {
     // --- Draw points ---
 
     for (auto it(points->cbegin()); it != points->cend(); ++it) {
-      if (show_pos) {
-        double x(it->x), y(it->y);
-
+      auto plot_point = [&](double x, double y) {
         double x_norm((x - min_x_val) / (max_x_val - min_x_val)),
                y_norm((y - min_y_val) / (max_y_val - min_y_val));
 
         if (!std::isnan(x_norm) && !std::isnan(y_norm)) {
           draw_list->AddCircle(ImVec2(x_norm, 1 - y_norm) * (bg_bb.Max - bg_bb.Min) + bg_bb.Min, 2, ImColor(1.0f, 0.0f, 0.0f, 1.0f));
         }
+      };
+
+      if (show_pos) {
+        double x(it->x), y(it->y);
+
+        plot_point(x, y);
       }
       if (show_target_pos) {
-        double dest_x = it->dest_x,
-               dest_y = it->dest_y;
+        double t_x = it->t_x,
+               t_y = it->t_y;
         
-        double dest_x_norm = (dest_x - min_x_val) / (max_x_val - min_x_val),
-               dest_y_norm = (dest_y - min_y_val) / (max_y_val - min_y_val);
-
-        if (!std::isnan(dest_x_norm) && !std::isnan(dest_y_norm)) {
-          draw_list->AddCircle(ImVec2(dest_x_norm, 1 - dest_y_norm) * (bg_bb.Max - bg_bb.Min) + bg_bb.Min, 2, ImColor(0.0f, 1.0f, 0.0f, 1.0f));
-        }
+        plot_point(t_x, t_y);
       }
     }
   }
