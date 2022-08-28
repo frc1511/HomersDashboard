@@ -37,6 +37,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   list(APPEND DASHBOARD_DEF_LIST "DASHBOARD_DEBUG")
 endif()
 
+option(DASHBOARD_WITH_CS "Build with camera server" ON)
+
+if (DASHBOARD_WITH_CS)
+  list(APPEND DASHBOARD_DEF_LIST "DASHBOARD_WITH_CS")
+endif()
+
 set(DASHBOARD_SRC_DIR        "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(DASHBOARD_INC_DIR        "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(DASHBOARD_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
@@ -93,6 +99,8 @@ build_dashboard_resource("${DASHBOARD_RES_DIR}/fonts/Ubuntu/Ubuntu-Bold.ttf"    
 build_dashboard_resource("${DASHBOARD_RES_DIR}/fonts/Font-Awesome/fa-regular-400.ttf" "FontAwesome_Regular_ttf")
 build_dashboard_resource("${DASHBOARD_RES_DIR}/fonts/Font-Awesome/fa-solid-900.ttf"   "FontAwesome_Solid_ttf")
 
+build_dashboard_resource("${DASHBOARD_RES_DIR}/images/no_camera.png"                  "no_camera_png")
+
 # --- Thirdparty ---
 
 option(GLFW_BUILD_EXAMPLES OFF)
@@ -104,6 +112,7 @@ add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/imgui")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/IconFontCppHeaders")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/glad")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/fmt")
+add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/stb_image")
 
 # WPILib Network Tables.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DASHBOARD_THIRDPARTY_DIR}/allwpilib/cmake/modules")
@@ -115,6 +124,11 @@ set(WITH_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/wpinet")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/wpiutil")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/ntcore")
+
+#WPILib CS Core.
+if(DASHBOARD_WITH_CS)
+  add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/cscore")
+endif()
 
 # --- Build ---
 
@@ -149,7 +163,12 @@ target_link_libraries(${PROJECT_NAME} imgui)
 target_link_libraries(${PROJECT_NAME} icons_font_awesome)
 target_link_libraries(${PROJECT_NAME} glad)
 target_link_libraries(${PROJECT_NAME} fmt)
+target_link_libraries(${PROJECT_NAME} stb_image)
 target_link_libraries(${PROJECT_NAME} ntcore)
+
+if(DASHBOARD_WITH_CS)
+  target_link_libraries(${PROJECT_NAME} cscore)
+endif()
 
 if(DASHBOARD_MACOS)
   target_link_libraries(${PROJECT_NAME} "-framework Foundation -framework AppKit -framework UniformTypeIdentifiers")

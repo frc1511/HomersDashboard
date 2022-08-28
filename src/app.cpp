@@ -4,6 +4,8 @@
 
 #include <pages/auto_chooser.h>
 #include <pages/motion_profile.h>
+#include <pages/intake_camera.h>
+#include <pages/limelight.h>
 #include <pages/settings.h>
 
 App::App() { }
@@ -12,6 +14,9 @@ App::~App() { }
 
 void App::init(GLFWwindow* win) {
     window = win;
+
+    IntakeCameraPage::get()->init();
+    LimelightPage::get()->init();
 }
 
 void App::present() {
@@ -20,7 +25,12 @@ void App::present() {
   static bool show_network_tables = false,
               show_auto_chooser = false,
               show_motion_profile = false,
+              show_intake_camera = false,
+              show_limelight = false,
               show_settings = false;
+
+  bool was_showing_intake_camera = show_intake_camera,
+       was_showing_limelight = show_limelight;
 
 #ifdef DASHBOARD_MACOS
 # define CTRL_STR "Cmd+"
@@ -37,6 +47,8 @@ void App::present() {
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Tools")) {
+      ImGui::MenuItem(ICON_FA_CAMERA "  Intake Camera", nullptr, &show_intake_camera);
+      ImGui::MenuItem(ICON_FA_LEMON "  Limelight", nullptr, &show_limelight);
       ImGui::MenuItem(ICON_FA_TH_LIST "  Network Tables", nullptr, &show_network_tables);
       ImGui::MenuItem(ICON_FA_BOLT "  Auto Chooser", nullptr, &show_auto_chooser);
 
@@ -60,7 +72,17 @@ void App::present() {
 
   if (show_auto_chooser) AutoChooserPage::get()->present(&show_auto_chooser);
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
+  if (show_intake_camera) IntakeCameraPage::get()->present(&show_intake_camera);
+  if (show_limelight) LimelightPage::get()->present(&show_limelight);
   if (show_settings) SettingsPage::get()->present(&show_settings);
+
+  if (show_intake_camera != was_showing_intake_camera) {
+    IntakeCameraPage::get()->set_running(show_intake_camera);
+  }
+
+  if (show_limelight != was_showing_limelight) {
+    LimelightPage::get()->set_running(show_limelight);
+  }
 
   switch (event_state) {
     case EventState::NONE:

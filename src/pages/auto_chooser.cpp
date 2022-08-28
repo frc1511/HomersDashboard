@@ -33,7 +33,6 @@ AutoChooserPage::AutoChooserPage()
 AutoChooserPage::~AutoChooserPage() { }
 
 void AutoChooserPage::present(bool* running) {
-  ImGui::ShowDemoWindow();
   ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
   
   if (!ImGui::Begin("Auto Chooser", running, ImGuiWindowFlags_NoCollapse)) {

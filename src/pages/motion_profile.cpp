@@ -24,7 +24,6 @@ MotionProfilePage::MotionProfilePage()
 MotionProfilePage::~MotionProfilePage() { }
 
 void MotionProfilePage::present(bool* running) {
-  ImGui::ShowDemoWindow();
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
   
   if (!ImGui::Begin("Motion Profile", running,
