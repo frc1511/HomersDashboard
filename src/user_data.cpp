@@ -1,7 +1,11 @@
 #include <user_data.h>
+#include <app.h>
 #include <pages/settings.h>
 #include <pages/auto_chooser.h>
 #include <pages/blinky_blinky.h>
+
+#define SECTION_APP_STATE "AppState"
+#define KEY_PAGE_STATES "PageStates"
 
 #define SECTION_SETTINGS "Settings"
 #define KEY_TEAM_NUMBER "TeamNumber"
@@ -25,7 +29,7 @@ void UserData::read_init(ImGuiContext*, ImGuiSettingsHandler*) { }
 void* UserData::read_open(ImGuiContext*, ImGuiSettingsHandler*, const char* name) {
   bool res = true;
   
-  if (std::strcmp(name, SECTION_SETTINGS) && std::strcmp(name, SECTION_AUTO_CHOOSER) && std::strcmp(name, SECTION_BLINKY_BLINKY)) {
+  if (std::strcmp(name, SECTION_APP_STATE) && std::strcmp(name, SECTION_SETTINGS) && std::strcmp(name, SECTION_AUTO_CHOOSER) && std::strcmp(name, SECTION_BLINKY_BLINKY)) {
     res = false;
   }
   
@@ -46,6 +50,9 @@ void UserData::apply_all(ImGuiContext*, ImGuiSettingsHandler* handler) {
     val = line.substr(del + 1, line.size());
     
     if (std::strcmp(handler->TypeName, USER_DATA_NAME) == 0) {
+      if (key == KEY_PAGE_STATES) {
+        App::get()->set_page_states(std::atoll(val.c_str()));
+      }
       if (key == KEY_TEAM_NUMBER) {
         SettingsPage::get()->set_team_number(std::atol(val.c_str()));
       }
@@ -86,6 +93,10 @@ void UserData::write_all(ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiText
   };
   
   if (std::strcmp(handler->TypeName, USER_DATA_NAME) == 0) {
+    begin_section(SECTION_APP_STATE);
+    add_entry(KEY_PAGE_STATES, "%lld", App::get()->get_page_states());
+    end_section();
+
     begin_section(SECTION_SETTINGS);
     add_entry(KEY_TEAM_NUMBER, "%lu", SettingsPage::get()->get_team_number());
     end_section();

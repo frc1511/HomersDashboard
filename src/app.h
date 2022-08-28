@@ -27,6 +27,9 @@ public:
   void handle_keyboard(int key, int scancode, int action, int mods);
   
   constexpr bool is_running() const { return running; }
+
+  unsigned get_page_states() const;
+  void set_page_states(unsigned page_states);
   
 private:
   App();
@@ -42,6 +45,24 @@ private:
   bool running = true;
   
   GLFWwindow* window = nullptr;
+
+  bool show_network_tables = false,
+       show_auto_chooser   = false,
+       show_motion_profile = false,
+       show_intake_camera  = false,
+       show_limelight      = false,
+       show_blinky_blinky  = false,
+       show_settings       = false;
+
+  enum Pages {
+    PAGE_NETWORK_TABLES = 1 << 0,
+    PAGE_AUTO_CHOOSER   = 1 << 1,
+    PAGE_MOTION_PROFILE = 1 << 2,
+    PAGE_INTAKE_CAMERA  = 1 << 3,
+    PAGE_LIMELIGHT      = 1 << 4,
+    PAGE_BLINKY_BLINKY  = 1 << 5,
+    PAGE_SETTINGS       = 1 << 6,
+  };
   
   static App instance;
 };

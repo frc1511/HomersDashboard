@@ -23,14 +23,6 @@ void App::init(GLFWwindow* win) {
 void App::present() {
   bool item_close = false;
 
-  static bool show_network_tables = false,
-              show_auto_chooser = false,
-              show_motion_profile = false,
-              show_intake_camera = false,
-              show_limelight = false,
-              show_blinky_blinky = false,
-              show_settings = false;
-
   bool was_showing_intake_camera = show_intake_camera,
        was_showing_limelight = show_limelight;
 
@@ -106,6 +98,8 @@ void App::close() {
 }
 
 void App::handle_keyboard(int key, int scancode, int action, int mods) {
+  (void)scancode;
+
 #ifdef DASHBOARD_MACOS
   int ctrl_key = GLFW_MOD_SUPER;
 #else
@@ -118,6 +112,30 @@ void App::handle_keyboard(int key, int scancode, int action, int mods) {
   if (GET_CTRL_KEY(GLFW_KEY_W)) {
     menu_close();
   }
+}
+
+unsigned App::get_page_states() const {
+  unsigned page_states = 0;
+
+  if (show_network_tables) page_states |= PAGE_NETWORK_TABLES;
+  if (show_auto_chooser)   page_states |= PAGE_AUTO_CHOOSER;
+  if (show_motion_profile) page_states |= PAGE_MOTION_PROFILE;
+  if (show_intake_camera)  page_states |= PAGE_INTAKE_CAMERA;
+  if (show_limelight)      page_states |= PAGE_LIMELIGHT;
+  if (show_blinky_blinky)  page_states |= PAGE_BLINKY_BLINKY;
+  if (show_settings)       page_states |= PAGE_SETTINGS;
+
+  return page_states;
+}
+
+void App::set_page_states(unsigned page_states) {
+  show_network_tables = page_states & PAGE_NETWORK_TABLES;
+  show_auto_chooser   = page_states & PAGE_AUTO_CHOOSER;
+  show_motion_profile = page_states & PAGE_MOTION_PROFILE;
+  show_intake_camera  = page_states & PAGE_INTAKE_CAMERA;
+  show_limelight      = page_states & PAGE_LIMELIGHT;
+  show_blinky_blinky  = page_states & PAGE_BLINKY_BLINKY;
+  show_settings       = page_states & PAGE_SETTINGS;
 }
 
 App App::instance {};
