@@ -3,6 +3,7 @@
 #include <IconsFontAwesome5.h>
 
 #include <pages/auto_chooser.h>
+#include <pages/robot_position.h>
 #include <pages/motion_profile.h>
 #include <pages/intake_camera.h>
 #include <pages/limelight.h>
@@ -17,6 +18,7 @@ App::~App() { }
 void App::init(GLFWwindow* win) {
     window = win;
 
+    RobotPositionPage::get()->init();
     IntakeCameraPage::get()->init();
     LimelightPage::get()->init();
 }
@@ -42,16 +44,13 @@ void App::present() {
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Tools")) {
-      ImGui::MenuItem(ICON_FA_CAMERA "  Intake Camera", nullptr, &show_intake_camera);
-      ImGui::MenuItem(ICON_FA_LEMON "  Limelight", nullptr, &show_limelight);
-      ImGui::MenuItem(ICON_FA_TH_LIST "  Network Tables", nullptr, &show_network_tables);
-      ImGui::MenuItem(ICON_FA_BOLT "  Auto Chooser", nullptr, &show_auto_chooser);
-      ImGui::MenuItem(ICON_FA_LIGHTBULB "  Blinky Blinky", nullptr, &show_blinky_blinky);
-
-      ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Diagnostics")) {
-      ImGui::MenuItem(ICON_FA_CHART_LINE "  Motion Profile", nullptr, &show_motion_profile);
+      ImGui::MenuItem(ICON_FA_CAMERA         "  Intake Camera",  nullptr, &show_intake_camera);
+      ImGui::MenuItem(ICON_FA_LEMON          "  Limelight",      nullptr, &show_limelight);
+      ImGui::MenuItem(ICON_FA_TH_LIST        "  Network Tables", nullptr, &show_network_tables);
+      ImGui::MenuItem(" " ICON_FA_BOLT           "   Auto Chooser",   nullptr, &show_auto_chooser);
+      ImGui::MenuItem(" " ICON_FA_LIGHTBULB      "   Blinky Blinky",  nullptr, &show_blinky_blinky);
+      ImGui::MenuItem(ICON_FA_MAP_MARKED_ALT "  Robot Position", nullptr, &show_robot_position);
+      ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
 
       ImGui::EndMenu();
     }
@@ -67,6 +66,7 @@ void App::present() {
   if (item_close)      menu_close();
 
   if (show_auto_chooser) AutoChooserPage::get()->present(&show_auto_chooser);
+  if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_intake_camera) IntakeCameraPage::get()->present(&show_intake_camera);
   if (show_limelight) LimelightPage::get()->present(&show_limelight);
@@ -120,6 +120,7 @@ unsigned App::get_page_states() const {
   unsigned page_states = 0;
 
   if (show_network_tables) page_states |= PAGE_NETWORK_TABLES;
+  if (show_robot_position) page_states |= PAGE_ROBOT_POSITION;
   if (show_auto_chooser)   page_states |= PAGE_AUTO_CHOOSER;
   if (show_motion_profile) page_states |= PAGE_MOTION_PROFILE;
   if (show_intake_camera)  page_states |= PAGE_INTAKE_CAMERA;
@@ -132,6 +133,7 @@ unsigned App::get_page_states() const {
 
 void App::set_page_states(unsigned page_states) {
   show_network_tables = page_states & PAGE_NETWORK_TABLES;
+  show_robot_position = page_states & PAGE_ROBOT_POSITION;
   show_auto_chooser   = page_states & PAGE_AUTO_CHOOSER;
   show_motion_profile = page_states & PAGE_MOTION_PROFILE;
   show_intake_camera  = page_states & PAGE_INTAKE_CAMERA;

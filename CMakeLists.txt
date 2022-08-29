@@ -100,6 +100,7 @@ build_dashboard_resource("${DASHBOARD_RES_DIR}/fonts/Font-Awesome/fa-regular-400
 build_dashboard_resource("${DASHBOARD_RES_DIR}/fonts/Font-Awesome/fa-solid-900.ttf"   "FontAwesome_Solid_ttf")
 
 build_dashboard_resource("${DASHBOARD_RES_DIR}/images/no_camera.png"                  "no_camera_png")
+build_dashboard_resource("${DASHBOARD_RES_DIR}/images/field-2022.png"                 "field_2022_png")
 
 # --- Thirdparty ---
 

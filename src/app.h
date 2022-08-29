@@ -47,6 +47,7 @@ private:
   GLFWwindow* window = nullptr;
 
   bool show_network_tables = false,
+       show_robot_position = false,
        show_auto_chooser   = false,
        show_motion_profile = false,
        show_intake_camera  = false,
@@ -56,12 +57,13 @@ private:
 
   enum Pages {
     PAGE_NETWORK_TABLES = 1 << 0,
-    PAGE_AUTO_CHOOSER   = 1 << 1,
-    PAGE_MOTION_PROFILE = 1 << 2,
-    PAGE_INTAKE_CAMERA  = 1 << 3,
-    PAGE_LIMELIGHT      = 1 << 4,
-    PAGE_BLINKY_BLINKY  = 1 << 5,
-    PAGE_SETTINGS       = 1 << 6,
+    PAGE_ROBOT_POSITION = 1 << 1,
+    PAGE_AUTO_CHOOSER   = 1 << 2,
+    PAGE_MOTION_PROFILE = 1 << 3,
+    PAGE_INTAKE_CAMERA  = 1 << 4,
+    PAGE_LIMELIGHT      = 1 << 5,
+    PAGE_BLINKY_BLINKY  = 1 << 6,
+    PAGE_SETTINGS       = 1 << 7,
   };
   
   static App instance;
