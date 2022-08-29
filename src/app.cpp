@@ -6,6 +6,7 @@
 #include <pages/motion_profile.h>
 #include <pages/intake_camera.h>
 #include <pages/limelight.h>
+#include <pages/network_tables.h>
 #include <pages/blinky_blinky.h>
 #include <pages/settings.h>
 
@@ -69,6 +70,7 @@ void App::present() {
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_intake_camera) IntakeCameraPage::get()->present(&show_intake_camera);
   if (show_limelight) LimelightPage::get()->present(&show_limelight);
+  if (show_network_tables) NetworkTablesPage::get()->present(&show_network_tables);
   if (show_blinky_blinky) BlinkyBlinkyPage::get()->present(&show_blinky_blinky);
   if (show_settings) SettingsPage::get()->present(&show_settings);
 

@@ -4,6 +4,7 @@ add_dashboard_sources(
   "${DASHBOARD_SRC_DIR}/pages/motion_profile.cpp"
   "${DASHBOARD_SRC_DIR}/pages/intake_camera.cpp"
   "${DASHBOARD_SRC_DIR}/pages/limelight.cpp"
+  "${DASHBOARD_SRC_DIR}/pages/network_tables.cpp"
   "${DASHBOARD_SRC_DIR}/pages/blinky_blinky.cpp"
   "${DASHBOARD_SRC_DIR}/pages/settings.cpp"
 )

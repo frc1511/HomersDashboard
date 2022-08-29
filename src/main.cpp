@@ -282,6 +282,12 @@ static void set_imgui_style() {
   style.Colors[ImGuiCol_TabUnfocusedActive] = red_low;
   
   style.Colors[ImGuiCol_DockingPreview] = red_low;
+
+  style.Colors[ImGuiCol_TableHeaderBg] = grey_low;
+  style.Colors[ImGuiCol_TableBorderStrong] = grey_mid;
+  style.Colors[ImGuiCol_TableBorderLight] = grey_mid;
+  style.Colors[ImGuiCol_TableRowBg] = bg;
+  style.Colors[ImGuiCol_TableRowBgAlt] = bg;
   
   ImGuiIO* io = &ImGui::GetIO();
   
