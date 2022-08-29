@@ -56,4 +56,24 @@ void BlinkyBlinkyPage::present(bool* running) {
   ImGui::End();
 }
 
+void BlinkyBlinkyPage::set_led_mode(int mode) {
+  led_mode = mode;
+  sd_table->PutNumber("LED_Mode", mode);
+}
+
+void BlinkyBlinkyPage::set_custom_r(float r) {
+  custom_color[0] = r;
+  sd_table->PutNumber("LED_Custom_Color_R", r);
+}
+
+void BlinkyBlinkyPage::set_custom_g(float g) {
+  custom_color[1] = g;
+  sd_table->PutNumber("LED_Custom_Color_G", g);
+}
+
+void BlinkyBlinkyPage::set_custom_b(float b) {
+  custom_color[2] = b;
+  sd_table->PutNumber("LED_Custom_Color_B", b);
+}
+
 BlinkyBlinkyPage BlinkyBlinkyPage::instance;

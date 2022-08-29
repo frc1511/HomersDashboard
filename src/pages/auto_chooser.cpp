@@ -92,6 +92,8 @@ void AutoChooserPage::set_auto_mode(int mode) {
   if (auto_mode < 0 || auto_mode >= static_cast<int>(auto_modes.size())) {
     auto_mode = 0;
   }
+
+  sd_table->PutNumber("Auto_Mode", auto_mode);
 }
 
 void AutoChooserPage::set_auto_delay(double delay) {
@@ -104,6 +106,8 @@ void AutoChooserPage::set_auto_delay(double delay) {
   if (auto_delay > 10.0) {
     auto_delay = 10.0;
   }
+
+  sd_table->PutNumber("Auto_Delay", auto_delay);
 }
 
 AutoChooserPage AutoChooserPage::instance;

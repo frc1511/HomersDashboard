@@ -17,13 +17,13 @@ public:
   void present(bool* running) override;
 
   constexpr int get_led_mode() const { return led_mode; }
-  constexpr void set_led_mode(int mode) { led_mode = mode; }
+  void set_led_mode(int mode);
 
   inline const std::tuple<float, float, float> get_custom_color() const { return std::make_tuple(custom_color[0], custom_color[1], custom_color[2]); }
 
-  constexpr void set_custom_r(float r) { custom_color[0] = r; }
-  constexpr void set_custom_g(float g) { custom_color[1] = g; }
-  constexpr void set_custom_b(float b) { custom_color[2] = b; }
+  void set_custom_r(float r);
+  void set_custom_g(float g);
+  void set_custom_b(float b);
 
 private:
   BlinkyBlinkyPage();

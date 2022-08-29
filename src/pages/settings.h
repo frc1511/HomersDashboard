@@ -26,7 +26,5 @@ private:
   std::size_t team_number = 0;
   char number_buf[10] = "0";
 
-  std::shared_ptr<nt::NetworkTable> sd_table;
-  
   static SettingsPage instance;
 };

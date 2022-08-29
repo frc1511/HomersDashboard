@@ -7,7 +7,6 @@ NetworkTablesPage::NetworkTablesPage()
 NetworkTablesPage::~NetworkTablesPage() { }
 
 void NetworkTablesPage::present(bool* running) {
-  ImGui::ShowDemoWindow();
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 
   if (!ImGui::Begin("Network Tables", running, ImGuiWindowFlags_NoCollapse)) {
