@@ -2,6 +2,8 @@
 #include <platform/platform.h>
 #include <imgui_internal.h>
 
+#include <app.h>
+
 extern "C" {
   struct HAL_ControlWord {
     uint32_t enabled : 1;
@@ -17,11 +19,9 @@ extern "C" {
 
 #define COL_WIDTH 150
 
-MotionProfilePage::MotionProfilePage()
-: sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")),
-  fms_info_table(nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo")) { }
+MotionProfilePage::MotionProfilePage() = default;
 
-MotionProfilePage::~MotionProfilePage() { }
+MotionProfilePage::~MotionProfilePage() = default;
 
 void MotionProfilePage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
@@ -144,15 +144,15 @@ void MotionProfilePage::present(bool* running) {
 
         if (new_entry) {
           if (recording_type == RecordingType::INTERVAL || (recording_type == RecordingType::AUTO && was_in_auto)) {
-            double x = sd_table->GetNumber("DriveCSV_x_pos", 0.0);
-            double y = sd_table->GetNumber("DriveCSV_y_pos", 0.0);
-            double t_x = sd_table->GetNumber("DriveCSV_t_x_pos", 0.0);
-            double t_y = sd_table->GetNumber("DriveCSV_t_y_pos", 0.0);
-            double vel_x = sd_table->GetNumber("DriveCSV_x_vel", 0.0);
-            double vel_y = sd_table->GetNumber("DriveCSV_y_vel", 0.0);
-            double vel_theta = sd_table->GetNumber("DriveCSV_ang_vel", 0.0);
-            double ang = sd_table->GetNumber("DriveCSV_ang", 0.0);
-            double t_ang = sd_table->GetNumber("DriveCSV_t_ang", 0.0);
+            double x = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_x_pos", 0.0);
+            double y = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_y_pos", 0.0);
+            double t_x = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_t_x_pos", 0.0);
+            double t_y = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_t_y_pos", 0.0);
+            double vel_x = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_x_vel", 0.0);
+            double vel_y = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_y_vel", 0.0);
+            double vel_theta = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_ang_vel", 0.0);
+            double ang = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_ang", 0.0);
+            double t_ang = App::get()->get_nt_sd_table()->GetNumber("DriveCSV_t_ang", 0.0);
 
             recorded_points.push_back(Point{ elapsed, x, y, t_x, t_y, vel_x, vel_y, vel_theta, ang, t_ang });
           }
@@ -166,7 +166,7 @@ void MotionProfilePage::present(bool* running) {
           }
         }
         else {
-          int32_t ctrl_word_int = static_cast<int32_t>(fms_info_table->GetNumber("FMSControlData", 0.0));
+          int32_t ctrl_word_int = static_cast<int32_t>(App::get()->get_nt_fms_table()->GetNumber("FMSControlData", 0.0));
 
           HAL_ControlWord ctrl_word;
           std::memcpy(&ctrl_word, &ctrl_word_int, sizeof(ctrl_word));

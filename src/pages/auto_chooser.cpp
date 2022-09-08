@@ -4,12 +4,16 @@
 #include <networktables/EntryListenerFlags.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include <app.h>
+
 #define COL_WIDTH 100
 
-AutoChooserPage::AutoChooserPage()
-: sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")) {
-  
-  mode_listener = sd_table->AddEntryListener(
+AutoChooserPage::AutoChooserPage() = default;
+
+AutoChooserPage::~AutoChooserPage() = default;
+
+void AutoChooserPage::init() {
+  mode_listener = App::get()->get_nt_sd_table()->AddEntryListener(
     "thunderdashboard_auto_list",
     // Updates the auto modes when the list entry is changed.
     [&](nt::NetworkTable*, std::string_view, nt::NetworkTableEntry, std::shared_ptr<nt::Value> value, int) -> void {
@@ -22,15 +26,13 @@ AutoChooserPage::AutoChooserPage()
         getline(ss, sub, ',');
         if (sub == "") continue;
         
-        std::string desc(sd_table->GetString("thunderdashboard_auto_" + sub, ""));
+        std::string desc(App::get()->get_nt_sd_table()->GetString("thunderdashboard_auto_" + sub, ""));
         auto_modes.insert({ std::atoi(sub.c_str()), sub + ": " + desc });
       }
     },
     nt::EntryListenerFlags::kUpdate | nt::EntryListenerFlags::kNew | nt::EntryListenerFlags::kLocal
   );
 }
-
-AutoChooserPage::~AutoChooserPage() = default;
 
 void AutoChooserPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
@@ -52,7 +54,7 @@ void AutoChooserPage::present(bool* running) {
   if (ImGui::BeginCombo("##Auto Mode", auto_mode_str.c_str())) {
     for (auto& [num, name] : auto_modes) {
       if (ImGui::Selectable(name.c_str(), auto_mode == num)) {
-        sd_table->PutNumber("Auto_Mode", auto_mode);
+        App::get()->get_nt_sd_table()->PutNumber("Auto_Mode", auto_mode);
         auto_mode = num;
         auto_mode_str = name;
       }
@@ -77,7 +79,7 @@ void AutoChooserPage::present(bool* running) {
       auto_delay = 10.0f;
     }
     
-    sd_table->PutNumber("Auto_Delay", auto_delay);
+    App::get()->get_nt_sd_table()->PutNumber("Auto_Delay", auto_delay);
   }
   
   ImGui::Columns(1);
@@ -93,7 +95,7 @@ void AutoChooserPage::set_auto_mode(int mode) {
     auto_mode = 0;
   }
 
-  sd_table->PutNumber("Auto_Mode", auto_mode);
+  App::get()->get_nt_sd_table()->PutNumber("Auto_Mode", auto_mode);
 }
 
 void AutoChooserPage::set_auto_delay(double delay) {
@@ -107,7 +109,7 @@ void AutoChooserPage::set_auto_delay(double delay) {
     auto_delay = 10.0;
   }
 
-  sd_table->PutNumber("Auto_Delay", auto_delay);
+  App::get()->get_nt_sd_table()->PutNumber("Auto_Delay", auto_delay);
 }
 
 AutoChooserPage AutoChooserPage::instance;

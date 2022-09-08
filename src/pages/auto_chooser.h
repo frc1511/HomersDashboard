@@ -13,6 +13,8 @@ public:
   
   AutoChooserPage(AutoChooserPage const&) = delete;
   AutoChooserPage& operator=(AutoChooserPage const&) = delete;
+
+  void init() override;
   
   void present(bool* running) override;
 
@@ -33,8 +35,6 @@ private:
   
   std::map<int, std::string> auto_modes;
   
-  std::shared_ptr<nt::NetworkTable> sd_table;
-
   NT_EntryListener mode_listener;
   
   static AutoChooserPage instance;

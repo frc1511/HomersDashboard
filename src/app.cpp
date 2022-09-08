@@ -16,11 +16,23 @@ App::App() { }
 App::~App() { }
 
 void App::init(GLFWwindow* win) {
-    window = win;
+  window = win;
 
-    RobotPositionPage::get()->init();
-    IntakeCameraPage::get()->init();
-    LimelightPage::get()->init();
+  nt_inst = nt::NetworkTableInstance::GetDefault();
+  sd_table = nt_inst.GetTable("SmartDashboard");
+  fms_table = nt_inst.GetTable("FMSInfo");
+
+  nt_inst.StartClientTeam(1511);
+  nt_inst.StartDSClient();
+
+  AutoChooserPage::get()->init();
+  BlinkyBlinkyPage::get()->init();
+  IntakeCameraPage::get()->init();
+  LimelightPage::get()->init();
+  MotionProfilePage::get()->init();
+  NetworkTablesPage::get()->init();
+  RobotPositionPage::get()->init();
+  SettingsPage::get()->init();
 }
 
 void App::present() {
@@ -47,8 +59,8 @@ void App::present() {
       ImGui::MenuItem(ICON_FA_CAMERA         "  Intake Camera",  nullptr, &show_intake_camera);
       ImGui::MenuItem(ICON_FA_LEMON          "  Limelight",      nullptr, &show_limelight);
       ImGui::MenuItem(ICON_FA_TH_LIST        "  Network Tables", nullptr, &show_network_tables);
-      ImGui::MenuItem(" " ICON_FA_BOLT           "   Auto Chooser",   nullptr, &show_auto_chooser);
-      ImGui::MenuItem(" " ICON_FA_LIGHTBULB      "   Blinky Blinky",  nullptr, &show_blinky_blinky);
+      ImGui::MenuItem(" " ICON_FA_BOLT       "   Auto Chooser",  nullptr, &show_auto_chooser);
+      ImGui::MenuItem(" " ICON_FA_LIGHTBULB  "   Blinky Blinky", nullptr, &show_blinky_blinky);
       ImGui::MenuItem(ICON_FA_MAP_MARKED_ALT "  Robot Position", nullptr, &show_robot_position);
       ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
 

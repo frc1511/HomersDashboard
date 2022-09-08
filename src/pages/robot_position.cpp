@@ -4,12 +4,13 @@
 
 #include <field_2022_png.h>
 
+#include <app.h>
+
 // Field dimensions (meters).
 #define FIELD_X 15.5702 // 54' 1"
 #define FIELD_Y 8.1026 // 26' 7"
 
-RobotPositionPage::RobotPositionPage()
-: sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")) { }
+RobotPositionPage::RobotPositionPage() = default;
 
 RobotPositionPage::~RobotPositionPage() = default;
 
@@ -80,8 +81,8 @@ void RobotPositionPage::present(bool* running) {
 
   draw_list->AddImage(reinterpret_cast<void*>(field_tex), bb.Min, bb.Max);
 
-  ImVec2 pt(sd_table->GetNumber("DriveCSV_x_pos", 0.0), sd_table->GetNumber("DriveCSV_y_pos", 0.0));
-  double ang(sd_table->GetNumber("DriveCSV_ang", 0.0));
+  ImVec2 pt(App::get()->get_nt_sd_table()->GetNumber("DriveCSV_x_pos", 0.0), App::get()->get_nt_sd_table()->GetNumber("DriveCSV_y_pos", 0.0));
+  double ang(App::get()->get_nt_sd_table()->GetNumber("DriveCSV_ang", 0.0));
 
   ImVec2 pt0(to_draw_coord(pt)),
          pt1(to_draw_coord(ImVec2((std::cos(ang) * 1.0f) + pt.x, (std::sin(ang) * 1.0f) + pt.y)));

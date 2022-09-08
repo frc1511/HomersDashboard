@@ -15,7 +15,7 @@ public:
   RobotPositionPage(RobotPositionPage const&) = delete;
   RobotPositionPage& operator=(RobotPositionPage const&) = delete;
 
-  void init();
+  void init() override;
   
   void present(bool* running) override;
   
@@ -33,8 +33,6 @@ private:
          max { 0.885f, 0.84f };
 
   ImRect bb;
-  
-  std::shared_ptr<nt::NetworkTable> sd_table;
   
   static RobotPositionPage instance;
 };

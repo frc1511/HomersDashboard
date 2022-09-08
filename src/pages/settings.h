@@ -1,9 +1,6 @@
 #pragma once
 
 #include <pages/page.h>
-#include <networktables/NetworkTable.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/TableEntryListener.h>
 
 class SettingsPage: public Page {
 public:

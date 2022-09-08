@@ -4,10 +4,11 @@
 #include <networktables/EntryListenerFlags.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include <app.h>
+
 #define COL_WIDTH 100
 
-BlinkyBlinkyPage::BlinkyBlinkyPage()
-: sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")) { }
+BlinkyBlinkyPage::BlinkyBlinkyPage() = default;
 
 BlinkyBlinkyPage::~BlinkyBlinkyPage() = default;
 
@@ -30,7 +31,7 @@ void BlinkyBlinkyPage::present(bool* running) {
   const char* led_modes = "Robot State\0Alliance\0Custom\0Off\0";
 
   if (ImGui::Combo("##LED Mode", &led_mode, led_modes, 4)) {
-    sd_table->PutNumber("LED_Mode", led_mode);
+    App::get()->get_nt_sd_table()->PutNumber("LED_Mode", led_mode);
   }
   
   ImGui::Columns(1);
@@ -45,9 +46,9 @@ void BlinkyBlinkyPage::present(bool* running) {
     ImGui::NextColumn();
 
     if (ImGui::ColorEdit3("##Custom Color", custom_color)) {
-      sd_table->PutNumber("LED_Custom_Color_R", custom_color[0]);
-      sd_table->PutNumber("LED_Custom_Color_G", custom_color[1]);
-      sd_table->PutNumber("LED_Custom_Color_B", custom_color[2]);
+      App::get()->get_nt_sd_table()->PutNumber("LED_Custom_Color_R", custom_color[0]);
+      App::get()->get_nt_sd_table()->PutNumber("LED_Custom_Color_G", custom_color[1]);
+      App::get()->get_nt_sd_table()->PutNumber("LED_Custom_Color_B", custom_color[2]);
     }
 
     ImGui::Columns(1);
@@ -58,22 +59,22 @@ void BlinkyBlinkyPage::present(bool* running) {
 
 void BlinkyBlinkyPage::set_led_mode(int mode) {
   led_mode = mode;
-  sd_table->PutNumber("LED_Mode", mode);
+  App::get()->get_nt_sd_table()->PutNumber("LED_Mode", mode);
 }
 
 void BlinkyBlinkyPage::set_custom_r(float r) {
   custom_color[0] = r;
-  sd_table->PutNumber("LED_Custom_Color_R", r);
+  App::get()->get_nt_sd_table()->PutNumber("LED_Custom_Color_R", r);
 }
 
 void BlinkyBlinkyPage::set_custom_g(float g) {
   custom_color[1] = g;
-  sd_table->PutNumber("LED_Custom_Color_G", g);
+  App::get()->get_nt_sd_table()->PutNumber("LED_Custom_Color_G", g);
 }
 
 void BlinkyBlinkyPage::set_custom_b(float b) {
   custom_color[2] = b;
-  sd_table->PutNumber("LED_Custom_Color_B", b);
+  App::get()->get_nt_sd_table()->PutNumber("LED_Custom_Color_B", b);
 }
 
 BlinkyBlinkyPage BlinkyBlinkyPage::instance;

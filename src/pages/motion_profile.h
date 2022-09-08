@@ -68,8 +68,6 @@ private:
   std::vector<Point>* points = nullptr;
   
   bool unsaved = false;
-
-  std::shared_ptr<nt::NetworkTable> sd_table, fms_info_table;
   
   static MotionProfilePage instance;
 };

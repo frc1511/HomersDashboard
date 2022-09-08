@@ -1,10 +1,11 @@
 #include <pages/network_tables.h>
 #include <imgui_internal.h>
 
-NetworkTablesPage::NetworkTablesPage()
-: sd_table(nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard")) { }
+#include <app.h>
 
-NetworkTablesPage::~NetworkTablesPage() { }
+NetworkTablesPage::NetworkTablesPage() = default;
+
+NetworkTablesPage::~NetworkTablesPage() = default;
 
 void NetworkTablesPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
@@ -21,7 +22,7 @@ void NetworkTablesPage::present(bool* running) {
     ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 100);
     ImGui::TableHeadersRow();
 
-    std::vector<std::string> keys(sd_table->GetKeys());
+    std::vector<std::string> keys(App::get()->get_nt_sd_table()->GetKeys());
     // Sort the keys alphabetically.
     std::sort(keys.begin(), keys.end());
     
@@ -34,7 +35,7 @@ void NetworkTablesPage::present(bool* running) {
 
       ImGui::TableSetColumnIndex(1);
       
-      std::shared_ptr<nt::Value> value(sd_table->GetEntry(key).GetValue());
+      std::shared_ptr<nt::Value> value(App::get()->get_nt_sd_table()->GetEntry(key).GetValue());
       
       // The value.
       switch (value->type()) {

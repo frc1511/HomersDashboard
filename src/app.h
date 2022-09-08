@@ -4,6 +4,9 @@
 #include <GLFW/glfw3.h>
 // #include <platform/platform.h>
 #include <dashboard.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/TableEntryListener.h>
 
 class App {
 public:
@@ -30,6 +33,11 @@ public:
 
   unsigned get_page_states() const;
   void set_page_states(unsigned page_states);
+
+  inline nt::NetworkTableInstance get_nt_inst() { return nt_inst; }
+
+  inline std::shared_ptr<nt::NetworkTable> get_nt_sd_table() { return sd_table; }
+  inline std::shared_ptr<nt::NetworkTable> get_nt_fms_table() { return fms_table; }
   
 private:
   App();
@@ -41,6 +49,9 @@ private:
   };
 
   EventState event_state = EventState::NONE;
+
+  nt::NetworkTableInstance nt_inst;
+  std::shared_ptr<nt::NetworkTable> sd_table, fms_table;
   
   bool running = true;
   

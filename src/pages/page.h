@@ -4,6 +4,7 @@
 
 class Page {
 public:
+  virtual void init() { }
   virtual void present(bool* running) = 0;
   constexpr bool is_focused() const { return focused; }
   

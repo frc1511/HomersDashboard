@@ -20,7 +20,5 @@ private:
   NetworkTablesPage();
   ~NetworkTablesPage();
   
-  std::shared_ptr<nt::NetworkTable> sd_table;
-  
   static NetworkTablesPage instance;
 };

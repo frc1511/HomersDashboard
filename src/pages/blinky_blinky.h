@@ -32,7 +32,5 @@ private:
   int led_mode = 0;
   float custom_color[3] = { 0.0f, 0.0f, 1.0f };
   
-  std::shared_ptr<nt::NetworkTable> sd_table;
-
   static BlinkyBlinkyPage instance;
 };
