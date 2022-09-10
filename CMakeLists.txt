@@ -38,6 +38,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 option(DASHBOARD_WITH_CS "Build with camera server" ON)
+option(DASHBOARD_DOWNLOAD_WPILIB "Download WPILib binaries instead of building them" OFF)
+set(DASHBOARD_DOWNLOAD_WPILIB_VERSION "" CACHE STRING "WPILib version to download")
+
+if(NOT DASHBOARD_DOWNLOAD_WPILIB_VERSION)
+  set(DASHBOARD_DOWNLOAD_WPILIB_VERSION "2022.4.1")
+endif()
 
 if (DASHBOARD_WITH_CS)
   list(APPEND DASHBOARD_DEF_LIST "DASHBOARD_WITH_CS")
@@ -52,15 +58,20 @@ set(DASHBOARD_RES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(DASHBOARD_WINDOWS ON)
   list(APPEND DASHBOARD_DEF_LIST "DASHBOARD_WINDOWS")
+  set(DASHBOARD_DOWNLOAD_OS "windows")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   set(DASHBOARD_MACOS ON)
   list(APPEND DASHBOARD_DEF_LIST "DASHBOARD_MACOS")
+  set(DASHBOARD_DOWNLOAD_OS "osx")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(DASHBOARD_LINUX ON)
   list(APPEND DASHBOARD_DEF_LIST "DASHBOARD_LINUX")
+  set(DASHBOARD_DOWNLOAD_OS "linux")
 else()
   message(FATAL_ERROR "Target operating system '${CMAKE_SYSTEM_NAME}' not supported")
 endif()
+
+set(DASHBOARD_DOWNLOAD_ARCH "x86-64")
 
 if(DASHBOARD_MACOS)
   enable_language(OBJC)
@@ -115,20 +126,66 @@ add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/glad")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/fmt")
 add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/stb_image")
 
-# WPILib Network Tables.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DASHBOARD_THIRDPARTY_DIR}/allwpilib/cmake/modules")
-set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(DASHBOARD_WPILIB_DOWNLOAD_DIR "${CMAKE_CURRENT_BINARY_DIR}/wpilib_${DASHBOARD_DOWNLOAD_WPILIB_VERSION}")
+string(REPLACE "." "_" DASHBOARD_WPILIB_DOWNLOAD_DIR ${DASHBOARD_WPILIB_DOWNLOAD_DIR})
 
-set(WITH_JAVA OFF CACHE BOOL "" FORCE)
-set(WITH_TESTS OFF CACHE BOOL "" FORCE)
+# WPILib ntcore and cscore.
+if(DASHBOARD_DOWNLOAD_WPILIB)
+  function(download_lib LIB_NAME LIB_URL LIB_DEST)
+    message(STATUS "Downloading ${LIB_URL}")
+    file(DOWNLOAD ${LIB_URL} ${LIB_DEST})
+    message(STATUS "Downloaded ${LIB_NAME}")
+  endfunction()
 
-add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/wpinet")
-add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/wpiutil")
-add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/ntcore")
+  function(extract_lib LIB_NAME ZIP_DIR LIB_DEST)
+    message(STATUS "Extracting ${ZIP_DIR}")
+    file(ARCHIVE_EXTRACT INPUT "${ZIP_DIR}" DESTINATION "${LIB_DEST}")
+    message(STATUS "Extracted ${LIB_NAME}")
+  endfunction()
 
-#WPILib CS Core.
-if(DASHBOARD_WITH_CS)
-  add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/cscore")
+  function(download_extract_lib LIB_NAME)
+    set(LIB_URL "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/${LIB_NAME}/${LIB_NAME}-cpp/${DASHBOARD_DOWNLOAD_WPILIB_VERSION}/${LIB_NAME}-cpp-${DASHBOARD_DOWNLOAD_WPILIB_VERSION}-${DASHBOARD_DOWNLOAD_OS}${DASHBOARD_DOWNLOAD_ARCH}static.zip")
+    set(LIB_DEST "${DASHBOARD_WPILIB_DOWNLOAD_DIR}/${LIB_NAME}")
+
+    download_lib(${LIB_NAME} ${LIB_URL} "${LIB_DEST}.zip")
+    extract_lib(${LIB_NAME} "${LIB_DEST}.zip" ${LIB_DEST})
+  endfunction()
+
+  function(download_extract_headers LIB_NAME)
+    set(INC_URL "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/${LIB_NAME}/${LIB_NAME}-cpp/${DASHBOARD_DOWNLOAD_WPILIB_VERSION}/${LIB_NAME}-cpp-${DASHBOARD_DOWNLOAD_WPILIB_VERSION}-headers.zip")
+
+    set(INC_DEST "${DASHBOARD_WPILIB_DOWNLOAD_DIR}/${LIB_NAME}_include")
+
+    download_lib(${LIB_NAME} ${INC_URL} "${INC_DEST}.zip")
+    extract_lib(${LIB_NAME} "${INC_DEST}.zip" ${INC_DEST})
+  endfunction()
+
+  download_extract_lib("ntcore")
+  download_extract_headers("ntcore")
+
+  download_extract_lib("wpiutil")
+  download_extract_headers("wpiutil")
+
+  if(DASHBOARD_WITH_CS)
+    download_extract_lib("cscore")
+    download_extract_headers("cscore")
+  endif()
+  
+else()
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DASHBOARD_THIRDPARTY_DIR}/allwpilib/cmake/modules")
+  set(WPILIB_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
+  set(WITH_JAVA OFF CACHE BOOL "" FORCE)
+  set(WITH_TESTS OFF CACHE BOOL "" FORCE)
+
+  add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/wpinet")
+  add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/wpiutil")
+  add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/ntcore")
+
+  #WPILib CS Core.
+  if(DASHBOARD_WITH_CS)
+    add_subdirectory("${DASHBOARD_THIRDPARTY_DIR}/allwpilib/cscore")
+  endif()
 endif()
 
 # --- Build ---
@@ -165,10 +222,52 @@ target_link_libraries(${PROJECT_NAME} icons_font_awesome)
 target_link_libraries(${PROJECT_NAME} glad)
 target_link_libraries(${PROJECT_NAME} fmt)
 target_link_libraries(${PROJECT_NAME} stb_image)
-target_link_libraries(${PROJECT_NAME} ntcore)
 
-if(DASHBOARD_WITH_CS)
-  target_link_libraries(${PROJECT_NAME} cscore)
+if(DASHBOARD_DOWNLOAD_WPILIB)
+  target_link_directories(${PROJECT_NAME} PRIVATE ${DASHBOARD_WPILIB_DOWNLOAD_DIR})
+
+  function(find_lib_dir LIB_DIR LIB_NAME)
+    find_library(${LIB_DIR}
+      NAMES ${LIB_NAME}
+      PATHS "${DASHBOARD_WPILIB_DOWNLOAD_DIR}/${LIB_NAME}/${DASHBOARD_DOWNLOAD_OS}/${DASHBOARD_DOWNLOAD_ARCH}/static"
+      PATH_SUFFIXES "lib" "lib32" "lib64"
+    )
+  endfunction()
+
+  function(find_inc_dir INC_DIR LIB_NAME)
+    set(${INC_DIR} "${DASHBOARD_WPILIB_DOWNLOAD_DIR}/${LIB_NAME}_include" PARENT_SCOPE)
+  endfunction()
+
+  find_lib_dir(NTCORE_LIB_DIR "ntcore")
+  find_inc_dir(NTCORE_INC_DIR "ntcore")
+  target_link_libraries(${PROJECT_NAME} ${NTCORE_LIB_DIR})
+  target_include_directories(${PROJECT_NAME} PUBLIC ${NTCORE_INC_DIR})
+
+  find_lib_dir(WPIUTIL_LIB_DIR "wpiutil")
+  find_inc_dir(WPIUTIL_INC_DIR "wpiutil")
+  target_link_libraries(${PROJECT_NAME} ${WPIUTIL_LIB_DIR})
+  target_include_directories(${PROJECT_NAME} PUBLIC ${WPIUTIL_INC_DIR})
+
+  if(DASHBOARD_WITH_CS)
+    find_package(OpenCV REQUIRED)
+    if(NOT OpenCV_FOUND)
+      message(FATAL_ERROR "OpenCV not found. Install OpenCV or add flag -DDASHBOARD_WITH_CS=0")
+    endif()
+
+    target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+    target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
+
+    find_lib_dir(CSCORE_LIB_DIR "cscore")
+    find_inc_dir(CSCORE_INC_DIR "cscore")
+    target_link_libraries(${PROJECT_NAME} ${CSCORE_LIB_DIR})
+    target_include_directories(${PROJECT_NAME} PUBLIC ${CSCORE_INC_DIR})
+  endif()
+else()
+  target_link_libraries(${PROJECT_NAME} ntcore)
+
+  if(DASHBOARD_WITH_CS)
+    target_link_libraries(${PROJECT_NAME} cscore)
+  endif()
 endif()
 
 if(DASHBOARD_MACOS)
