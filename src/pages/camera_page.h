@@ -46,7 +46,7 @@ private:
   std::mutex camera_mutex;
   
 #ifdef DASHBOARD_WITH_CS
-  cs::HttpCamera camera;
+  std::unique_ptr<cs::HttpCamera> camera;
 #endif
 
   // OpenGL textures.

@@ -14,15 +14,15 @@ static void setup_tex(unsigned int& tex) {
 }
 
 CameraPage::CameraPage(std::string_view _name, std::string_view _url)
-: name(_name), url(_url)
-#ifdef DASHBOARD_WITH_CS
-, camera(name, url)//, cs::HttpCamera::kMJPGStreamer)
-#endif
-{
-  set_fps(fps);
-}
+: name(_name), url(_url) { }
 
 void CameraPage::init() {
+#ifdef DASHBOARD_WITH_CS
+  camera = std::make_unique<cs::HttpCamera>(name, url);
+#endif
+  
+  set_fps(fps);
+
   int width, height, nr_channels;
   unsigned char* img_data = stbi_load_from_memory(no_camera_png, no_camera_png_size, &width, &height, &nr_channels, 0);
 
@@ -55,6 +55,7 @@ CameraPage::~CameraPage() {
   glDeleteTextures(1, &no_cam_tex);
   glDeleteTextures(1, &frame_tex);
   glDeleteTextures(1, &working_frame_tex);
+  camera.release();
 }
 
 void CameraPage::set_fps(std::size_t _fps) {
@@ -62,7 +63,7 @@ void CameraPage::set_fps(std::size_t _fps) {
   fps = _fps;
 
 #ifdef DASHBOARD_WITH_CS
-  camera.SetFPS(fps);
+  camera->SetFPS(fps);
 #endif
 }
 
@@ -102,7 +103,7 @@ void CameraPage::thread_start() {
   std::string camera_name;
   {
     std::lock_guard<std::mutex> lk(camera_mutex);
-    camera_name = camera.GetName();
+    camera_name = camera->GetName();
   }
 
   std::chrono::steady_clock::time_point start, end;
@@ -123,7 +124,7 @@ void CameraPage::thread_start() {
       continue;
     }
 
-    cv_sink.SetSource(camera);
+    cv_sink.SetSource(*camera);
 
     std::size_t frame_time = cv_sink.GrabFrame(frame);
     if (frame_time) {

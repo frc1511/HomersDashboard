@@ -77,14 +77,14 @@ void App::present() {
 
   if (item_close)      menu_close();
 
+  if (show_settings) SettingsPage::get()->present(&show_settings);
+  if (show_blinky_blinky) BlinkyBlinkyPage::get()->present(&show_blinky_blinky);
   if (show_auto_chooser) AutoChooserPage::get()->present(&show_auto_chooser);
-  if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
-  if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_intake_camera) IntakeCameraPage::get()->present(&show_intake_camera);
   if (show_limelight) LimelightPage::get()->present(&show_limelight);
   if (show_network_tables) NetworkTablesPage::get()->present(&show_network_tables);
-  if (show_blinky_blinky) BlinkyBlinkyPage::get()->present(&show_blinky_blinky);
-  if (show_settings) SettingsPage::get()->present(&show_settings);
+  if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
+  if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
 
   if (show_intake_camera != was_showing_intake_camera) {
     IntakeCameraPage::get()->set_running(show_intake_camera);
