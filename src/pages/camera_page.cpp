@@ -18,10 +18,11 @@ CameraPage::CameraPage(std::string_view _name, std::string_view _url)
 
 void CameraPage::init() {
 #ifdef DASHBOARD_WITH_CS
-  camera = std::make_unique<cs::HttpCamera>(name, url);
+  camera = std::make_unique<cs::HttpCamera>(name, url, cs::HttpCamera::HttpCameraKind::kMJPGStreamer);
+  camera->SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
 #endif
   
-  set_fps(fps);
+  //set_fps(fps);
 
   int width, height, nr_channels;
   unsigned char* img_data = stbi_load_from_memory(no_camera_png, no_camera_png_size, &width, &height, &nr_channels, 0);
@@ -55,7 +56,6 @@ CameraPage::~CameraPage() {
   glDeleteTextures(1, &no_cam_tex);
   glDeleteTextures(1, &frame_tex);
   glDeleteTextures(1, &working_frame_tex);
-  camera.release();
 }
 
 void CameraPage::set_fps(std::size_t _fps) {
@@ -100,11 +100,11 @@ void CameraPage::thread_start() {
   cs::CvSink cv_sink;
   cv::Mat frame;
 
-  std::string camera_name;
   {
     std::lock_guard<std::mutex> lk(camera_mutex);
-    camera_name = camera->GetName();
+    cv_sink.SetSource(*camera);
   }
+  cv_sink.SetEnabled(true);
 
   std::chrono::steady_clock::time_point start, end;
 
@@ -124,12 +124,18 @@ void CameraPage::thread_start() {
       continue;
     }
 
-    cv_sink.SetSource(*camera);
+    {
+      std::lock_guard<std::mutex> lk(camera_mutex);
+      cv_sink.SetSource(*camera);
+    }
 
-    std::size_t frame_time = cv_sink.GrabFrame(frame);
+    uint64_t frame_time = cv_sink.GrabFrame(frame);
+
     if (frame_time) {
       {
         std::lock_guard<std::mutex> lk(gl_mutex);
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+
         glBindTexture(GL_TEXTURE_2D, working_frame_tex);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame.cols, frame.rows, 0, GL_RGB, GL_UNSIGNED_BYTE, frame.data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -170,7 +176,7 @@ void CameraPage::thread_start() {
         std::lock_guard<std::mutex> lk(camera_mutex);
         has_frame = false;
       }
-
+      
       // Try again in 1 second.
       std::this_thread::sleep_for(1s);
     }

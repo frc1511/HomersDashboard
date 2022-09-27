@@ -1,7 +1,7 @@
 #include <pages/limelight.h>
 
 LimelightPage::LimelightPage()
-: CameraPage("intake_camera", "http://limelight-homer.local:5800") { }
+: CameraPage("limelight", "http://limelight-homer.local:5800/stream.mjpg") { }
 
 LimelightPage::~LimelightPage() = default;
 

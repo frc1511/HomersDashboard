@@ -152,6 +152,9 @@ void App::set_page_states(unsigned page_states) {
   show_limelight      = page_states & PAGE_LIMELIGHT;
   show_blinky_blinky  = page_states & PAGE_BLINKY_BLINKY;
   show_settings       = page_states & PAGE_SETTINGS;
+  
+  IntakeCameraPage::get()->set_running(show_intake_camera);
+  LimelightPage::get()->set_running(show_limelight);
 }
 
 App App::instance {};
