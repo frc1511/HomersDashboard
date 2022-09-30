@@ -1,0 +1,10 @@
+add_dashboard_sources(
+  "${HD_LIB_DIR}/pages/intake_camera.cpp"
+  "${HD_LIB_DIR}/pages/limelight.cpp"
+  "${HD_LIB_DIR}/pages/auto_chooser.cpp"
+  "${HD_LIB_DIR}/pages/blinky_blinky.cpp"
+  "${HD_LIB_DIR}/pages/motion_profile.cpp"
+  "${HD_LIB_DIR}/pages/network_tables.cpp"
+  "${HD_LIB_DIR}/pages/robot_position.cpp"
+  "${HD_LIB_DIR}/pages/settings.cpp"
+)

@@ -1,5 +1,0 @@
-set(DASHBOARD_PLATFORM_MACOS_DIR "${DASHBOARD_PLATFORM_DIR}/macos")
-
-add_dashboard_sources(
-  "${DASHBOARD_PLATFORM_MACOS_DIR}/macos.mm"
-)
