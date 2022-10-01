@@ -40,7 +40,6 @@ endif()
 set(HD_LIB_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(HD_INC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(TD_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ThunderDashboardLibrary")
-# set(TD_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../ThunderDashboardLibrary")
 
 set(HD_RES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 
@@ -72,7 +71,7 @@ build_dashboard_resource("${HD_RES_DIR}/images/field-2022.png" "field_2022_png")
 
 # --- Thirdparty ---
 
-add_subdirectory(${TD_LIB_DIR} "${CMAKE_CURRENT_BINARY_DIR}/ThunderDashboardLibrary")
+add_subdirectory(${TD_LIB_DIR})
 
 # --- Build ---
 
