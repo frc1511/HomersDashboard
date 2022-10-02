@@ -12,12 +12,12 @@ Dashboard application for Homer, FRC Team 1511's favorite robot.
 * [Building](#building)
 
 ## App Usage
-To make the driver station open the dashboard, edit the "DashboardCmdLine" entry in the "C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini" file with the path to the executable.
+To make the FRC Driver Station open the dashboard on launch, edit the "DashboardCmdLine" entry in the "C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini" file with the path to the executable.
 
 Homer's Dashboard contains many useful pages used for accessing robot functionality and providing diagnostic data about the robot code.
 
 ### Camera Streams
-In camera-server builds, the Intake and Limelight camera pages will present video streams from their respective cameras. The Intake Camera Page looks for a stream at http://roborio-1511-frc.local:1181/stream.mjpg, and the Limelight Page looks at http://limelight-homer.local:5800. If a stream is not found or the camera server is disabled, the view will present the words "No Camera".
+In camera-server builds, the Intake and Limelight camera pages will present video streams from their respective cameras. The Intake Camera Page looks for a stream at http://roborio-1511-frc.local:1181/stream.mjpg, and the Limelight Page looks at http://limelight-homer.local:5800/stream.mjpg. If a stream is not found or the camera server is disabled, the view will present the words "No Camera".
 
 ### Network Tables
 
@@ -81,6 +81,6 @@ cmake --build build
 ```
 All the app's resources (Images, Fonts, etc.) are built into the executable, so there's no need to worry about moving them around once it's built.
 
-__Important:__ OpenCV is used for creating the camera pages so it is required to be installed when building and running the app. The `-DDASHBOARD_WITH_CS=0` flag may be added to the cmake configuration to build without the camera server if OpenCV is not installed.
+__Important:__ OpenCV is used for creating the camera pages so it is required to be installed when building and running the app. On Windows, the app searches for OpenCV binaries in C:\Program Files\opencv\, so make sure to add C:\Program Files\opecv\build\x64\v15\bin to Path. As an alternative, the `-DDASHBOARD_WITH_CS=0` flag may be added to the cmake configuration to build without the camera server if OpenCV is not installed.
 
 Problems have emerged when compiling the wpilib libraries (ntcore, cscore, wpiutil), so the `-DDASHBOARD_DOWNLOAD_WPILIB=1` flag may be added to the cmake configuration to download and link to pre-built libraries instead. The version downloaded can be specified by adding the `-DDASHBOARD_DOWNLOAD_WPILIB_VERSION=YEAR.X.X` flag.
