@@ -12,7 +12,7 @@ Dashboard application for Homer, FRC Team 1511's favorite robot.
 * [Building](#building)
 
 ## App Usage
-To make the FRC Driver Station open the dashboard on launch, edit the "DashboardCmdLine" entry in the "C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini" file with the path to the executable.
+To make the FRC Driver Station open the dashboard on launch, edit the "DashboardCmdLine" entry in C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini  with the path to the executable.
 
 Homer's Dashboard contains many useful pages used for accessing robot functionality and providing diagnostic data about the robot code.
 
@@ -37,7 +37,7 @@ The Auto Chooser Page contains the functionality to set the "Auto_Mode" and "Aut
 
 The Blinky Blinky Page allows users to adjust the color of the LEDs on Homer. The LED Mode dropdown has a number of different configurations,
 * Robot State
-  - Colors change depending on the robot's state (Disabled = orange, Enabled = Alliance Color, Crater Mode = Green, etc).
+  - Colors change depending on the robot's state (Disabled = Orange, Enabled = Alliance Color, Crater Mode = Green, etc).
 * Alliance
   - The alliance color.
 * Custom
