@@ -177,6 +177,12 @@ void HomersDashboard::set_page_states(unsigned states) {
 #define LED_CUSTOM_G "CustomG"
 #define LED_CUSTOM_B "CustomB"
 
+#define SECTION_WINDOW_STUFF "WindowSize"
+#define KEY_WIN_WIDTH "Width"
+#define KEY_WIN_HEIGHT "Height"
+#define KEY_WIN_XPOS "XPos"
+#define KEY_WIN_YPOS "YPos"
+
 void HomersDashboard::data_clear() {
   data_map.clear();
 }
@@ -184,7 +190,7 @@ void HomersDashboard::data_clear() {
 bool HomersDashboard::data_should_open(const char* name) {
   bool res = true;
 
-  if (std::strcmp(name, SECTION_APP_STATE) && std::strcmp(name, SECTION_SETTINGS) && std::strcmp(name, SECTION_AUTO_CHOOSER) && std::strcmp(name, SECTION_BLINKY_BLINKY)) {
+  if (std::strcmp(name, SECTION_APP_STATE) && std::strcmp(name, SECTION_SETTINGS) && std::strcmp(name, SECTION_AUTO_CHOOSER) && std::strcmp(name, SECTION_BLINKY_BLINKY) && std::strcmp(name, SECTION_WINDOW_STUFF)) {
     res = false;
   }
 
@@ -229,6 +235,26 @@ void HomersDashboard::data_apply(const char* type_name) {
       if (key == LED_CUSTOM_B) {
         BlinkyBlinkyPage::get()->set_custom_b(std::atof(val.c_str()));
       }
+
+      int width, height;
+      glfwGetWindowSize(get_window(), &width, &height);
+
+      if (key == KEY_WIN_WIDTH) {
+        glfwSetWindowSize(get_window(), std::atoi(val.c_str()), height);
+      }
+      if (key == KEY_WIN_HEIGHT) {
+        glfwSetWindowSize(get_window(), width, std::atoi(val.c_str()));
+      }
+
+      int xpos, ypos;
+      glfwGetWindowPos(get_window(), &xpos, &ypos);
+
+      if (key == KEY_WIN_XPOS) {
+        glfwSetWindowPos(get_window(), std::atoi(val.c_str()), ypos);
+      }
+      if (key == KEY_WIN_YPOS) {
+        glfwSetWindowPos(get_window(), xpos, std::atoi(val.c_str()));
+      }
     }
   }
 }
@@ -267,6 +293,17 @@ void HomersDashboard::data_write(const char* type_name, ImGuiTextBuffer* buf) {
     add_entry(LED_CUSTOM_R, "%f", std::get<0>(color));
     add_entry(LED_CUSTOM_G, "%f", std::get<1>(color));
     add_entry(LED_CUSTOM_B, "%f", std::get<2>(color));
+    end_section();
+
+    begin_section(SECTION_WINDOW_STUFF);
+    int width, height;
+    glfwGetWindowSize(get_window(), &width, &height);
+    add_entry(KEY_WIN_WIDTH, "%d", width);
+    add_entry(KEY_WIN_HEIGHT, "%d", height);
+    int xpos, ypos;
+    glfwGetWindowPos(get_window(), &xpos, &ypos);
+    add_entry(KEY_WIN_XPOS, "%d", xpos);
+    add_entry(KEY_WIN_YPOS, "%d", ypos);
     end_section();
   }
 }
