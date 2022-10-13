@@ -44,9 +44,9 @@ void BlinkyBlinkyPage::present(bool* running) {
     ImGui::NextColumn();
 
     if (ImGui::ColorEdit3("##Custom Color", custom_color)) {
-      frc1511::NTHandler::get()->get_smart_dashboard()->PutNumber("LED_Custom_Color_R", custom_color[0]);
-      frc1511::NTHandler::get()->get_smart_dashboard()->PutNumber("LED_Custom_Color_G", custom_color[1]);
-      frc1511::NTHandler::get()->get_smart_dashboard()->PutNumber("LED_Custom_Color_B", custom_color[2]);
+      set_custom_r(custom_color[0]);
+      set_custom_g(custom_color[1]);
+      set_custom_b(custom_color[2]);
     }
 
     ImGui::Columns(1);
