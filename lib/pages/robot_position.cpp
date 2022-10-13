@@ -79,8 +79,8 @@ void RobotPositionPage::present(bool* running) {
 
   draw_list->AddImage(reinterpret_cast<void*>(field_tex), bb.Min, bb.Max);
 
-  ImVec2 pt(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_x_pos", 0.0), frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_y_pos", 0.0));
-  double ang(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_ang", 0.0));
+  ImVec2 pt(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_x_pos", 0.0), frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_y_pos", 0.0));
+  double ang(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_ang", 0.0));
 
   ImVec2 pt0(to_draw_coord(pt)),
          pt1(to_draw_coord(ImVec2((std::cos(ang) * 1.0f) + pt.x, (std::sin(ang) * 1.0f) + pt.y)));

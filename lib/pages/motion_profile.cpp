@@ -129,15 +129,15 @@ void MotionProfilePage::present(bool* running) {
 
         if (new_entry) {
           if (recording_type == RecordingType::INTERVAL || (recording_type == RecordingType::AUTO && was_in_auto)) {
-            double x = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_x_pos", 0.0);
-            double y = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_y_pos", 0.0);
-            double t_x = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_t_x_pos", 0.0);
-            double t_y = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_t_y_pos", 0.0);
-            double vel_x = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_x_vel", 0.0);
-            double vel_y = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_y_vel", 0.0);
-            double vel_theta = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_ang_vel", 0.0);
-            double ang = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_ang", 0.0);
-            double t_ang = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("DriveCSV_t_ang", 0.0);
+            double x = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_x_pos", 0.0);
+            double y = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_y_pos", 0.0);
+            double t_x = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_target_x_pos", 0.0);
+            double t_y = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_target_y_pos", 0.0);
+            double vel_x = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_x_vel", 0.0);
+            double vel_y = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_y_vel", 0.0);
+            double vel_theta = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_ang_vel", 0.0);
+            double ang = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_ang", 0.0);
+            double t_ang = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_drive_target_ang", 0.0);
 
             recorded_points.push_back(Point{ elapsed, x, y, t_x, t_y, vel_x, vel_y, vel_theta, ang, t_ang });
           }
