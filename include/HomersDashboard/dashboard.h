@@ -43,7 +43,9 @@ private:
        show_intake_camera  = false,
        show_limelight      = false,
        show_blinky_blinky  = false,
-       show_settings       = false;
+       show_settings       = false,
+       show_match_timer    = false,
+       show_2022_ball_count = false;
 
   enum Pages {
     PAGE_NETWORK_TABLES = 1 << 0,
@@ -54,6 +56,8 @@ private:
     PAGE_LIMELIGHT      = 1 << 5,
     PAGE_BLINKY_BLINKY  = 1 << 6,
     PAGE_SETTINGS       = 1 << 7,
+    PAGE_MATCH_TIMER    = 1 << 8,
+    PAGE_2022_BALL_COUNT = 1 << 9,
   };
 
   unsigned get_page_states() const;

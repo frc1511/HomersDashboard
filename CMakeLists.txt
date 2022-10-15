@@ -67,7 +67,10 @@ include("${HD_LIB_DIR}/CMakeLists.txt")
 
 # --- Resources ---
 
-build_dashboard_resource("${HD_RES_DIR}/images/field-2022.png" "field_2022_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_field.png"      "field_2022_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_blue.png" "cargo_blue_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_red.png"  "cargo_red_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_none.png" "cargo_none_png")
 
 # --- Thirdparty ---
 

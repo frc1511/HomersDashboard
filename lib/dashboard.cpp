@@ -12,6 +12,8 @@
 #include <HomersDashboard/pages/network_tables.h>
 #include <HomersDashboard/pages/blinky_blinky.h>
 #include <HomersDashboard/pages/settings.h>
+#include <HomersDashboard/pages/match_timer.h>
+#include <HomersDashboard/pages/2022/ball_count.h>
 
 namespace frc1511 {
 
@@ -37,6 +39,8 @@ void HomersDashboard::init() {
   NetworkTablesPage::get()->init();
   RobotPositionPage::get()->init();
   SettingsPage::get()->init();
+  MatchTimerPage::get()->init();
+  BallCountPage::get()->init();
 }
 
 void HomersDashboard::present() {
@@ -69,6 +73,11 @@ void HomersDashboard::present() {
       ImGui::MenuItem(" " ICON_FA_LIGHTBULB  "   Blinky Blinky", nullptr, &show_blinky_blinky);
       ImGui::MenuItem(ICON_FA_MAP_MARKED_ALT "  Robot Position", nullptr, &show_robot_position);
       ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
+      ImGui::MenuItem(ICON_FA_CLOCK          "  Match Timer",    nullptr, &show_match_timer);
+      if (ImGui::BeginMenu("2022")) {
+        ImGui::MenuItem(ICON_FA_BASEBALL_BALL "  Ball Count",    nullptr, &show_2022_ball_count);
+        ImGui::EndMenu();
+      }
 
       ImGui::EndMenu();
     }
@@ -91,6 +100,8 @@ void HomersDashboard::present() {
   if (show_network_tables) NetworkTablesPage::get()->present(&show_network_tables);
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
+  if (show_match_timer) MatchTimerPage::get()->present(&show_match_timer);
+  if (show_2022_ball_count) BallCountPage::get()->present(&show_2022_ball_count);
 
   if (show_intake_camera != was_showing_intake_camera) {
     IntakeCameraPage::get()->set_running(show_intake_camera);
@@ -141,6 +152,8 @@ unsigned HomersDashboard::get_page_states() const {
   if (show_limelight)      states |= PAGE_LIMELIGHT;
   if (show_blinky_blinky)  states |= PAGE_BLINKY_BLINKY;
   if (show_settings)       states |= PAGE_SETTINGS;
+  if (show_match_timer)    states |= PAGE_MATCH_TIMER;
+  if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
 
   return states;
 }
@@ -154,6 +167,8 @@ void HomersDashboard::set_page_states(unsigned states) {
   show_limelight      = states & PAGE_LIMELIGHT;
   show_blinky_blinky  = states & PAGE_BLINKY_BLINKY;
   show_settings       = states & PAGE_SETTINGS;
+  show_match_timer    = states & PAGE_MATCH_TIMER;
+  show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
 
   IntakeCameraPage::get()->set_running(show_intake_camera);
   LimelightPage::get()->set_running(show_limelight);
