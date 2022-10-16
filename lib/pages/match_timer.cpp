@@ -22,10 +22,19 @@ void MatchTimerPage::present(bool* running) {
   
   double match_time = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_match_remaining", 911.0);
 
-  int minutes = std::floor(match_time / 60.0);
+  if (match_time < 0) {
+    match_time = 911.0;
+  }
+
+  int minutes = static_cast<int>(std::floor(match_time / 60.0));
   int seconds = static_cast<int>(match_time) % 60;
 
-  ImGui::Text("%d:%d", minutes, seconds);
+  bool zero = false;
+  if (seconds < 10) {
+    zero = true;
+  }
+
+  ImGui::Text("%d:%s%d", minutes, zero ? "0" : "", seconds);
 
   ImGui::PopFont();
   

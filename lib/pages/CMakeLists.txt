@@ -8,5 +8,6 @@ add_dashboard_sources(
   "${HD_LIB_DIR}/pages/robot_position.cpp"
   "${HD_LIB_DIR}/pages/settings.cpp"
   "${HD_LIB_DIR}/pages/match_timer.cpp"
+  "${HD_LIB_DIR}/pages/comp_info.cpp"
   "${HD_LIB_DIR}/pages/2022/ball_count.cpp"
 )

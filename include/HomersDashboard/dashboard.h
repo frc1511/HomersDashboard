@@ -45,6 +45,7 @@ private:
        show_blinky_blinky  = false,
        show_settings       = false,
        show_match_timer    = false,
+       show_comp_info      = false,
        show_2022_ball_count = false;
 
   enum Pages {
@@ -57,7 +58,8 @@ private:
     PAGE_BLINKY_BLINKY  = 1 << 6,
     PAGE_SETTINGS       = 1 << 7,
     PAGE_MATCH_TIMER    = 1 << 8,
-    PAGE_2022_BALL_COUNT = 1 << 9,
+    PAGE_COMP_INFO      = 1 << 9,
+    PAGE_2022_BALL_COUNT = 1 << 10,
   };
 
   unsigned get_page_states() const;

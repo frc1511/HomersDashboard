@@ -52,7 +52,7 @@ void BallCountPage::present(bool* running) {
   
   focused = ImGui::IsWindowFocused();
 
-  double ball_count = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_ballcount", 2.0);
+  double ball_count = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_ballcount", 0.0);
   frc1511::NTHandler::Alliance alliance = frc1511::NTHandler::get()->get_alliance();
 
   unsigned int tex0 = no_cargo_tex, tex1 = no_cargo_tex;
@@ -70,7 +70,7 @@ void BallCountPage::present(bool* running) {
   
   ImVec2 avail(ImGui::GetContentRegionAvail());
   // Square image.
-  float tex_dim = avail.x * (0.9f / 2.0f);
+  float tex_dim = avail.x / 2.0f;
 
   ImGui::Image(reinterpret_cast<void*>(tex0), ImVec2(tex_dim, tex_dim));
   ImGui::SameLine();

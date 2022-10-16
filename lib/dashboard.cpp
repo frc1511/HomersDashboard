@@ -13,6 +13,7 @@
 #include <HomersDashboard/pages/blinky_blinky.h>
 #include <HomersDashboard/pages/settings.h>
 #include <HomersDashboard/pages/match_timer.h>
+#include <HomersDashboard/pages/comp_info.h>
 #include <HomersDashboard/pages/2022/ball_count.h>
 
 namespace frc1511 {
@@ -40,6 +41,7 @@ void HomersDashboard::init() {
   RobotPositionPage::get()->init();
   SettingsPage::get()->init();
   MatchTimerPage::get()->init();
+  CompInfoPage::get()->init();
   BallCountPage::get()->init();
 }
 
@@ -74,6 +76,7 @@ void HomersDashboard::present() {
       ImGui::MenuItem(ICON_FA_MAP_MARKED_ALT "  Robot Position", nullptr, &show_robot_position);
       ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
       ImGui::MenuItem(ICON_FA_CLOCK          "  Match Timer",    nullptr, &show_match_timer);
+      ImGui::MenuItem(ICON_FA_INFO           "  Competition Info", nullptr, &show_comp_info);
       if (ImGui::BeginMenu("2022")) {
         ImGui::MenuItem(ICON_FA_BASEBALL_BALL "  Ball Count",    nullptr, &show_2022_ball_count);
         ImGui::EndMenu();
@@ -101,6 +104,7 @@ void HomersDashboard::present() {
   if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
   if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
   if (show_match_timer) MatchTimerPage::get()->present(&show_match_timer);
+  if (show_comp_info) CompInfoPage::get()->present(&show_comp_info);
   if (show_2022_ball_count) BallCountPage::get()->present(&show_2022_ball_count);
 
   if (show_intake_camera != was_showing_intake_camera) {
@@ -153,6 +157,7 @@ unsigned HomersDashboard::get_page_states() const {
   if (show_blinky_blinky)  states |= PAGE_BLINKY_BLINKY;
   if (show_settings)       states |= PAGE_SETTINGS;
   if (show_match_timer)    states |= PAGE_MATCH_TIMER;
+  if (show_comp_info)      states |= PAGE_COMP_INFO;
   if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
 
   return states;
@@ -168,6 +173,7 @@ void HomersDashboard::set_page_states(unsigned states) {
   show_blinky_blinky  = states & PAGE_BLINKY_BLINKY;
   show_settings       = states & PAGE_SETTINGS;
   show_match_timer    = states & PAGE_MATCH_TIMER;
+  show_comp_info      = states & PAGE_COMP_INFO;
   show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
 
   IntakeCameraPage::get()->set_running(show_intake_camera);
