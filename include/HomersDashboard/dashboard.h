@@ -46,7 +46,8 @@ private:
        show_settings       = false,
        show_match_timer    = false,
        show_comp_info      = false,
-       show_2022_ball_count = false;
+       show_2022_ball_count = false,
+       show_2022_shooter_pos = false;
 
   enum Pages {
     PAGE_NETWORK_TABLES = 1 << 0,
@@ -60,6 +61,7 @@ private:
     PAGE_MATCH_TIMER    = 1 << 8,
     PAGE_COMP_INFO      = 1 << 9,
     PAGE_2022_BALL_COUNT = 1 << 10,
+    PAGE_2022_SHOOTER_POS = 1 << 11,
   };
 
   unsigned get_page_states() const;

@@ -15,6 +15,7 @@
 #include <HomersDashboard/pages/match_timer.h>
 #include <HomersDashboard/pages/comp_info.h>
 #include <HomersDashboard/pages/2022/ball_count.h>
+#include <HomersDashboard/pages/2022/shooter_position.h>
 
 namespace frc1511 {
 
@@ -43,6 +44,7 @@ void HomersDashboard::init() {
   MatchTimerPage::get()->init();
   CompInfoPage::get()->init();
   BallCountPage::get()->init();
+  ShooterPositionPage::get()->init();
 }
 
 void HomersDashboard::present() {
@@ -76,9 +78,10 @@ void HomersDashboard::present() {
       ImGui::MenuItem(ICON_FA_MAP_MARKED_ALT "  Robot Position", nullptr, &show_robot_position);
       ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
       ImGui::MenuItem(ICON_FA_CLOCK          "  Match Timer",    nullptr, &show_match_timer);
-      ImGui::MenuItem(ICON_FA_INFO           "  Competition Info", nullptr, &show_comp_info);
+      ImGui::MenuItem(" " ICON_FA_INFO           "   Competition Info", nullptr, &show_comp_info);
       if (ImGui::BeginMenu("2022")) {
         ImGui::MenuItem(ICON_FA_BASEBALL_BALL "  Ball Count",    nullptr, &show_2022_ball_count);
+        ImGui::MenuItem(ICON_FA_METEOR "  Shooter Position",    nullptr, &show_2022_shooter_pos);
         ImGui::EndMenu();
       }
 
@@ -106,6 +109,7 @@ void HomersDashboard::present() {
   if (show_match_timer) MatchTimerPage::get()->present(&show_match_timer);
   if (show_comp_info) CompInfoPage::get()->present(&show_comp_info);
   if (show_2022_ball_count) BallCountPage::get()->present(&show_2022_ball_count);
+  if (show_2022_shooter_pos) ShooterPositionPage::get()->present(&show_2022_shooter_pos);
 
   if (show_intake_camera != was_showing_intake_camera) {
     IntakeCameraPage::get()->set_running(show_intake_camera);
@@ -159,6 +163,7 @@ unsigned HomersDashboard::get_page_states() const {
   if (show_match_timer)    states |= PAGE_MATCH_TIMER;
   if (show_comp_info)      states |= PAGE_COMP_INFO;
   if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
+  if (show_2022_shooter_pos) states |= PAGE_2022_SHOOTER_POS;
 
   return states;
 }
@@ -175,6 +180,7 @@ void HomersDashboard::set_page_states(unsigned states) {
   show_match_timer    = states & PAGE_MATCH_TIMER;
   show_comp_info      = states & PAGE_COMP_INFO;
   show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
+  show_2022_shooter_pos = states & PAGE_2022_SHOOTER_POS;
 
   IntakeCameraPage::get()->set_running(show_intake_camera);
   LimelightPage::get()->set_running(show_limelight);
