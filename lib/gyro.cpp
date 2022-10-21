@@ -11,11 +11,11 @@ GyroHandler::~GyroHandler() = default;
 void GyroHandler::handle_calibration() {
   using namespace std::chrono_literals;
 
-  bool cal = static_cast<bool>(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_gyro", 1.0));
+  bool needs_cal = static_cast<bool>(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_gyro", 0.0));
 
   std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
 
-  if (frc1511::NTHandler::get()->get_instance().IsConnected() && !cal) {
+  if (frc1511::NTHandler::get()->get_instance().IsConnected() && needs_cal) {
     double dur = std::chrono::duration_cast<std::chrono::milliseconds>(now - blinkClock).count() * 0.001;
     if (dur >= 1.0) {
       blink = !blink;
