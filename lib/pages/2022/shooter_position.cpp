@@ -8,8 +8,6 @@ ShooterPositionPage::ShooterPositionPage() = default;
 ShooterPositionPage::~ShooterPositionPage() = default;
 
 void ShooterPositionPage::present(bool* running) {
-ImGui::ShowDemoWindow();
-
   ImGui::SetNextWindowSize(ImVec2(300, 500), ImGuiCond_FirstUseEver);
 
   if (!ImGui::Begin("Shooter Position", running, ImGuiWindowFlags_NoCollapse)) {

@@ -58,7 +58,7 @@ void BallCountPage::present(bool* running) {
   unsigned int tex0 = no_cargo_tex, tex1 = no_cargo_tex;
 
   auto get_ball_tex = [&]() -> unsigned int {
-    return alliance == decltype(alliance)::BLUE ? blue_cargo_tex : red_cargo_tex;
+    return alliance == frc1511::NTHandler::Alliance::BLUE ? blue_cargo_tex : red_cargo_tex;
   };
 
   if (ball_count >= 1) {
