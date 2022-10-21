@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include <ThunderDashboard/nt_handler.h>
+#include <HomersDashboard/gyro.h>
 #include <HomersDashboard/pages/auto_chooser.h>
 #include <HomersDashboard/pages/robot_position.h>
 #include <HomersDashboard/pages/motion_profile.h>
@@ -49,6 +50,8 @@ void HomersDashboard::init() {
 
 void HomersDashboard::present() {
   frc1511::NTHandler::get()->update();
+
+  GyroHandler::get()->handle_calibration();
 
   bool item_close = false;
 
