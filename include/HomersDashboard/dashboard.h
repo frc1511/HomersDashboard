@@ -48,6 +48,7 @@ private:
        show_settings       = false,
        show_match_timer    = false,
        show_comp_info      = false,
+       show_pressure_gauge = false,
        show_2022_ball_count = false,
        show_2022_shooter_pos = false;
 
@@ -62,8 +63,9 @@ private:
     PAGE_SETTINGS       = 1 << 7,
     PAGE_MATCH_TIMER    = 1 << 8,
     PAGE_COMP_INFO      = 1 << 9,
-    PAGE_2022_BALL_COUNT = 1 << 10,
-    PAGE_2022_SHOOTER_POS = 1 << 11,
+    PAGE_PRESSURE_GAUGE = 1 << 10,
+    PAGE_2022_BALL_COUNT = 1 << 11,
+    PAGE_2022_SHOOTER_POS = 1 << 12,
   };
 
   unsigned get_page_states() const;

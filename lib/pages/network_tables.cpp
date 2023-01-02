@@ -74,21 +74,36 @@ void NetworkTablesPage::show_table(std::string name) {
         case NT_RAW:
           ImGui::TextUnformatted("=== NT_RAW ===");
           break;
-        case NT_BOOLEAN_ARRAY:
-          for (const auto& v : value.GetBooleanArray()) {
-            ImGui::Text("%s, ", v ? "true" : "false");
+        case NT_BOOLEAN_ARRAY: {
+          std::span<const int> bools = value.GetBooleanArray();
+          for (std::size_t i = 0; i < bools.size(); i++) {
+            if (!i) ImGui::TextUnformatted("[");
+            ImGui::Text("%s", bools[i] ? "true" : "false");
+            if (i == bools.size() - 1) ImGui::TextUnformatted("]");
+            else ImGui::TextUnformatted(", ");
           }
           break;
-        case NT_DOUBLE_ARRAY:
-          for (const auto& v : value.GetDoubleArray()) {
-            ImGui::Text("%f, ", v);
+        }
+        case NT_DOUBLE_ARRAY: {
+          std::span<const double> doubles = value.GetDoubleArray();
+          for (std::size_t i = 0; i < doubles.size(); i++) {
+            if (!i) ImGui::TextUnformatted("[");
+            ImGui::Text("%f", doubles[i]);
+            if (i == doubles.size() - 1) ImGui::TextUnformatted("]");
+            else ImGui::TextUnformatted(", ");
           }
           break;
-        case NT_STRING_ARRAY:
-          for (const auto& v : value.GetStringArray()) {
-            ImGui::Text("\"%s\", ", v.data());
+        }
+        case NT_STRING_ARRAY: {
+          std::span<const std::string> strings = value.GetStringArray();
+          for (std::size_t i = 0; i < strings.size(); i++) {
+            if (!i) ImGui::TextUnformatted("[");
+            ImGui::Text("%s", strings[i].data());
+            if (i == strings.size() - 1) ImGui::TextUnformatted("]");
+            else ImGui::TextUnformatted(", ");
           }
           break;
+        }
         case NT_RPC:
           ImGui::TextUnformatted("=== NT_RPC ===");
           break;
@@ -98,16 +113,26 @@ void NetworkTablesPage::show_table(std::string name) {
         case NT_FLOAT:
           ImGui::Text("%f", value.GetFloat());
           break;
-        case NT_INTEGER_ARRAY:
-          for (const auto& v : value.GetIntegerArray()) {
-            ImGui::Text("%lld, ", v);
+        case NT_INTEGER_ARRAY: {
+          std::span<const int64_t> ints = value.GetIntegerArray();
+          for (std::size_t i = 0; i < ints.size(); i++) {
+            if (!i) ImGui::TextUnformatted("[");
+            ImGui::Text("%lld", ints[i]);
+            if (i == ints.size() - 1) ImGui::TextUnformatted("]");
+            else ImGui::TextUnformatted(", ");
           }
           break;
-        case NT_FLOAT_ARRAY:
-          for (const auto& v : value.GetFloatArray()) {
-            ImGui::Text("%f, ", v);
+        }
+        case NT_FLOAT_ARRAY: {
+          std::span<const float> floats = value.GetFloatArray();
+          for (std::size_t i = 0; i < floats.size(); i++) {
+            if (!i) ImGui::TextUnformatted("[");
+            ImGui::Text("%f", floats[i]);
+            if (i == floats.size() - 1) ImGui::TextUnformatted("]");
+            else ImGui::TextUnformatted(", ");
           }
           break;
+        }
       }
     }
     ImGui::EndTable();

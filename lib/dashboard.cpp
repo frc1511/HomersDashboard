@@ -16,6 +16,7 @@
 #include <HomersDashboard/pages/settings.h>
 #include <HomersDashboard/pages/match_timer.h>
 #include <HomersDashboard/pages/comp_info.h>
+#include <HomersDashboard/pages/pressure_gauge.h>
 #include <HomersDashboard/pages/2022/ball_count.h>
 #include <HomersDashboard/pages/2022/shooter_position.h>
 
@@ -72,6 +73,7 @@ void HomersDashboard::present() {
     SettingsPage::get()->init();
     MatchTimerPage::get()->init();
     CompInfoPage::get()->init();
+    PressureGaugePage::get()->init();
     BallCountPage::get()->init();
     ShooterPositionPage::get()->init();
   }
@@ -109,6 +111,7 @@ void HomersDashboard::present() {
       ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
       ImGui::MenuItem(ICON_FA_CLOCK          "  Match Timer",    nullptr, &show_match_timer);
       ImGui::MenuItem(" " ICON_FA_INFO           "   Competition Info", nullptr, &show_comp_info);
+      ImGui::MenuItem(ICON_FA_SKULL "  Pressure Gauge", nullptr, &show_pressure_gauge);
       if (ImGui::BeginMenu("2022")) {
         ImGui::MenuItem(ICON_FA_BASEBALL_BALL "  Ball Count",    nullptr, &show_2022_ball_count);
         ImGui::MenuItem(ICON_FA_METEOR "  Shooter Position",    nullptr, &show_2022_shooter_pos);
@@ -138,6 +141,7 @@ void HomersDashboard::present() {
   if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
   if (show_match_timer) MatchTimerPage::get()->present(&show_match_timer);
   if (show_comp_info) CompInfoPage::get()->present(&show_comp_info);
+  if (show_pressure_gauge) PressureGaugePage::get()->present(&show_pressure_gauge);
   if (show_2022_ball_count) BallCountPage::get()->present(&show_2022_ball_count);
   if (show_2022_shooter_pos) ShooterPositionPage::get()->present(&show_2022_shooter_pos);
 
@@ -186,6 +190,7 @@ unsigned HomersDashboard::get_page_states() const {
   if (show_settings)       states |= PAGE_SETTINGS;
   if (show_match_timer)    states |= PAGE_MATCH_TIMER;
   if (show_comp_info)      states |= PAGE_COMP_INFO;
+  if (show_pressure_gauge) states |= PAGE_PRESSURE_GAUGE;
   if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
   if (show_2022_shooter_pos) states |= PAGE_2022_SHOOTER_POS;
 
@@ -203,6 +208,7 @@ void HomersDashboard::set_page_states(unsigned states) {
   show_settings       = states & PAGE_SETTINGS;
   show_match_timer    = states & PAGE_MATCH_TIMER;
   show_comp_info      = states & PAGE_COMP_INFO;
+  show_pressure_gauge = states & PAGE_PRESSURE_GAUGE;
   show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
   show_2022_shooter_pos = states & PAGE_2022_SHOOTER_POS;
 
