@@ -1,9 +1,6 @@
 #include <HomersDashboard/pages/blinky_blinky.h>
 #include <imgui_internal.h>
 
-#include <networktables/EntryListenerFlags.h>
-#include <networktables/NetworkTableInstance.h>
-
 #define COL_WIDTH 100
 
 BlinkyBlinkyPage::BlinkyBlinkyPage() = default;
@@ -57,7 +54,7 @@ void BlinkyBlinkyPage::present(bool* running) {
 
 void BlinkyBlinkyPage::set_led_mode(int mode) {
   led_mode = mode;
-  frc1511::NTHandler::get()->get_smart_dashboard()->PutNumber("LED_Mode", mode);
+  frc1511::NTHandler::get()->set_double("LED_Mode", mode);
 }
 
 void BlinkyBlinkyPage::set_custom_r(float r) {

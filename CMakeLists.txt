@@ -14,15 +14,15 @@ list(APPEND HD_DEF_LIST "HD_VERSION_STR=\"${HD_VERSION}\"")
 
 project(HomersDashboard LANGUAGES C CXX VERSION ${HD_VERSION})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_compile_options(-Wdeprecated-declarations) #-Wno-psabi 
 
 if(MSVC)
   #add_compile_options(/W4)
   message(STATUS "MSVC Compiler Detected")
-else()
-  add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)

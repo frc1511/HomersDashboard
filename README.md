@@ -1,86 +1,94 @@
-# Homer's Dashboard
-Dashboard application for Homer, FRC Team 1511's favorite robot.
 
-## Table of Contents
-* [App Usage](#app-usage)
+# Homer's Dashboard
+* [Description](#description)
+* [Usage](#usage)
+* [Tools](#tools)
   - [Camera Streams](#camera-streams)
-  - [Network Tables](#network-tables)
-  - [Auto Chooser](#auto-chooser)
-  - [Blinky Blinky](#blinky-blinky)
-  - [Robot Position](#robot-position)
+  - [Network Table Viewer](#network-table-viewer)
+  - [Auto Mode Selector](#auto-mode-selector)
+  - [LED Control](#led-control)
+  - [Robot Pose Viewer](#robot-pose-viewer)
   - [Motion Profile](#motion-profile)
+* [Installation](#installation)
 * [Building](#building)
 
-## App Usage
-To make the FRC Driver Station open the dashboard on launch, edit the "DashboardCmdLine" entry in C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini  with the path to the executable.
+## Description
+Homer's Dashboard is a custom dashboard that was created during the 2022 offseason. It was designed to be a simple dashboard that could be easily customized and improved upon. Originally, Homer's Dashboard was created to only be used for Homer, but it has since been expanded to be used for future 1511 robots as well.
 
-Homer's Dashboard contains many useful pages used for accessing robot functionality and providing diagnostic data about the robot code.
+<img src="https://frc1511.github.io/assets/images/homers_dashboard/homers_dashboard.jpg" alt="Homer's Dashboard" width="800"/>
+
+## Usage
+To make the FRC Driver Station open the dashboard on launch, edit the `DashboardCmdLine` entry in `C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini` with the path to the executable.
+
+## Tools
+Homer's Dashboard is made up of a few different tools that can be used to view diagnostic information about the robot and control different aspects of the robot.
 
 ### Camera Streams
-In camera-server builds, the Intake and Limelight camera pages will present video streams from their respective cameras. The Intake Camera Page looks for a stream at http://roborio-1511-frc.local:1181/stream.mjpg, and the Limelight Page looks at http://limelight-homer.local:5800/stream.mjpg. If a stream is not found or the camera server is disabled, the view will present the words "No Camera".
+In camera-server builds, the dashboard contains camera stream views for cameras connected to the robot. If any of the camera streams fail to load, the view will present the words "No Camera" in the view.
 
-### Network Tables
-
-<img src="https://raw.githubusercontent.com/wiki/petelilley/HomersDashboard/web/screenshots/network_tables.png" width="400">
-
+### Network Table Viewer
 The Network Tables page presents a list of key-value pairs in the SmartDashboard network table. The values are readonly and are sorted alphabetically.
 
-### Auto Chooser
+<img src="https://frc1511.github.io/assets/images/homers_dashboard/network_tables.png" alt="Homer's Dashboard Network Tables" width="500"/>
 
-<img src="https://raw.githubusercontent.com/wiki/petelilley/HomersDashboard/web/screenshots/auto_chooser_empty.png" width="400">
+### Auto Mode Selector
+The Auto Mode Selector page allows the user to configure the Autonomous subsystem of the robot. The user can use the "Auto Mode" dropdown menu to select the autonomous mode to run. The user can also set the delay time before the autonomous mode starts. The tool sets the SmartDashboard network table values `Auto_Mode` and `Auto_Delay` to the selected autonomous mode and delay time respectively.
 
-The Auto Chooser Page contains the functionality to set the "Auto_Mode" and "Auto_Delay" SmartDashboard network table entries. The list of auto modes is obtained by using the comma seperated list entry "thunderdashboard_auto_list", along with each "thunderdashboard_auto_XXX" description entry. The "Auto_Mode" entry is set to the index of the selected auto mode in the given list. The "Auto_Delay" can be set to any value between 0 and 10 seconds.
+<img src="https://frc1511.github.io/assets/images/homers_dashboard/auto_chooser.png" alt="Homer's Dashboard Auto Chooser" width="400"/>
 
-### Blinky Blinky
-
-<img src="https://raw.githubusercontent.com/wiki/petelilley/HomersDashboard/web/screenshots/blinky_blinky_custom.png" width="400">
-
-The Blinky Blinky Page allows users to adjust the color of the LEDs on Homer. The LED Mode dropdown has a number of different configurations,
+### LED Control
+The LED Control page allows the user to control the LEDs on the robot. The user can use the "LED Mode" dropdown to select the desired configuration for the LEDs:
 * Robot State
   - Colors change depending on the robot's state (Disabled = Orange, Enabled = Alliance Color, Crater Mode = Green, etc).
 * Alliance
   - The alliance color.
 * Custom
-  - A custom color. When this mode is selected, the user can pick any color to set the lights to.
+  - A custom color. When this mode is selected, the user can use the "Custom Color" color picker to select the custom color to use.
 * Off
-  - Off or something.
+  - Off.
 
-The "LED_Mode" SmartDashboard network tables entry is set to the index of the selected mode. Also the "LED_Custom_Color_X" R, G, and B entries are set to the configured custom color.
+The tool sets the SmartDashboard network table value `LED_Mode` to the selected LED mode, and the "LED_Custom_Color_R", "LED_Custom_Color_G", and "LED_Custom_Color_B" network table values to the red, green, and blue components of the custom color.
 
-### Robot Position
+<img src="https://frc1511.github.io/assets/images/homers_dashboard/blinky_blinky_custom.png" alt="Homer's Dashboard LED Control" width="400"/>
 
-<img src="https://raw.githubusercontent.com/wiki/petelilley/HomersDashboard/web/screenshots/robot_position_0_0.png" width="500">
+### Robot Pose Viewer
+The Robot Pose Viewer page allows the user to view the robot's pose on the field. The robot's pose is determined by the `thunderdashboard_drive_x_pos`, `thunderdashboard_drive_y_pos`, and `thunderdashboard_drive_ang` network table values. The robot's pose is displayed as a yellow dot on the field, with a yellow line representing the robot's rotation.
 
-The Robot Position page displays the calculated position of the robot on the field. It reads the X and Y position (meters) from the "DriveCSV_x_pos" and "DriveCSV_y_pos" SmartDashboard network table entries, and the rotation from "DriveCSV_ang". The page displays a point representing the robot's position and a line representing its heading overlayed on top of the field image.
+<img src="https://frc1511.github.io/assets/images/homers_dashboard/robot_pose_0_0.png" alt="Homer's Dashboard Robot Pose" width="500"/>
 
 ### Motion Profile
+The Motion Profile Page allows users to record positional data of the robot over a period of time and plot it on a graph. The user can record an entire autonomous mode or just an interval, and can adjust the period at which data is recorded. The user can specify which pieces of data are plotted on the graph and how the graph is structured (based on time or position). The `/home/lvuser/trajectory_motion.csv` file stored on the RoboRIO contains the same data recorded by the Motion Profile Page for autonomous modes. Switching to the "File" tab will present the option to load a CSV file for examination on the graph.
 
-<img src="https://raw.githubusercontent.com/wiki/petelilley/HomersDashboard/web/screenshots/motion_profile_empty.png" width="500">
+<img src="https://frc1511.github.io/assets/images/homers_dashboard/motion_profile.png" alt="Homer's Dashboard Motion Profile" width="500"/>
 
-The Motion Profile Page allows users to record positional data of the robot over a period of time and plot it on a graph. The user can record an entire autonomous mode or just an interval, and can adjust the period at which data is recorded. The user can specify which pieces of data are plotted on the graph and how the graph is structured (based on time or position).
-The "/home/lvuser/trajectory_motion.csv" file stored on the RoboRIO contains the same data recorded by the Motion Profile Page for autonomous modes. Switching to the "File" tab will present the option to load a CSV file for examination on the graph.
+## Installation
+* [Executable Download](https://github.com/petelilley/HomersDashboard/releases/latest)
 
 ## Building
 Supported operating systems are Windows and macOS. Make sure to resolve all the git submodules before building!
-```bash
+``` bash
 git submodule init
 git submodule update
 ```
+
 Build projects can be generated using CMake. Tested targets include Visual Studio 2019 or 2022 on Windows and Xcode or Unix Makefiles on macOS.
-```bash
-# Configure Windows
-cmake . -Bbuild -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
+#### Configure Windows
+``` bash
+cmake . -B build -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release
 ```
-```bash
-# Configure macOS
-cmake . -Bbuild -G "Xcode" -DCMAKE_BUILD_TYPE=Release
+
+#### Configure macOS
+``` bash
+cmake . -B build -G "Xcode" -DCMAKE_BUILD_TYPE=Release
 ```
-```bash
-# Build
+
+#### Build
+``` bash
 cmake --build build
 ```
+
 All the app's resources (Images, Fonts, etc.) are built into the executable, so there's no need to worry about moving them around once it's built.
 
-__Important:__ OpenCV is used for creating the camera pages so it is required to be installed when building and running the app. On Windows, the app searches for OpenCV binaries in C:\Program Files\opencv\, so make sure to add C:\Program Files\opecv\build\x64\v15\bin to Path. As an alternative, the `-DDASHBOARD_WITH_CS=0` flag may be added to the cmake configuration to build without the camera server if OpenCV is not installed.
+__Important:__ OpenCV is used for creating the camera pages so it is required to be installed when building and running the app. On Windows, the app searches for OpenCV binaries in `C:\Program Files\opencv\`, so make sure to add `C:\Program Files\opecv\build\x64\v15\bin` to Path. As an alternative, the `-DDASHBOARD_WITH_CS=0` flag may be added to the cmake configuration to build without the camera server if OpenCV is not installed.
 
 Problems have emerged when compiling the wpilib libraries (ntcore, cscore, wpiutil), so the `-DDASHBOARD_DOWNLOAD_WPILIB=1` flag may be added to the cmake configuration to download and link to pre-built libraries instead. The version downloaded can be specified by adding the `-DDASHBOARD_DOWNLOAD_WPILIB_VERSION=YEAR.X.X` flag.

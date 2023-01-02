@@ -1,9 +1,6 @@
 #include <HomersDashboard/pages/auto_chooser.h>
 #include <imgui_internal.h>
 
-#include <networktables/EntryListenerFlags.h>
-#include <networktables/NetworkTableInstance.h>
-
 #define COL_WIDTH 100
 
 AutoChooserPage::AutoChooserPage() = default;
@@ -11,12 +8,15 @@ AutoChooserPage::AutoChooserPage() = default;
 AutoChooserPage::~AutoChooserPage() = default;
 
 void AutoChooserPage::init() {
-  mode_listener = frc1511::NTHandler::get()->get_smart_dashboard()->AddEntryListener(
-    "thunderdashboard_auto_list",
+  mode_sub = frc1511::NTHandler::get()->get_smart_dashboard()->GetStringTopic("thunderdashboard_auto_list").Subscribe("");
+  mode_listener = frc1511::NTHandler::get()->get_instance().AddListener(
+    mode_sub,
+    nt::EventFlags::kValueAll,
     // Updates the auto modes when the list entry is changed.
-    [&](nt::NetworkTable*, std::string_view, nt::NetworkTableEntry, std::shared_ptr<nt::Value> value, int) -> void {
+    [&](const nt::Event& event) {
+      std::lock_guard lk(modes_mutex);
       auto_modes.clear();
-      std::string auto_list(value->GetString());
+      std::string auto_list(event.GetValueEventData()->value.GetString());
       
       std::stringstream ss(auto_list);
       while (ss.good()) {
@@ -27,8 +27,7 @@ void AutoChooserPage::init() {
         std::string desc(frc1511::NTHandler::get()->get_smart_dashboard()->GetString("thunderdashboard_auto_" + sub, ""));
         auto_modes.insert({ std::atoi(sub.c_str()), sub + ": " + desc });
       }
-    },
-    nt::EntryListenerFlags::kUpdate | nt::EntryListenerFlags::kNew | nt::EntryListenerFlags::kLocal
+    }
   );
 }
 
@@ -50,6 +49,7 @@ void AutoChooserPage::present(bool* running) {
   ImGui::NextColumn();
   
   if (ImGui::BeginCombo("##Auto Mode", auto_mode_str.c_str())) {
+    std::lock_guard lk(modes_mutex);
     for (auto& [num, name] : auto_modes) {
       if (ImGui::Selectable(name.c_str(), auto_mode == num)) {
         frc1511::NTHandler::get()->set_double("Auto_Mode", auto_mode);
@@ -79,6 +79,8 @@ void AutoChooserPage::present(bool* running) {
     
     frc1511::NTHandler::get()->set_double("Auto_Delay", auto_delay);
   }
+
+  frc1511::NTHandler::get()->get_smart_dashboard()->GetSubTable("table thingy")->PutString("thingy", "hi");
   
   ImGui::Columns(1);
   ImGui::PopID();
@@ -88,8 +90,14 @@ void AutoChooserPage::present(bool* running) {
 
 void AutoChooserPage::set_auto_mode(int mode) {
   auto_mode = mode;
+
+  int sz;
+  {
+    std::lock_guard lk(modes_mutex);
+    sz = auto_modes.size();
+  }
   
-  if (auto_mode < 0 || auto_mode >= static_cast<int>(auto_modes.size())) {
+  if (auto_mode < 0 || auto_mode >= sz) {
     auto_mode = 0;
   }
 

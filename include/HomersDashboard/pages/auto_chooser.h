@@ -2,6 +2,7 @@
 
 #include <ThunderDashboard/pages/page.h>
 #include <ThunderDashboard/nt_handler.h>
+#include <networktables/StringTopic.h>
 
 class AutoChooserPage: public frc1511::Page {
 public:
@@ -33,7 +34,9 @@ private:
   
   std::map<int, std::string> auto_modes;
   
-  NT_EntryListener mode_listener;
+  std::mutex modes_mutex;
+  nt::StringSubscriber mode_sub;
+  NT_Listener mode_listener;
   
   static AutoChooserPage instance;
 };

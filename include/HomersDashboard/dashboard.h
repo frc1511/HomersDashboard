@@ -34,6 +34,8 @@ private:
     CLOSE,
   };
 
+  bool initialized = false;
+
   EventState event_state = EventState::NONE;
   
   bool show_network_tables = false,

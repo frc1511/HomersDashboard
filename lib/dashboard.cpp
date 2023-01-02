@@ -5,6 +5,7 @@
 
 #include <ThunderDashboard/nt_handler.h>
 #include <HomersDashboard/gyro.h>
+#include <HomersDashboard/popups/startup.h>
 #include <HomersDashboard/pages/auto_chooser.h>
 #include <HomersDashboard/pages/robot_position.h>
 #include <HomersDashboard/pages/motion_profile.h>
@@ -31,24 +32,50 @@ HomersDashboard::HomersDashboard()
 
 HomersDashboard::~HomersDashboard() = default;
 
-void HomersDashboard::init() {
-  frc1511::NTHandler::get()->init();
-
-  AutoChooserPage::get()->init();
-  BlinkyBlinkyPage::get()->init();
-  IntakeCameraPage::get()->init();
-  LimelightPage::get()->init();
-  MotionProfilePage::get()->init();
-  NetworkTablesPage::get()->init();
-  RobotPositionPage::get()->init();
-  SettingsPage::get()->init();
-  MatchTimerPage::get()->init();
-  CompInfoPage::get()->init();
-  BallCountPage::get()->init();
-  ShooterPositionPage::get()->init();
-}
+void HomersDashboard::init() { }
 
 void HomersDashboard::present() {
+  auto handle_state = [&]() {
+    switch (event_state) {
+      case EventState::NONE:
+        break;
+      case EventState::CLOSE:
+        running = false;
+        break;
+    }
+  };
+
+  if (!initialized) {
+    ImGui::OpenPopup(StartupPopup::get()->get_name().c_str());
+
+    bool showing_popup = true;
+    StartupPopup::get()->present(&showing_popup);
+
+    if (showing_popup) {
+      handle_state();
+      return;
+    }
+
+    initialized = true;
+
+    StartupPopup::Result result = StartupPopup::get()->get_result();
+
+    frc1511::NTHandler::get()->init(result.version, result.ds_running);
+
+    AutoChooserPage::get()->init();
+    BlinkyBlinkyPage::get()->init();
+    IntakeCameraPage::get()->init();
+    LimelightPage::get()->init();
+    MotionProfilePage::get()->init();
+    NetworkTablesPage::get()->init();
+    RobotPositionPage::get()->init();
+    SettingsPage::get()->init();
+    MatchTimerPage::get()->init();
+    CompInfoPage::get()->init();
+    BallCountPage::get()->init();
+    ShooterPositionPage::get()->init();
+  }
+
   frc1511::NTHandler::get()->update();
 
   GyroHandler::get()->handle_calibration();
@@ -122,13 +149,7 @@ void HomersDashboard::present() {
     LimelightPage::get()->set_running(show_limelight);
   }
 
-  switch (event_state) {
-    case EventState::NONE:
-      break;
-    case EventState::CLOSE:
-      running = false;
-      break;
-  }
+  handle_state();
 }
 
 void HomersDashboard::close() {
