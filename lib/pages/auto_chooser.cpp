@@ -79,8 +79,6 @@ void AutoChooserPage::present(bool* running) {
     
     frc1511::NTHandler::get()->set_double("Auto_Delay", auto_delay);
   }
-
-  frc1511::NTHandler::get()->get_smart_dashboard()->GetSubTable("table thingy")->PutString("thingy", "hi");
   
   ImGui::Columns(1);
   ImGui::PopID();
