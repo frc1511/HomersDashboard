@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include <field_2022_png.h>
+#include <_2022_field_png.h>
 
 // Field dimensions (meters).
 #define FIELD_X 15.5702 // 54' 1"
@@ -14,7 +14,7 @@ RobotPositionPage::~RobotPositionPage() = default;
 
 void RobotPositionPage::init() {
   int width, height, nr_channels;
-  unsigned char* img_data = stbi_load_from_memory(field_2022_png, field_2022_png_size, &width, &height, &nr_channels, 0);
+  unsigned char* img_data = stbi_load_from_memory(_2022_field_png, _2022_field_png_size, &width, &height, &nr_channels, 0);
 
   assert(img_data); // Failed to load texture from memory.
 

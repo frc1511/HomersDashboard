@@ -12,4 +12,5 @@ add_dashboard_sources(
   "${HD_LIB_DIR}/pages/pressure_gauge.cpp"
   "${HD_LIB_DIR}/pages/2022/ball_count.cpp"
   "${HD_LIB_DIR}/pages/2022/shooter_position.cpp"
+  "${HD_LIB_DIR}/pages/2023/node_selector.cpp"
 )

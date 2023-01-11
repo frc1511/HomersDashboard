@@ -2,9 +2,9 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include <cargo_blue_png.h>
-#include <cargo_red_png.h>
-#include <cargo_none_png.h>
+#include <_2022_cargo_blue_png.h>
+#include <_2022_cargo_red_png.h>
+#include <_2022_cargo_none_png.h>
 
 #define COL_WIDTH 100
 
@@ -37,9 +37,9 @@ void BallCountPage::init() {
     return tex;
   };
 
-  no_cargo_tex = gen_tex(cargo_none_png, cargo_none_png_size);
-  red_cargo_tex = gen_tex(cargo_red_png, cargo_red_png_size);
-  blue_cargo_tex = gen_tex(cargo_blue_png, cargo_blue_png_size);
+  no_cargo_tex = gen_tex(_2022_cargo_none_png, _2022_cargo_none_png_size);
+  red_cargo_tex = gen_tex(_2022_cargo_blue_png, _2022_cargo_blue_png_size);
+  blue_cargo_tex = gen_tex(_2022_cargo_red_png, _2022_cargo_red_png_size);
 }
 
 void BallCountPage::present(bool* running) {

@@ -19,6 +19,7 @@
 #include <HomersDashboard/pages/pressure_gauge.h>
 #include <HomersDashboard/pages/2022/ball_count.h>
 #include <HomersDashboard/pages/2022/shooter_position.h>
+#include <HomersDashboard/pages/2023/node_selector.h>
 
 namespace frc1511 {
 
@@ -76,6 +77,7 @@ void HomersDashboard::present() {
     PressureGaugePage::get()->init();
     BallCountPage::get()->init();
     ShooterPositionPage::get()->init();
+    NodeSelectorPage::get()->init();
   }
 
   frc1511::NTHandler::get()->update();
@@ -117,6 +119,10 @@ void HomersDashboard::present() {
         ImGui::MenuItem(ICON_FA_METEOR "  Shooter Position",    nullptr, &show_2022_shooter_pos);
         ImGui::EndMenu();
       }
+      if (ImGui::BeginMenu("2023")) {
+        ImGui::MenuItem(ICON_FA_FILM "  Node Selector",    nullptr, &show_2023_node_selector);
+        ImGui::EndMenu();
+      }
 
       ImGui::EndMenu();
     }
@@ -144,6 +150,7 @@ void HomersDashboard::present() {
   if (show_pressure_gauge) PressureGaugePage::get()->present(&show_pressure_gauge);
   if (show_2022_ball_count) BallCountPage::get()->present(&show_2022_ball_count);
   if (show_2022_shooter_pos) ShooterPositionPage::get()->present(&show_2022_shooter_pos);
+  if (show_2023_node_selector) NodeSelectorPage::get()->present(&show_2023_node_selector);
 
   if (show_intake_camera != was_showing_intake_camera) {
     IntakeCameraPage::get()->set_running(show_intake_camera);
@@ -193,6 +200,7 @@ unsigned HomersDashboard::get_page_states() const {
   if (show_pressure_gauge) states |= PAGE_PRESSURE_GAUGE;
   if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
   if (show_2022_shooter_pos) states |= PAGE_2022_SHOOTER_POS;
+  if (show_2023_node_selector) states |= PAGE_2023_NODE_SELECTOR;
 
   return states;
 }
@@ -211,6 +219,7 @@ void HomersDashboard::set_page_states(unsigned states) {
   show_pressure_gauge = states & PAGE_PRESSURE_GAUGE;
   show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
   show_2022_shooter_pos = states & PAGE_2022_SHOOTER_POS;
+  show_2023_node_selector = states & PAGE_2023_NODE_SELECTOR;
 
   IntakeCameraPage::get()->set_running(show_intake_camera);
   LimelightPage::get()->set_running(show_limelight);

@@ -67,10 +67,12 @@ include("${HD_LIB_DIR}/CMakeLists.txt")
 
 # --- Resources ---
 
-build_dashboard_resource("${HD_RES_DIR}/images/2022_field.png"      "field_2022_png")
-build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_blue.png" "cargo_blue_png")
-build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_red.png"  "cargo_red_png")
-build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_none.png" "cargo_none_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_field.png"      "_2022_field_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_blue.png" "_2022_cargo_blue_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_red.png"  "_2022_cargo_red_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2022_cargo_none.png" "_2022_cargo_none_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2023_grid_blue.png"  "_2023_grid_blue_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2023_grid_red.png"   "_2023_grid_red_png")
 
 # --- Thirdparty ---
 
