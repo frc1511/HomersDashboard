@@ -18,11 +18,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_compile_options(-Wdeprecated-declarations) #-Wno-psabi 
 
 if(MSVC)
   #add_compile_options(/W4)
   message(STATUS "MSVC Compiler Detected")
+else()
+  add_compile_options(-Wdeprecated-declarations) #-Wno-psabi 
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)

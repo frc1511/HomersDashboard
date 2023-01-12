@@ -46,7 +46,13 @@ void RobotPositionPage::present(bool* running) {
   }
   
   focused = ImGui::IsWindowFocused();
-  
+
+  show_robot_position();
+
+  ImGui::End();
+}
+
+void RobotPositionPage::show_robot_position() {
   ImDrawList* draw_list(ImGui::GetWindowDrawList());
   ImGuiWindow* win(ImGui::GetCurrentWindow());
   if (win->SkipItems) return;
@@ -87,8 +93,6 @@ void RobotPositionPage::present(bool* running) {
 
   draw_list->AddCircle(pt0, 5.0f, ImColor(252, 186, 3, 255), 0, 2.0f);
   draw_list->AddLine(pt0, pt1, ImColor(252, 186, 3, 255), 2.0f);
-
-  ImGui::End();
 }
 
 ImVec2 RobotPositionPage::to_draw_coord(ImVec2 pt) const {

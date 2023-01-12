@@ -19,6 +19,8 @@ private:
   NodeSelectorPage();
   ~NodeSelectorPage();
 
+  void show_node_selector();
+
   unsigned int red_grid_tex, blue_grid_tex;
 
   double grid_ar = 1;

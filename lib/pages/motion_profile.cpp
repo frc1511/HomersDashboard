@@ -375,8 +375,8 @@ void MotionProfilePage::present_graph() {
     }
     else {
       auto recalc_bounds = [&](double& min, double& max, double val) {
-        min = std::min(min, val);
-        max = std::max(max, val);
+        min = min <= val ? min : val;
+        max = max >= val ? max : val;
       };
 
       recalc_bounds(min_time, max_time, time);

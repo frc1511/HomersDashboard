@@ -21,6 +21,8 @@ private:
   RobotPositionPage();
   ~RobotPositionPage();
 
+  void show_robot_position();
+
   ImVec2 to_draw_coord(ImVec2 pt) const;
   ImVec2 adjust_field_coord(ImVec2 pt) const;
   

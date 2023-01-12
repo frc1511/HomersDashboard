@@ -56,6 +56,12 @@ void NodeSelectorPage::present(bool* running) {
   
   focused = ImGui::IsWindowFocused();
 
+  show_node_selector();
+
+  ImGui::End();
+}
+
+void NodeSelectorPage::show_node_selector() {
   ImDrawList* draw_list(ImGui::GetWindowDrawList());
   ImGuiWindow* win(ImGui::GetCurrentWindow());
   if (win->SkipItems) return;
@@ -91,7 +97,28 @@ void NodeSelectorPage::present(bool* running) {
 
   draw_list->AddImage(reinterpret_cast<void*>(tex), bb.Min, bb.Max);
 
-  ImGui::End();
+  int column = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_column", 0.0);
+  int row = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_row", 0.0);
+
+
+  double total_width = 0.84;
+  const double cone_width = 0.1;
+  const double cube_width = 0.1;
+// x0xx0xx0x
+  ImVec2 min(0.08, 0.0), max(min.x + cone_width * total_width, 1.0);
+  for (int i = 0; i < 9; i++) {
+    draw_list->AddRect(bb.Min + min * canvas, bb.Min + max * canvas, ImColor(252, 186, 3, 255), 10.0f);
+    min.x += cone_width * total_width;
+    max.x += cone_width * total_width;
+    if (i != 2 && i != 5) {
+      min.x += (cone_width/9) * total_width;
+      max.x += (cone_width/9) * total_width;
+    }
+    else {
+      min.x += (cone_width/15) * total_width;
+      max.x += (cone_width/15) * total_width;
+    }
+  }
 }
 
 NodeSelectorPage NodeSelectorPage::instance;
