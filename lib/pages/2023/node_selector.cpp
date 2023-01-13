@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <stb_image.h>
 #include <imgui_internal.h>
+#include <ThunderDashboard/font_manager.h>
 
 #include <_2023_grid_blue_png.h>
 #include <_2023_grid_red_png.h>
@@ -11,6 +12,18 @@
 NodeSelectorPage::NodeSelectorPage() = default;
 
 NodeSelectorPage::~NodeSelectorPage() = default;
+
+const std::map<int, float> box_coords = {
+    { 0, 0.08 },
+    { 1, 0.08 + 0.0935 },
+    { 2, 0.08 + 0.0935 * 2 + 0.002 },
+    { 3, 0.08 + 0.0935 * 3 + 0.003 },
+    { 4, 0.08 + 0.0935 * 4 + 0.005 },
+    { 5, 0.08 + 0.0935 * 5 + 0.005 },
+    { 6, 0.08 + 0.0935 * 6 + 0.007 },
+    { 7, 0.08 + 0.0935 * 7 + 0.007 },
+    { 8, 0.08 + 0.0935 * 8 + 0.009 },
+};
 
 void NodeSelectorPage::init() {
   auto gen_tex = [&](unsigned char* img, std::size_t img_size) -> unsigned int {
@@ -100,25 +113,14 @@ void NodeSelectorPage::show_node_selector() {
   int column = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_column", 0.0);
   int row = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_row", 0.0);
 
+  column = column > 8 ? 8 : column < 0 ? 0 : column;
 
-  double total_width = 0.84;
-  const double cone_width = 0.1;
-  const double cube_width = 0.1;
-// x0xx0xx0x
-  ImVec2 min(0.08, 0.0), max(min.x + cone_width * total_width, 1.0);
-  for (int i = 0; i < 9; i++) {
-    draw_list->AddRect(bb.Min + min * canvas, bb.Min + max * canvas, ImColor(252, 186, 3, 255), 10.0f);
-    min.x += cone_width * total_width;
-    max.x += cone_width * total_width;
-    if (i != 2 && i != 5) {
-      min.x += (cone_width/9) * total_width;
-      max.x += (cone_width/9) * total_width;
-    }
-    else {
-      min.x += (cone_width/15) * total_width;
-      max.x += (cone_width/15) * total_width;
-    }
-  }
+  draw_list->AddRect(bb.Min + ImVec2(box_coords.at(column), 0.0f) * canvas, bb.Min + ImVec2(box_coords.at(column) + 0.084f, 1.3f) * canvas, ImColor(252, 186, 3, 255), 10.0f, 0, 5.0f);
+
+
+  ImGui::PushFont(frc1511::FontManager::get()->big);
+  ImGui::Text("          0      1      2      3      4      5      6      7      8");
+  ImGui::PopFont();
 }
 
 NodeSelectorPage NodeSelectorPage::instance;
