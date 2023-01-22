@@ -13,16 +13,28 @@ NodeSelectorPage::NodeSelectorPage() = default;
 
 NodeSelectorPage::~NodeSelectorPage() = default;
 
-const std::map<int, float> box_coords = {
-    { 0, 0.08 },
-    { 1, 0.08 + 0.0935 },
-    { 2, 0.08 + 0.0935 * 2 + 0.002 },
-    { 3, 0.08 + 0.0935 * 3 + 0.003 },
-    { 4, 0.08 + 0.0935 * 4 + 0.005 },
-    { 5, 0.08 + 0.0935 * 5 + 0.005 },
-    { 6, 0.08 + 0.0935 * 6 + 0.007 },
-    { 7, 0.08 + 0.0935 * 7 + 0.007 },
-    { 8, 0.08 + 0.0935 * 8 + 0.009 },
+const std::map<int, float> col_coords = {
+  { 0, 0.08 },
+  { 1, 0.08 + 0.0935 },
+  { 2, 0.08 + 0.0935 * 2 + 0.002 },
+  { 3, 0.08 + 0.0935 * 3 + 0.003 },
+  { 4, 0.08 + 0.0935 * 4 + 0.005 },
+  { 5, 0.08 + 0.0935 * 5 + 0.005 },
+  { 6, 0.08 + 0.0935 * 6 + 0.007 },
+  { 7, 0.08 + 0.0935 * 7 + 0.007 },
+  { 8, 0.08 + 0.0935 * 8 + 0.009 },
+};
+
+const std::map<int, float> cone_row_coords = {
+  { 0, 0.08 },
+  { 1, 0.26 },
+  { 2, 0.50 },
+};
+
+const std::map<int, float> cube_row_coords = {
+  { 0, 0.10 },
+  { 1, 0.27 },
+  { 2, 0.52 },
 };
 
 void NodeSelectorPage::init() {
@@ -111,16 +123,15 @@ void NodeSelectorPage::show_node_selector() {
   draw_list->AddImage(reinterpret_cast<void*>(tex), bb.Min, bb.Max);
 
   int column = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_column", 0.0);
-  int row = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_row", 0.0);
+  int row = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_row", 2.0);
 
   column = column > 8 ? 8 : column < 0 ? 0 : column;
 
-  draw_list->AddRect(bb.Min + ImVec2(box_coords.at(column), 0.0f) * canvas, bb.Min + ImVec2(box_coords.at(column) + 0.084f, 1.3f) * canvas, ImColor(252, 186, 3, 255), 10.0f, 0, 5.0f);
+  draw_list->AddRect(bb.Min + ImVec2(col_coords.at(column), 0.0f) * canvas, bb.Min + ImVec2(col_coords.at(column) + 0.084f, 1.0f) * canvas, ImColor(252, 186, 3, 255), 10.0f, 0, 5.0f);
 
+  row = row > 2 ? 2 : row < 0 ? 0 : row;
 
-  ImGui::PushFont(frc1511::FontManager::get()->big);
-  ImGui::Text("          0      1      2      3      4      5      6      7      8");
-  ImGui::PopFont();
+  draw_list->AddRect(bb.Min + ImVec2(col_coords.at(column), cone_row_coords.at(row)) * canvas, bb.Min + ImVec2(col_coords.at(column) + 0.084f, cone_row_coords.at(row) + 0.23f) * canvas, ImColor(0, 255, 0, 255), 10.0f, 0, 5.0f);
 }
 
 NodeSelectorPage NodeSelectorPage::instance;
