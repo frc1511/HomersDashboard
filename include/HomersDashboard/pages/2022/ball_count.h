@@ -3,6 +3,8 @@
 #include <ThunderDashboard/pages/page.h>
 #include <ThunderDashboard/nt_handler.h>
 
+namespace y2022 {
+
 class BallCountPage : public frc1511::Page {
 public:
   static BallCountPage* get() {
@@ -23,3 +25,5 @@ private:
   
   static BallCountPage instance;
 };
+
+}  // namespace y2022

@@ -9,6 +9,8 @@
 
 #define COL_WIDTH 100
 
+using namespace y2023;
+
 NodeSelectorPage::NodeSelectorPage() = default;
 
 NodeSelectorPage::~NodeSelectorPage() = default;
@@ -71,7 +73,7 @@ void NodeSelectorPage::init() {
 void NodeSelectorPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 
-  if (!ImGui::Begin("Node Selector", running, 
+  if (!ImGui::Begin("2023 Node Selector", running, 
                     ImGuiWindowFlags_NoCollapse
                   | ImGuiWindowFlags_NoScrollbar
                   | ImGuiWindowFlags_NoScrollWithMouse)) {

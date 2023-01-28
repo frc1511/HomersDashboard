@@ -8,6 +8,8 @@
 
 #define COL_WIDTH 100
 
+using namespace y2022;
+
 BallCountPage::BallCountPage() = default;
 
 BallCountPage::~BallCountPage() = default;
@@ -45,7 +47,7 @@ void BallCountPage::init() {
 void BallCountPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
 
-  if (!ImGui::Begin("Ball Count", running, ImGuiWindowFlags_NoCollapse)) {
+  if (!ImGui::Begin("2022 Ball Count", running, ImGuiWindowFlags_NoCollapse)) {
     ImGui::End();
     return;
   }

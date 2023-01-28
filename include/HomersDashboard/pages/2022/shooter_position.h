@@ -3,6 +3,8 @@
 #include <ThunderDashboard/pages/page.h>
 #include <ThunderDashboard/nt_handler.h>
 
+namespace y2022 {
+
 class ShooterPositionPage : public frc1511::Page {
 public:
   static ShooterPositionPage* get() {
@@ -20,3 +22,5 @@ private:
 
   static ShooterPositionPage instance;
 };
+
+} // namespace y2022

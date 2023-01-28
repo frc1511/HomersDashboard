@@ -3,6 +3,8 @@
 
 #define COL_WIDTH 50
 
+using namespace y2022;
+
 ShooterPositionPage::ShooterPositionPage() = default;
 
 ShooterPositionPage::~ShooterPositionPage() = default;
@@ -10,13 +12,13 @@ ShooterPositionPage::~ShooterPositionPage() = default;
 void ShooterPositionPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(300, 500), ImGuiCond_FirstUseEver);
 
-  if (!ImGui::Begin("Shooter Position", running, ImGuiWindowFlags_NoCollapse)) {
+  if (!ImGui::Begin("2022 Shooter Position", running, ImGuiWindowFlags_NoCollapse)) {
     ImGui::End();
     return;
   }
   
   focused = ImGui::IsWindowFocused();
-  char buf[32];
+  std::string buf;
 
   ImGui::PushID("RPM");
   ImGui::Columns(2, nullptr, false);
@@ -29,8 +31,8 @@ void ShooterPositionPage::present(bool* running) {
 
   double rpm_pct = rpm / rpm_max;
 
-  sprintf(buf, "%d", (int)rpm);
-  ImGui::ProgressBar(rpm_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30), buf);
+  buf = fmt::format("{}", (int)rpm);
+  ImGui::ProgressBar(rpm_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30), buf.c_str());
 
   ImGui::Columns(1);
   ImGui::PopID();
@@ -47,8 +49,8 @@ void ShooterPositionPage::present(bool* running) {
 
   double hood_pct = (hood - hood_min) / (hood_max - hood_min);
 
-  sprintf(buf, "%.3f", hood - hood_min);
-  ImGui::ProgressBar(hood_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30), buf);
+  buf = fmt::format("{:.3f}", hood - hood_min);
+  ImGui::ProgressBar(hood_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30), buf.c_str());
 
   ImGui::Columns(1);
   ImGui::PopID();

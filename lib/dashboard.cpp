@@ -20,6 +20,7 @@
 #include <HomersDashboard/pages/2022/ball_count.h>
 #include <HomersDashboard/pages/2022/shooter_position.h>
 #include <HomersDashboard/pages/2023/node_selector.h>
+#include <HomersDashboard/pages/2023/auto_config.h>
 
 namespace frc1511 {
 
@@ -75,9 +76,10 @@ void HomersDashboard::present() {
     MatchTimerPage::get()->init();
     CompInfoPage::get()->init();
     PressureGaugePage::get()->init();
-    BallCountPage::get()->init();
-    ShooterPositionPage::get()->init();
-    NodeSelectorPage::get()->init();
+    y2022::BallCountPage::get()->init();
+    y2022::ShooterPositionPage::get()->init();
+    y2023::NodeSelectorPage::get()->init();
+    y2023::AutoConfigPage::get()->init();
   }
 
   frc1511::NTHandler::get()->update();
@@ -120,6 +122,7 @@ void HomersDashboard::present() {
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("2023")) {
+        ImGui::MenuItem(ICON_FA_FILM "  Auto Config",    nullptr, &show_2023_auto_config);
         ImGui::MenuItem(ICON_FA_FILM "  Node Selector",    nullptr, &show_2023_node_selector);
         ImGui::EndMenu();
       }
@@ -148,9 +151,10 @@ void HomersDashboard::present() {
   if (show_match_timer) MatchTimerPage::get()->present(&show_match_timer);
   if (show_comp_info) CompInfoPage::get()->present(&show_comp_info);
   if (show_pressure_gauge) PressureGaugePage::get()->present(&show_pressure_gauge);
-  if (show_2022_ball_count) BallCountPage::get()->present(&show_2022_ball_count);
-  if (show_2022_shooter_pos) ShooterPositionPage::get()->present(&show_2022_shooter_pos);
-  if (show_2023_node_selector) NodeSelectorPage::get()->present(&show_2023_node_selector);
+  if (show_2022_ball_count) y2022::BallCountPage::get()->present(&show_2022_ball_count);
+  if (show_2022_shooter_pos) y2022::ShooterPositionPage::get()->present(&show_2022_shooter_pos);
+  if (show_2023_node_selector) y2023::NodeSelectorPage::get()->present(&show_2023_node_selector);
+  if (show_2023_auto_config) y2023::AutoConfigPage::get()->present(&show_2023_auto_config);
 
   if (show_intake_camera != was_showing_intake_camera) {
     IntakeCameraPage::get()->set_running(show_intake_camera);
@@ -201,6 +205,7 @@ unsigned HomersDashboard::get_page_states() const {
   if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
   if (show_2022_shooter_pos) states |= PAGE_2022_SHOOTER_POS;
   if (show_2023_node_selector) states |= PAGE_2023_NODE_SELECTOR;
+  if (show_2023_auto_config) states |= PAGE_2023_AUTO_CONFIG;
 
   return states;
 }
@@ -220,6 +225,7 @@ void HomersDashboard::set_page_states(unsigned states) {
   show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
   show_2022_shooter_pos = states & PAGE_2022_SHOOTER_POS;
   show_2023_node_selector = states & PAGE_2023_NODE_SELECTOR;
+  show_2023_auto_config = states & PAGE_2023_AUTO_CONFIG;
 
   IntakeCameraPage::get()->set_running(show_intake_camera);
   LimelightPage::get()->set_running(show_limelight);

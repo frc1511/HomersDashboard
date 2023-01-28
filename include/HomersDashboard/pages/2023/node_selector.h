@@ -3,6 +3,8 @@
 #include <ThunderDashboard/pages/page.h>
 #include <ThunderDashboard/nt_handler.h>
 
+namespace y2023 {
+
 class NodeSelectorPage : public frc1511::Page {
 public:
   static NodeSelectorPage* get() {
@@ -27,3 +29,5 @@ private:
   
   static NodeSelectorPage instance;
 };
+
+} // namespace y2023
