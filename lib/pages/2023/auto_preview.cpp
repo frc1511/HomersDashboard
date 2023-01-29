@@ -129,9 +129,10 @@ void AutoPreviewPage::show_auto_preview() {
 
 #define GP_DIST 1.2f
 
-#define GP_CENTER ImVec2(FIELD_X / 2.0f - 1.0f, FIELD_Y / 2.0f - 2.5f)
+#define GP_CENTER ImVec2(FIELD_X / 2.0f - 1.0f, FIELD_Y / 2.0f - 1.3f)
 
 void AutoPreviewPage::draw_gamepiece(GamePiece gp, int index, bool blue_side) {
+  index = 3 - index;
   --index;
   if (index <= 0) --index;
 
@@ -142,7 +143,7 @@ void AutoPreviewPage::draw_gamepiece(GamePiece gp, int index, bool blue_side) {
   coord.y += index_sign * (GP_DIST / 2.0f);
 
   if (index != -1 && index != 1) {
-    coord.y += (index / index_sign) * GP_DIST;
+    coord.y += index_sign * GP_DIST;
   }
 
   if (!blue_side) {
@@ -157,7 +158,7 @@ void AutoPreviewPage::draw_gamepiece(GamePiece gp, int index, bool blue_side) {
     col = ImColor(83, 83, 83, 255);
   }
 
-  draw_list->AddCircleFilled(to_draw_coord(coord), 12.0f, col);
+  draw_list->AddCircleFilled(to_draw_coord(coord), 8.0f, col);
 }
 
 ImVec2 AutoPreviewPage::to_draw_coord(ImVec2 pt) const {
