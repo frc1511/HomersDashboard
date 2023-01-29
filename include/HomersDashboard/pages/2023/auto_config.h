@@ -28,12 +28,12 @@ public:
     CONE,
   };
 
-  constexpr void set_doing_auto(bool doing) { doing_auto = doing; }
-  constexpr void set_starting_location(StartingLocation location) { starting_location = location; }
-  constexpr void set_starting_gamepiece(GamePiece gp) { starting_gamepiece = gp; }
-  constexpr void set_starting_action(int action) { starting_action = action; }
-  constexpr void set_field_gamepiece(GamePiece gp) { field_gamepiece = gp; }
-  constexpr void set_final_action(int action) { final_action = action; }
+  void set_doing_auto(bool doing);
+  void set_starting_location(StartingLocation location);
+  void set_starting_gamepiece(GamePiece gp);
+  void set_starting_action(int action);
+  void set_field_gamepiece(GamePiece gp);
+  void set_final_action(int action);
 
   constexpr bool get_doing_auto() const { return doing_auto; }
   constexpr StartingLocation get_starting_location() const { return starting_location; }
@@ -45,6 +45,8 @@ public:
 private:
   AutoConfigPage();
   ~AutoConfigPage();
+
+  void update_nt();
 
   bool doing_auto = true;
   StartingLocation starting_location = BARRIER;

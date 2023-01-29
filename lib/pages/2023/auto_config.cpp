@@ -32,7 +32,9 @@ void AutoConfigPage::present(bool* running) {
   ImGui::SetColumnWidth(0, COL_WIDTH);
   ImGui::Text("Doing Auto");
   ImGui::NextColumn();
-  ImGui::Checkbox("##Doing Auto", &doing_auto);
+  if (ImGui::Checkbox("##Doing Auto", &doing_auto)) {
+    update_nt();
+  }
   ImGui::Columns(1);
   ImGui::PopID();
 
@@ -73,7 +75,9 @@ void AutoConfigPage::present(bool* running) {
     "Edge Side",
   };
 
-  ImGui::Combo("##Start Pos", (int*)&starting_location, starting_location_names, 3);
+  if (ImGui::Combo("##Start Pos", (int*)&starting_location, starting_location_names, 3)) {
+    update_nt();
+  }
 
   ImGui::Columns(1);
   ImGui::PopID();
@@ -91,7 +95,9 @@ void AutoConfigPage::present(bool* running) {
   ImGui::Text("Start GP");
   ImGui::NextColumn();
 
-  ImGui::Combo("##Start GP", (int*)&starting_gamepiece, starting_gp_names, 2);
+  if (ImGui::Combo("##Start GP", (int*)&starting_gamepiece, starting_gp_names, 2)) {
+    update_nt();
+  }
 
   ImGui::Columns(1);
   ImGui::PopID();
@@ -110,7 +116,9 @@ void AutoConfigPage::present(bool* running) {
       "Score preload, traverse, collect GP 2",
     };
 
-    ImGui::Combo("##Start Action", (int*)&starting_action, starting_action_names, 2);
+    if (ImGui::Combo("##Start Action", (int*)&starting_action, starting_action_names, 2)) {
+      update_nt();
+    }
   }
   else {
     ImGui::Text("Score preloaded GP");
@@ -137,7 +145,9 @@ void AutoConfigPage::present(bool* running) {
     ICON_FA_ICE_CREAM " Cone",
   };
 
-  ImGui::Combo("##Field GP", (int*)&field_gamepiece, field_gp_names, 2);
+  if (ImGui::Combo("##Field GP", (int*)&field_gamepiece, field_gp_names, 2)) {
+    update_nt();
+  }
 
   ImGui::Columns(1);
   ImGui::PopID();
@@ -184,12 +194,53 @@ void AutoConfigPage::present(bool* running) {
   ImGui::Text("Final Action");
   ImGui::NextColumn();
 
-  ImGui::Combo("##Final Action", (int*)&final_action, final_action_names, final_action_name_num);
+  if (ImGui::Combo("##Final Action", (int*)&final_action, final_action_names, final_action_name_num)) {
+    update_nt();
+  }
 
   ImGui::Columns(1);
   ImGui::PopID();
 
   ImGui::End();
+}
+
+void AutoConfigPage::set_doing_auto(bool doing) {
+  doing_auto = doing;
+  frc1511::NTHandler::get()->set_bool("thunderdashboard_auto_doing_auto", doing_auto);
+}
+
+void AutoConfigPage::set_starting_location(StartingLocation location) {
+  starting_location = location;
+  frc1511::NTHandler::get()->set_double("thunderdashboard_auto_starting_location", starting_location);
+}
+
+void AutoConfigPage::set_starting_gamepiece(GamePiece gp) {
+  starting_gamepiece = gp;
+  frc1511::NTHandler::get()->set_double("thunderdashboard_auto_starting_gamepiece", starting_gamepiece);
+}
+
+void AutoConfigPage::set_starting_action(int action) {
+  starting_action = action;
+  frc1511::NTHandler::get()->set_double("thunderdashboard_auto_starting_action", starting_action);
+}
+
+void AutoConfigPage::set_field_gamepiece(GamePiece gp) {
+  field_gamepiece = gp;
+  frc1511::NTHandler::get()->set_double("thunderdashboard_auto_field_gamepiece", field_gamepiece);
+}
+
+void AutoConfigPage::set_final_action(int action) {
+  final_action = action;
+  frc1511::NTHandler::get()->set_double("thunderdashboard_auto_final_action", final_action);
+}
+
+void AutoConfigPage::update_nt() {
+  set_doing_auto(doing_auto);
+  set_starting_location(starting_location);
+  set_starting_gamepiece(starting_gamepiece);
+  set_starting_action(starting_action);
+  set_field_gamepiece(field_gamepiece);
+  set_final_action(final_action);
 }
 
 AutoConfigPage AutoConfigPage::instance;

@@ -251,9 +251,17 @@ void HomersDashboard::set_page_states(unsigned states) {
 
 #define SECTION_BLINKY_BLINKY "BlinkyBlinky"
 #define KEY_LED_MODE "LedMode"
-#define LED_CUSTOM_R "CustomR"
-#define LED_CUSTOM_G "CustomG"
-#define LED_CUSTOM_B "CustomB"
+#define KEY_LED_CUSTOM_R "CustomR"
+#define KEY_LED_CUSTOM_G "CustomG"
+#define KEY_LED_CUSTOM_B "CustomB"
+
+#define SECTION_2023_AUTO_CONFIG "AutoConfig2023"
+#define KEY_2023_AUTO_DOING "DoingAuto"
+#define KEY_2023_AUTO_STARTING_LOCATION "StartingLocation"
+#define KEY_2023_AUTO_STARTING_GAMEPIECE "StartingGamePiece"
+#define KEY_2023_AUTO_STARTING_ACTION "StartingAction"
+#define KEY_2023_AUTO_FIELD_GAMEPIECE "FieldGamePiece"
+#define KEY_2023_AUTO_FINAL_ACTION "FinalAction"
 
 #define SECTION_WINDOW_STUFF "WindowSize"
 #define KEY_WIN_WIDTH "Width"
@@ -268,7 +276,12 @@ void HomersDashboard::data_clear() {
 bool HomersDashboard::data_should_open(const char* name) {
   bool res = true;
 
-  if (std::strcmp(name, SECTION_APP_STATE) && std::strcmp(name, SECTION_SETTINGS) && std::strcmp(name, SECTION_AUTO_CHOOSER) && std::strcmp(name, SECTION_BLINKY_BLINKY) && std::strcmp(name, SECTION_WINDOW_STUFF)) {
+  if (std::strcmp(name, SECTION_APP_STATE) &&
+      std::strcmp(name, SECTION_SETTINGS) &&
+      std::strcmp(name, SECTION_AUTO_CHOOSER) &&
+      std::strcmp(name, SECTION_BLINKY_BLINKY) &&
+      std::strcmp(name, SECTION_WINDOW_STUFF) &&
+      std::strcmp(name, SECTION_2023_AUTO_CONFIG)) {
     res = false;
   }
 
@@ -304,14 +317,32 @@ void HomersDashboard::data_apply(const char* type_name) {
       if (key == KEY_LED_MODE) {
         BlinkyBlinkyPage::get()->set_led_mode(std::atoi(val.c_str()));
       }
-      if (key == LED_CUSTOM_R) {
+      if (key == KEY_LED_CUSTOM_R) {
         BlinkyBlinkyPage::get()->set_custom_r(std::atof(val.c_str()));
       }
-      if (key == LED_CUSTOM_G) {
+      if (key == KEY_LED_CUSTOM_G) {
         BlinkyBlinkyPage::get()->set_custom_g(std::atof(val.c_str()));
       }
-      if (key == LED_CUSTOM_B) {
+      if (key == KEY_LED_CUSTOM_B) {
         BlinkyBlinkyPage::get()->set_custom_b(std::atof(val.c_str()));
+      }
+      if (key == KEY_2023_AUTO_DOING) {
+        y2023::AutoConfigPage::get()->set_doing_auto(std::atoi(val.c_str()));
+      }
+      if (key == KEY_2023_AUTO_STARTING_LOCATION) {
+        y2023::AutoConfigPage::get()->set_starting_location((y2023::AutoConfigPage::StartingLocation)std::atoi(val.c_str()));
+      }
+      if (key == KEY_2023_AUTO_STARTING_GAMEPIECE) {
+        y2023::AutoConfigPage::get()->set_starting_gamepiece((y2023::AutoConfigPage::GamePiece)std::atoi(val.c_str()));
+      }
+      if (key == KEY_2023_AUTO_STARTING_ACTION) {
+        y2023::AutoConfigPage::get()->set_starting_action(std::atoi(val.c_str()));
+      }
+      if (key == KEY_2023_AUTO_FIELD_GAMEPIECE) {
+        y2023::AutoConfigPage::get()->set_field_gamepiece((y2023::AutoConfigPage::GamePiece)std::atoi(val.c_str()));
+      }
+      if (key == KEY_2023_AUTO_FINAL_ACTION) {
+        y2023::AutoConfigPage::get()->set_final_action(std::atoi(val.c_str()));
       }
 
       int width, height;
@@ -368,9 +399,18 @@ void HomersDashboard::data_write(const char* type_name, ImGuiTextBuffer* buf) {
     begin_section(SECTION_BLINKY_BLINKY);
     add_entry(KEY_LED_MODE, "%d", BlinkyBlinkyPage::get()->get_led_mode());
     auto color(BlinkyBlinkyPage::get()->get_custom_color());
-    add_entry(LED_CUSTOM_R, "%f", std::get<0>(color));
-    add_entry(LED_CUSTOM_G, "%f", std::get<1>(color));
-    add_entry(LED_CUSTOM_B, "%f", std::get<2>(color));
+    add_entry(KEY_LED_CUSTOM_R, "%f", std::get<0>(color));
+    add_entry(KEY_LED_CUSTOM_G, "%f", std::get<1>(color));
+    add_entry(KEY_LED_CUSTOM_B, "%f", std::get<2>(color));
+    end_section();
+
+    begin_section(SECTION_2023_AUTO_CONFIG);
+    add_entry(KEY_2023_AUTO_DOING, "%d", y2023::AutoConfigPage::get()->get_doing_auto());
+    add_entry(KEY_2023_AUTO_STARTING_LOCATION, "%d", y2023::AutoConfigPage::get()->get_starting_location());
+    add_entry(KEY_2023_AUTO_STARTING_GAMEPIECE, "%d", y2023::AutoConfigPage::get()->get_starting_gamepiece());
+    add_entry(KEY_2023_AUTO_STARTING_ACTION, "%d", y2023::AutoConfigPage::get()->get_starting_action());
+    add_entry(KEY_2023_AUTO_FIELD_GAMEPIECE, "%d", y2023::AutoConfigPage::get()->get_field_gamepiece());
+    add_entry(KEY_2023_AUTO_FINAL_ACTION, "%d", y2023::AutoConfigPage::get()->get_final_action());
     end_section();
 
     begin_section(SECTION_WINDOW_STUFF);
