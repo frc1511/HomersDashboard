@@ -1,5 +1,6 @@
 #include <HomersDashboard/pages/2023/auto_config.h>
 #include <IconsFontAwesome5.h>
+#include <HomersDashboard/pages/auto_chooser.h>
 
 #define COL_WIDTH 100
 
@@ -24,7 +25,7 @@ void AutoConfigPage::present(bool* running) {
   
   focused = ImGui::IsWindowFocused();
 
-  static bool doing_auto = true;
+  // Doing Auto
 
   ImGui::PushID("Doing Auto");
   ImGui::Columns(2, nullptr, false);
@@ -40,28 +41,49 @@ void AutoConfigPage::present(bool* running) {
     return;
   }
 
-  static int starting_location = 0;
+  // Auto Delay
 
-  ImGui::PushID("Start Pos");
+  ImGui::PushID("Auto Delay");
   ImGui::Columns(2, nullptr, false);
   ImGui::SetColumnWidth(0, COL_WIDTH);
-  ImGui::Text("Start Pos");
+  ImGui::Text("Auto Delay");
   ImGui::NextColumn();
 
-  const char* starting_lcoation_names[] = {
-    "Barrier Side",
-    "Center",
-    "Edge Side",
-  };
-
-  ImGui::Combo("##Start Pos", (int*)&starting_location, starting_lcoation_names, 3);
+  float auto_delay = AutoChooserPage::get()->get_auto_delay();
+  if (ImGui::DragFloat("##Auto Delay", &auto_delay, 0.1f, 0.0f, 0.0f, "%.2f s")) {
+    AutoChooserPage::get()->set_auto_delay(auto_delay);
+  }
 
   ImGui::Columns(1);
   ImGui::PopID();
 
   ImGui::Separator();
 
-  static int starting_gamepiece = -1;
+  // Start position
+
+  ImGui::PushID("Start Pos");
+  ImGui::Columns(2, nullptr, false);
+  ImGui::SetColumnWidth(0, COL_WIDTH);
+  ImGui::Text("Start Zone");
+  ImGui::NextColumn();
+
+  const char* starting_location_names[] = {
+    "Barrier Side",
+    "Center",
+    "Edge Side",
+  };
+
+  ImGui::Combo("##Start Pos", (int*)&starting_location, starting_location_names, 3);
+
+  ImGui::Columns(1);
+  ImGui::PopID();
+
+  // Starting GamePiece
+
+  const char* starting_gp_names[] = {
+    ICON_FA_CUBE " Cube",
+    ICON_FA_ICE_CREAM " Cone",
+  };
 
   ImGui::PushID("Start GP");
   ImGui::Columns(2, nullptr, false);
@@ -69,18 +91,40 @@ void AutoConfigPage::present(bool* running) {
   ImGui::Text("Start GP");
   ImGui::NextColumn();
 
-  const char* starting_gp_names[] = {
-    ICON_FA_CUBE " Cube",
-    ICON_FA_ICE_CREAM " Cone",
-    "None",
-  };
-
-  ImGui::Combo("##Start GP", (int*)&starting_gamepiece, starting_gp_names, 3);
+  ImGui::Combo("##Start GP", (int*)&starting_gamepiece, starting_gp_names, 2);
 
   ImGui::Columns(1);
   ImGui::PopID();
 
-  static int field_gamepiece = -1;
+  // Starting Action
+
+  ImGui::PushID("Start Action");
+  ImGui::Columns(2, nullptr, false);
+  ImGui::SetColumnWidth(0, COL_WIDTH);
+  ImGui::Text("Start Action");
+  ImGui::NextColumn();
+
+  if (starting_location == 1) {
+    const char* starting_action_names[] = {
+      "Score preload, balance",
+      "Score preload, traverse, collect GP 2",
+    };
+
+    ImGui::Combo("##Start Action", (int*)&starting_action, starting_action_names, 2);
+  }
+  else {
+    ImGui::Text("Score preloaded GP");
+  }
+
+  ImGui::Columns(1);
+  ImGui::PopID();
+
+  if (starting_location == 1 && starting_action == 0) {
+    ImGui::End();
+    return;
+  }
+
+  // Field GamePiece to collect
 
   ImGui::PushID("Field GP");
   ImGui::Columns(2, nullptr, false);
@@ -94,6 +138,53 @@ void AutoConfigPage::present(bool* running) {
   };
 
   ImGui::Combo("##Field GP", (int*)&field_gamepiece, field_gp_names, 2);
+
+  ImGui::Columns(1);
+  ImGui::PopID();
+
+  // Final Action
+
+  const char* barrier_final_action_names[] = {
+      "Do nothing",
+      "Score GP 1",
+      "Balance on CS"
+  };
+  const char* center_final_action_names[] = {
+      "Do nothing",
+      "Balance on CS"
+  };
+  const char* edge_final_action_names[] = {
+      "Do nothing",
+      "Score GP 4",
+      "Balance on CS"
+  };
+
+  const char** final_action_names = nullptr;
+  int final_action_name_num = 0;
+  switch (starting_location) {
+  case 0:
+    final_action_names = barrier_final_action_names;
+    final_action_name_num = 3;
+    break;
+  case 1:
+    final_action_names = center_final_action_names;
+    final_action_name_num = 2;
+    break;
+  case 2:
+    final_action_names = edge_final_action_names;
+    final_action_name_num = 3;
+    break;
+  default:
+    break;
+  }
+
+  ImGui::PushID("Final Action");
+  ImGui::Columns(2, nullptr, false);
+  ImGui::SetColumnWidth(0, COL_WIDTH);
+  ImGui::Text("Final Action");
+  ImGui::NextColumn();
+
+  ImGui::Combo("##Final Action", (int*)&final_action, final_action_names, final_action_name_num);
 
   ImGui::Columns(1);
   ImGui::PopID();

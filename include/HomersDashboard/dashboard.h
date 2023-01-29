@@ -52,7 +52,8 @@ private:
        show_2022_ball_count = false,
        show_2022_shooter_pos = false,
        show_2023_node_selector = false,
-       show_2023_auto_config = false;
+       show_2023_auto_config = false,
+       show_2023_auto_preview = false;
 
   enum Pages {
     PAGE_NETWORK_TABLES = 1 << 0,
@@ -70,6 +71,7 @@ private:
     PAGE_2022_SHOOTER_POS = 1 << 12,
     PAGE_2023_NODE_SELECTOR = 1 << 13,
     PAGE_2023_AUTO_CONFIG = 1 << 14,
+    PAGE_2023_AUTO_PREVIEW = 1 << 15,
   };
 
   unsigned get_page_states() const;
