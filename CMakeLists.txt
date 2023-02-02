@@ -41,6 +41,7 @@ endif()
 set(HD_LIB_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(HD_INC_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(TD_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ThunderDashboardLibrary")
+set(HD_THIRDPARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 
 set(HD_RES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 
@@ -81,6 +82,8 @@ build_dashboard_resource("${HD_RES_DIR}/images/2023_grid_red.png"   "_2023_grid_
 
 add_subdirectory(${TD_LIB_DIR})
 
+add_subdirectory("${HD_THIRDPARTY_DIR}/DualSense-Windows")
+
 # --- Build ---
 
 if(TD_WINDOWS)
@@ -110,5 +113,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${HD_INC_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/res")
 
 target_link_libraries(${PROJECT_NAME} ThunderDashboard)
+target_link_libraries(${PROJECT_NAME} DualSense-Windows)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${HD_DEF_LIST})
