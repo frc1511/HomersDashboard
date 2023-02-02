@@ -4,30 +4,31 @@
 #include <ds5w.h>
 
 extern "C" {
-  struct RumbleOptions {
-    uint32_t rumble_left : 8;
-    uint32_t rumble_right : 8;
+  struct PS5RumbleOptions {
+    uint32_t left : 8;
+    uint32_t right : 8;
     uint32_t pad : 16;
   };
-  typedef struct RumbleOptions RumbleOptions;
+  typedef struct PS5RumbleOptions PS5RumbleOptions;
   
-  struct TrigggerOptions {
-    uint32_t trigger_effect : 2; // (0 = off, 1 = section, 2 = continuous)
+  struct PS5TrigggerOptions {
     uint32_t start_position : 8;
     uint32_t end_position : 8;
     uint32_t force : 8;
+    uint32_t trigger_effect : 2; // (0 = off, 1 = section, 2 = continuous)
     uint32_t pad : 6;
   };
-  typedef struct TriggerOptions TriggerOptions;
+  typedef struct PS5TriggerOptions PS5TriggerOptions;
 
-  struct LEDOptions {
-    unsigned char led_r;
-    unsigned char led_g;
-    unsigned char led_b;
-    uint32_t mic_led : 2; // (0 = off, 1 = on, 2 = blink)
-    uint32_t pad : 6;
+  struct PS5LEDOptions {
+    uint32_t lightbar_r : 8;
+    uint32_t lightbar_g : 8;
+    uint32_t lightbar_b : 8;
+    uint32_t mic : 2; // (0 = off, 1 = on, 2 = pulse)
+    uint32_t player_fade : 1;
+    uint32_t player_bitmask : 5; // (0x01 = left, 0x02 = middle left, 0x04 = middle, 0x08 = middle right, 0x10 = right)
   };
-  typedef struct LEDOptions LEDOptions;
+  typedef struct PS5LEDOptions PS5LEDOptions;
 }
 
 class PS5ControllerHandler {
@@ -38,6 +39,13 @@ public:
 
   PS5ControllerHandler(PS5ControllerHandler const&) = delete;
   PS5ControllerHandler& operator=(PS5ControllerHandler const&) = delete;
+
+  struct Options {
+    PS5RumbleOptions rumble;
+    PS5TriggerOptions left_trigger;
+    PS5TriggerOptions right_trigger;
+    PS5LEDOptions leds;
+  };
 
   void init();
 
@@ -51,11 +59,16 @@ private:
   PS5ControllerHandler();
   ~PS5ControllerHandler();
 
+  void handle_controller(DS5W::DeviceContext& context, const Options& options);
+
   int driver_id = 0;
   int aux_id = 1;
 
   DS5W::DeviceContext driver_context;
   DS5W::DeviceContext aux_context;
+
+  Options driver_options;
+  Options aux_options;
 
   bool valid_driver = false;
   bool valid_aux = false;

@@ -3,6 +3,7 @@
 #include <IconsFontAwesome5.h>
 #include <GLFW/glfw3.h>
 
+#include <ThunderDashboard/platform/platform.h>
 #include <ThunderDashboard/nt_handler.h>
 #include <HomersDashboard/gyro.h>
 #include <HomersDashboard/popups/startup.h>
@@ -22,6 +23,9 @@
 #include <HomersDashboard/pages/2023/node_selector.h>
 #include <HomersDashboard/pages/2023/auto_config.h>
 #include <HomersDashboard/pages/2023/auto_preview.h>
+#ifdef THUNDER_WINDOWS
+# include <HomersDashboard/ps5_controller_handler.h>
+#endif
 
 namespace frc1511 {
 
@@ -65,6 +69,10 @@ void HomersDashboard::present() {
     StartupPopup::Result result = StartupPopup::get()->get_result();
 
     frc1511::NTHandler::get()->init(result.version, result.ds_running);
+
+#ifdef THUNDER_WINDOWS
+    PS5ControllerHandler::get()->init();
+#endif
 
     AutoChooserPage::get()->init();
     BlinkyBlinkyPage::get()->init();
@@ -142,6 +150,10 @@ void HomersDashboard::present() {
   }
 
   if (item_close) close();
+
+#ifdef THUNDER_WINDOWS
+  PS5ControllerHandler::get()->process();
+#endif
 
   if (show_settings) SettingsPage::get()->present(&show_settings);
   if (show_blinky_blinky) BlinkyBlinkyPage::get()->present(&show_blinky_blinky);
