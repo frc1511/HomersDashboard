@@ -7,5 +7,5 @@ add_dashboard_sources(
 )
 
 if(TD_WINDOWS)
-  add_dashboard_sources("${HD_LIB_DIR}/windows/ps5_controller_handler.cpp")
+  add_dashboard_sources("${HD_LIB_DIR}/ps5_controller_handler.cpp")
 endif()

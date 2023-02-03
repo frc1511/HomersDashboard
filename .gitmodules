@@ -1,3 +1,6 @@
 [submodule "ThunderDashboardLibrary"]
 	path = ThunderDashboardLibrary
 	url = https://github.com/petelilley/ThunderDashboardLibrary
+[submodule "thirdparty/DualSense-Windows/DualSense-Windows"]
+	path = thirdparty/DualSense-Windows/DualSense-Windows
+	url = https://github.com/Ohjurot/DualSense-Windows

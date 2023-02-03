@@ -24,7 +24,7 @@
 #include <HomersDashboard/pages/2023/auto_config.h>
 #include <HomersDashboard/pages/2023/auto_preview.h>
 #ifdef THUNDER_WINDOWS
-# include <HomersDashboard/ps5_controller_handler.h>
+# include <HomersDashboard/ps5_contoller_handler.h>
 #endif
 
 namespace frc1511 {
@@ -256,6 +256,8 @@ void HomersDashboard::set_page_states(unsigned states) {
 
 #define SECTION_SETTINGS "Settings"
 #define KEY_TEAM_NUMBER "TeamNumber"
+#define KEY_DRIVER_PS5_ID "DriverPS5ID"
+#define KEY_AUX_PS5_ID "AuxPS5ID"
 
 #define SECTION_AUTO_CHOOSER "AutoChooser"
 #define KEY_AUTO_MODE "AutoMode"
@@ -319,6 +321,18 @@ void HomersDashboard::data_apply(const char* type_name) {
       }
       if (key == KEY_TEAM_NUMBER) {
         SettingsPage::get()->set_team_number(std::atol(val.c_str()));
+      }
+      if (key == KEY_DRIVER_PS5_ID) {
+#ifdef THUNDER_WINDOWS
+        auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
+        PS5ControllerHandler::get()->set_controller_ids(std::atoi(val.c_str()), aux_id);
+#endif
+      }
+      if (key == KEY_AUX_PS5_ID) {
+#ifdef THUNDER_WINDOWS
+        auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
+        PS5ControllerHandler::get()->set_controller_ids(driver_id, std::atoi(val.c_str()));
+#endif
       }
       if (key == KEY_AUTO_MODE) {
         AutoChooserPage::get()->set_auto_mode(std::atoi(val.c_str()));
@@ -401,6 +415,11 @@ void HomersDashboard::data_write(const char* type_name, ImGuiTextBuffer* buf) {
 
     begin_section(SECTION_SETTINGS);
     add_entry(KEY_TEAM_NUMBER, "%lu", SettingsPage::get()->get_team_number());
+#ifdef THUNDER_WINDOWS
+    auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
+    add_entry(KEY_DRIVER_PS5_ID, "%d", driver_id);
+    add_entry(KEY_AUX_PS5_ID, "%d", aux_id);
+#endif
     end_section();
 
     begin_section(SECTION_AUTO_CHOOSER);

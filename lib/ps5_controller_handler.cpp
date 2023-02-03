@@ -24,7 +24,7 @@ void PS5ControllerHandler::init() {
 void PS5ControllerHandler::process() {
   auto sd = frc1511::NTHandler::get()->get_smart_dashboard();
 
-  const auto get_controller_options = [&](int32_t& options, const std::string& key) {
+  const auto get_controller_options = [&](auto& options, const std::string& key) {
     int32_t _options = static_cast<int32_t>(sd->GetNumber(key, 0.0));
     std::memcpy(&options, &_options, sizeof(options));
   };
@@ -34,10 +34,20 @@ void PS5ControllerHandler::process() {
   get_controller_options(driver_options.right_trigger, "thunderdashboard_driver_right_trigger");
   get_controller_options(driver_options.leds, "thunderdashboard_driver_leds");
 
+  if (testing_driver) {
+    driver_options.rumble.left = 0xFF;
+    driver_options.rumble.right = 0xFF;
+  }
+
   get_controller_options(aux_options.rumble, "thunderdashboard_aux_rumble");
   get_controller_options(aux_options.left_trigger, "thunderdashboard_aux_left_trigger");
   get_controller_options(aux_options.right_trigger, "thunderdashboard_aux_right_trigger");
   get_controller_options(aux_options.leds, "thunderdashboard_aux_leds");
+
+  if (testing_aux) {
+    aux_options.rumble.left = 0xFF;
+    aux_options.rumble.right = 0xFF;
+  }
 
   if (valid_driver) {
     handle_controller(driver_context, driver_options);
@@ -61,10 +71,6 @@ bool PS5ControllerHandler::reload_connections() {
       return false;
   }
 
-  if (count < 2) {
-    return false;
-  }
-
   if (DS5W_FAILED(DS5W::initDeviceContext(&infos[driver_id], &driver_context))){
     valid_driver = false;
   }
@@ -78,9 +84,14 @@ bool PS5ControllerHandler::reload_connections() {
   else {
     valid_aux = true;
   }
+
+  if (valid_aux && valid_driver) {
+    return true;
+  }
+  return false;
 }
 
-void PS5ControllerHandler::set_controller_id(int driver, int aux) {
+void PS5ControllerHandler::set_controller_ids(int driver, int aux) {
   driver_id = driver;
   aux_id = aux;
   reload_connections();
@@ -101,7 +112,7 @@ void PS5ControllerHandler::handle_controller(DS5W::DeviceContext& context, const
     switch (options.trigger_effect) {
       case 0:
       default:
-        effect.effectType = DS5W::NoResitance;
+        effect.effectType = DS5W::TriggerEffectType::NoResitance;
         return;
       case 1:
         effect.effectType = DS5W::TriggerEffectType::SectionResitance;
@@ -114,7 +125,7 @@ void PS5ControllerHandler::handle_controller(DS5W::DeviceContext& context, const
         effect.Continuous.startPosition = options.start_position;
         return;
     }
-  }
+  };
 
   handle_trigger(out_state.leftTriggerEffect, options.left_trigger);
   handle_trigger(out_state.rightTriggerEffect, options.right_trigger);
@@ -122,10 +133,10 @@ void PS5ControllerHandler::handle_controller(DS5W::DeviceContext& context, const
   // LEDs
 
   // Lightbar
-  out_state.lightbar = DS5W::Color { options.leds.lightbar_r, options.leds.lightbar_g, options.leds.lightbar_b };
+  out_state.lightbar = DS5W::Color { (unsigned char)options.leds.lightbar_r, (unsigned char)options.leds.lightbar_g, (unsigned char)options.leds.lightbar_b };
 
   // Microphone
-  out_state.microphoneLed = options.leds.microphone_led;
+  out_state.microphoneLed = static_cast<DS5W::MicLed>(options.leds.mic);
 
   // Player LEDs
   if (options.leds.player_bitmask) {

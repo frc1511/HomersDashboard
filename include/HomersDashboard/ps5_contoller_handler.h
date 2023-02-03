@@ -1,7 +1,10 @@
 #pragma once
 
 #include <ThunderDashboard/nt_handler.h>
-#include <ds5w.h>
+#include <DualSenseWindows/Device.h>
+#include <DualSenseWindows/DS5State.h>
+#include <DualSenseWindows/Helpers.h>
+#include <DualSenseWindows/IO.h>
 
 extern "C" {
   struct PS5RumbleOptions {
@@ -11,7 +14,7 @@ extern "C" {
   };
   typedef struct PS5RumbleOptions PS5RumbleOptions;
   
-  struct PS5TrigggerOptions {
+  struct PS5TriggerOptions {
     uint32_t start_position : 8;
     uint32_t end_position : 8;
     uint32_t force : 8;
@@ -53,7 +56,12 @@ public:
 
   bool reload_connections();
 
-  void set_controller_id(int driver, int aux);
+  void set_controller_ids(int driver, int aux);
+
+  inline std::pair<int, int> get_controller_ids() const { return { driver_id, aux_id }; }
+
+  constexpr void set_test_driver_controller(bool testing) { testing_driver = testing; }
+  constexpr void set_test_aux_controller(bool testing) { testing_aux = testing; }
 
 private:
   PS5ControllerHandler();
@@ -74,6 +82,9 @@ private:
   bool valid_aux = false;
 
   bool has_init = false;
+
+  bool testing_driver = false;
+  bool testing_aux = false;
 
   static PS5ControllerHandler instance;
 };
