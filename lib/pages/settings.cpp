@@ -95,6 +95,7 @@ void SettingsPage::present(bool* running) {
   PS5ControllerHandler::get()->set_test_aux_controller(testing_aux);
 
   ImGui::Columns(1);
+  ImGui::PopID();
 
   if (driver_id != old_driver_id || aux_id != old_aux_id) {
     PS5ControllerHandler::get()->set_controller_ids(driver_id, aux_id);

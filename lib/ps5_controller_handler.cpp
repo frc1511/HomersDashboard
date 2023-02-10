@@ -1,7 +1,15 @@
 #include <HomersDashboard/ps5_contoller_handler.h>
+// #include <winsock2.h>
+// #include <winsock.h>
+// #include <ws2tcpip.h>
+#define _WINSOCKAPI_
 #include <Windows.h>
 
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "mswsock.lib")
+
 PS5ControllerHandler::PS5ControllerHandler() { }
+
 PS5ControllerHandler::~PS5ControllerHandler() {
     if (valid_driver) {
         DS5W::freeDeviceContext(&driver_context);
@@ -16,45 +24,87 @@ void PS5ControllerHandler::init() {
     return;
   }
   
-  if (reload_connections()) {
-    has_init = true;
+  reload_connections();
+
+  WSADATA wsa_data;
+  int res = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+  if (res != 0) {
+    fmt::print("WSAStartup() failed with error: {}\n", res);
+    return;
   }
+
+  driver_thread = std::thread([this]() {
+    this->thread_main(true);
+  });
+
+  aux_thread = std::thread([this]() {
+    this->thread_main(false);
+  });
+
+  has_init = true;
 }
 
 void PS5ControllerHandler::process() {
-  auto sd = frc1511::NTHandler::get()->get_smart_dashboard();
-
-  const auto get_controller_options = [&](auto& options, const std::string& key) {
-    int32_t _options = static_cast<int32_t>(sd->GetNumber(key, 0.0));
-    std::memcpy(&options, &_options, sizeof(options));
-  };
-
-  get_controller_options(driver_options.rumble, "thunderdashboard_driver_rumble");
-  get_controller_options(driver_options.left_trigger, "thunderdashboard_driver_left_trigger");
-  get_controller_options(driver_options.right_trigger, "thunderdashboard_driver_right_trigger");
-  get_controller_options(driver_options.leds, "thunderdashboard_driver_leds");
-
-  if (testing_driver) {
-    driver_options.rumble.left = 0xFF;
-    driver_options.rumble.right = 0xFF;
+  OutputState* _new_driver_output = nullptr;
+  OutputState* _new_aux_output = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(driver_output_mutex);
+    _new_driver_output = new_driver_output ? &driver_output : nullptr;
   }
-
-  get_controller_options(aux_options.rumble, "thunderdashboard_aux_rumble");
-  get_controller_options(aux_options.left_trigger, "thunderdashboard_aux_left_trigger");
-  get_controller_options(aux_options.right_trigger, "thunderdashboard_aux_right_trigger");
-  get_controller_options(aux_options.leds, "thunderdashboard_aux_leds");
-
-  if (testing_aux) {
-    aux_options.rumble.left = 0xFF;
-    aux_options.rumble.right = 0xFF;
+  {
+    std::lock_guard<std::mutex> lock(aux_output_mutex);
+    _new_aux_output = new_aux_output ? &aux_output : nullptr;
   }
 
   if (valid_driver) {
-    handle_controller(driver_context, driver_options);
+    if (_new_driver_output || testing_driver) {
+      OutputState output;
+      ZeroMemory(&output, sizeof(output));
+      if (_new_driver_output) {
+        std::lock_guard<std::mutex> lock(driver_output_mutex);
+        output = *_new_driver_output;
+        new_driver_output = false;
+      }
+      if (testing_driver) {
+        output.rumbleLeft = 0xFF;
+        output.rumbleRight = 0xFF;
+      }
+
+      handle_controller_output(driver_context, output);
+    }
+
+    InputState _new_driver_input;
+    handle_controller_input(driver_context, &_new_driver_input);
+
+    std::lock_guard<std::mutex> lock(driver_output_mutex);
+    driver_input = _new_driver_input;
+    new_driver_input = true;
   }
 
   if (valid_aux) {
-    handle_controller(aux_context, aux_options);
+    if (_new_aux_output || testing_aux) {
+      OutputState output;
+      ZeroMemory(&output, sizeof(output));
+
+      if (_new_aux_output) {
+        std::lock_guard<std::mutex> lock(aux_output_mutex);
+        output = *_new_aux_output;
+        new_aux_output = false;
+      }
+      if (testing_aux) {
+        output.rumbleLeft = 0xFF;
+        output.rumbleRight = 0xFF;
+      }
+
+      handle_controller_output(aux_context, output);
+    }
+
+    InputState _new_aux_input;
+    handle_controller_input(driver_context, &_new_aux_input);
+
+    std::lock_guard<std::mutex> lock(aux_output_mutex);
+    aux_input = _new_aux_input;
+    new_aux_input = true;
   }
 }
 
@@ -97,53 +147,193 @@ void PS5ControllerHandler::set_controller_ids(int driver, int aux) {
   reload_connections();
 }
 
-void PS5ControllerHandler::handle_controller(DS5W::DeviceContext& context, const Options& options) {
+void PS5ControllerHandler::thread_main(bool is_driver) {
+  using namespace std::chrono_literals;
+
+SOCKET_CREATE:
+  SOCKET client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (client_socket == INVALID_SOCKET) {
+    fmt::print("socket() failed with error: {}\n", WSAGetLastError());
+    std::this_thread::sleep_for(1s);
+    goto SOCKET_CREATE;
+  }
+
+SOCKET_CONNECT:
+  sockaddr_in server_addr;
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(is_driver ? 5809 : 5808);
+  server_addr.sin_addr.s_addr = inet_addr("roborio-1511-FRC.local");
+  if (connect(client_socket, (SOCKADDR*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
+    fmt::print("connect() failed with error: {}\n", WSAGetLastError());
+    std::this_thread::sleep_for(0.5s);
+    goto SOCKET_CONNECT;
+  }
+
+  bool* new_input;
+  bool* new_output;
+  std::mutex* input_mutex;
+  std::mutex* output_mutex;
+  InputState* input_state;
+  OutputState* output_state;
+  if (is_driver) {
+    new_input = &new_driver_input;
+    new_output = &new_driver_output;
+    input_mutex = &driver_input_mutex;
+    output_mutex = &driver_output_mutex;
+    input_state = &driver_input;
+    output_state = &driver_output;
+  }
+  else {
+    new_input = &new_aux_input;
+    new_output = &new_aux_output;
+    input_mutex = &aux_input_mutex;
+    output_mutex = &aux_output_mutex;
+    input_state = &aux_input;
+    output_state = &aux_output;
+  }
+
+  char input_buf[sizeof(InputState)];
+  char output_buf[sizeof(OutputState)];
+
+  while (true) {
+    bool _new_input = false;
+
+    {
+      std::lock_guard<std::mutex> lock(*input_mutex);
+      _new_input = *new_input;
+      *new_input = false;
+    }
+
+    // Send input.
+    if (_new_input) {
+      {
+        std::lock_guard<std::mutex> lock(*input_mutex);
+        std::memcpy(input_buf, input_state, sizeof(InputState));
+        *new_input = false;
+      }
+
+      if (send(client_socket, input_buf, sizeof(InputState), 0) == SOCKET_ERROR) {
+        fmt::print("send() failed with error: {}\n", WSAGetLastError());
+        goto SOCKET_CREATE;
+      }
+    }
+
+    // Receive output.
+    {
+      fd_set read_set;
+      FD_ZERO(&read_set);
+      FD_SET(client_socket, &read_set);
+      timeval timeout;
+      timeout.tv_sec = 0;
+      timeout.tv_usec = 1000; // 1 ms
+      int res = select(0, &read_set, NULL, NULL, &timeout);
+      if (res == SOCKET_ERROR) {
+        fmt::print("select() failed with error: {}\n", WSAGetLastError());
+        goto SOCKET_CREATE;
+      }
+      else if (!res) {
+        if (recv(client_socket, output_buf, sizeof(OutputState), 0) == SOCKET_ERROR) {
+          fmt::print("recv() failed with error: {}\n", WSAGetLastError());
+        }
+        else {
+          std::lock_guard<std::mutex> lock(*output_mutex);
+          std::memcpy(output_state, output_buf, sizeof(OutputState));
+          *new_output = true;
+        }
+      }
+    }
+  }
+}
+
+void PS5ControllerHandler::handle_controller_input(DS5W::DeviceContext& context, InputState* input) {
+    DS5W::DS5InputState input_state;
+	
+		// Retrieve data
+		if (DS5W_FAILED(DS5W::getDeviceInputState(&context, &input_state))) {
+      return;
+    }
+
+    input->axisLeftX = input_state.leftStick.x;
+    input->axisLeftY = input_state.leftStick.y;
+
+    input->axisRightX = input_state.rightStick.x;
+    input->axisRightY = input_state.rightStick.y;
+
+    input->axisLeftTrigger = input_state.leftTrigger;
+    input->axisRightTrigger = input_state.rightTrigger;
+
+    input->buttonsAndDPad = input_state.buttonsAndDpad;
+    input->buttonsA = input_state.buttonsA;
+    input->buttonsB = input_state.buttonsB;
+
+    auto accel = input_state.accelerometer;
+    input->accelX = accel.x;
+    input->accelY = accel.y;
+    input->accelZ = accel.z;
+
+    auto gyro = input_state.gyroscope;
+    input->gyroX = gyro.x;
+    input->gyroY = gyro.y;
+    input->gyroZ = gyro.z;
+}
+
+void PS5ControllerHandler::handle_controller_output(DS5W::DeviceContext& context, const OutputState& output) {
   DS5W::DS5OutputState out_state;
   ZeroMemory(&out_state, sizeof(out_state));
 
   // Rumble
 
-  out_state.leftRumble = options.rumble.left;
-  out_state.rightRumble = options.rumble.right;
+  out_state.leftRumble = output.rumbleLeft;
+  out_state.rightRumble = output.rumbleRight;
 
   // Triggers
 
-  auto handle_trigger = [](DS5W::TriggerEffect& effect, const PS5TriggerOptions& options) {
-    switch (options.trigger_effect) {
-      case 0:
-      default:
-        effect.effectType = DS5W::TriggerEffectType::NoResitance;
-        return;
-      case 1:
-        effect.effectType = DS5W::TriggerEffectType::SectionResitance;
-        effect.Section.startPosition = options.start_position;
-        effect.Section.endPosition = options.end_position;
-        return;
-      case 2: 
-        effect.effectType = DS5W::TriggerEffectType::ContinuousResitance;
-        effect.Continuous.force = options.force;
-        effect.Continuous.startPosition = options.start_position;
-        return;
-    }
-  };
+  switch (output.leftTriggerEffect) {
+    case 0:
+    default:
+      out_state.leftTriggerEffect.effectType = DS5W::TriggerEffectType::NoResitance;
+      break;
+    case 1:
+      out_state.leftTriggerEffect.effectType = DS5W::TriggerEffectType::SectionResitance;
+      out_state.leftTriggerEffect.Section.startPosition = output.leftTriggerStartPosition;
+      out_state.leftTriggerEffect.Section.endPosition = output.leftTriggerEndPosition;
+      break;
+    case 2:
+      out_state.leftTriggerEffect.effectType = DS5W::TriggerEffectType::ContinuousResitance;
+      out_state.leftTriggerEffect.Continuous.force = output.leftTriggerForce;
+      out_state.leftTriggerEffect.Continuous.startPosition = output.leftTriggerStartPosition;
+      break;
+  }
 
-  handle_trigger(out_state.leftTriggerEffect, options.left_trigger);
-  handle_trigger(out_state.rightTriggerEffect, options.right_trigger);
+  switch (output.rightTriggerEffect) {
+    case 0:
+    default:
+      out_state.rightTriggerEffect.effectType = DS5W::TriggerEffectType::NoResitance;
+      break;
+    case 1:
+      out_state.rightTriggerEffect.effectType = DS5W::TriggerEffectType::SectionResitance;
+      out_state.rightTriggerEffect.Section.startPosition = output.rightTriggerStartPosition;
+      out_state.rightTriggerEffect.Section.endPosition = output.rightTriggerEndPosition;
+      break;
+    case 2:
+      out_state.rightTriggerEffect.effectType = DS5W::TriggerEffectType::ContinuousResitance;
+      out_state.rightTriggerEffect.Continuous.force = output.rightTriggerForce;
+      out_state.rightTriggerEffect.Continuous.startPosition = output.rightTriggerStartPosition;
+      break;
+  }
 
   // LEDs
 
   // Lightbar
-  out_state.lightbar = DS5W::Color { (unsigned char)options.leds.lightbar_r, (unsigned char)options.leds.lightbar_g, (unsigned char)options.leds.lightbar_b };
+  out_state.lightbar = DS5W::Color { (unsigned char)output.lightbarR, (unsigned char)output.lightbarG, (unsigned char)output.lightbarB };
 
   // Microphone
-  out_state.microphoneLed = static_cast<DS5W::MicLed>(options.leds.mic);
+  out_state.microphoneLed = static_cast<DS5W::MicLed>(output.micLed);
 
   // Player LEDs
-  if (options.leds.player_bitmask) {
-    out_state.playerLeds.playerLedFade = options.leds.player_fade;
-    out_state.playerLeds.bitmask = options.leds.player_bitmask;
-    out_state.playerLeds.brightness = DS5W::LedBrightness::HIGH;
-  }
+  out_state.playerLeds.playerLedFade = output.playerLedFade;
+  out_state.playerLeds.bitmask = output.playerLedBitmask;
+  out_state.playerLeds.brightness = DS5W::LedBrightness::HIGH;
 
   DS5W::setDeviceOutputState(&context, &out_state);
 }

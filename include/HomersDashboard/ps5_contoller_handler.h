@@ -7,31 +7,46 @@
 #include <DualSenseWindows/IO.h>
 
 extern "C" {
-  struct PS5RumbleOptions {
-    uint32_t left : 8;
-    uint32_t right : 8;
-    uint32_t pad : 16;
-  };
-  typedef struct PS5RumbleOptions PS5RumbleOptions;
-  
-  struct PS5TriggerOptions {
-    uint32_t start_position : 8;
-    uint32_t end_position : 8;
-    uint32_t force : 8;
-    uint32_t trigger_effect : 2; // (0 = off, 1 = section, 2 = continuous)
-    uint32_t pad : 6;
-  };
-  typedef struct PS5TriggerOptions PS5TriggerOptions;
+    struct InputState {
+        uint32_t axisLeftX : 8;
+        uint32_t axisLeftY : 8;
+        uint32_t axisRightX : 8;
+        uint32_t axisRightY : 8;
+        uint32_t axisLeftTrigger : 8;
+        uint32_t axisRightTrigger : 8;
+        uint32_t buttonsAndDPad : 8;
+        uint32_t buttonsA : 8;
+        uint32_t accelX : 16;
+        uint32_t accelY : 16;
+        uint32_t accelZ : 16;
+        uint32_t gyroX : 16;
+        uint32_t gyroY : 16;
+        uint32_t gyroZ : 16;
+        uint32_t buttonsB : 8;
+        uint32_t pad : 24;
+    }; // 24 bytes
+    typedef struct InputState InputState;
 
-  struct PS5LEDOptions {
-    uint32_t lightbar_r : 8;
-    uint32_t lightbar_g : 8;
-    uint32_t lightbar_b : 8;
-    uint32_t mic : 2; // (0 = off, 1 = on, 2 = pulse)
-    uint32_t player_fade : 1;
-    uint32_t player_bitmask : 5; // (0x01 = left, 0x02 = middle left, 0x04 = middle, 0x08 = middle right, 0x10 = right)
-  };
-  typedef struct PS5LEDOptions PS5LEDOptions;
+    struct OutputState {
+        uint32_t rumbleLeft : 8;
+        uint32_t rumbleRight : 8;
+        uint32_t micLed : 2; // (0 = off, 1 = on, 2 = pulse)
+        uint32_t playerLedFade : 1;
+        uint32_t playerLedBitmask : 5; // (0x01 = left, 0x02 = middle left, 0x04 = middle, 0x08 = middle right, 0x10 = right)
+        uint32_t lightbarR : 8;
+        uint32_t lightbarG : 8;
+        uint32_t lightbarB : 8;
+        uint32_t leftTriggerStartPosition : 8;
+        uint32_t leftTriggerEndPosition : 8;
+        uint32_t leftTriggerForce : 8;
+        uint32_t rightTriggerStartPosition : 8;
+        uint32_t rightTriggerEndPosition : 8;
+        uint32_t rightTriggerForce : 8;
+        uint32_t leftTriggerEffect : 2; // (0 = off, 1 = section, 2 = continuous)
+        uint32_t rightTriggerEffect : 2; // (0 = off, 1 = section, 2 = continuous)
+        uint32_t pad : 28;
+    }; // 16 bytes
+    typedef struct OutputState OutputState;
 }
 
 class PS5ControllerHandler {
@@ -42,13 +57,6 @@ public:
 
   PS5ControllerHandler(PS5ControllerHandler const&) = delete;
   PS5ControllerHandler& operator=(PS5ControllerHandler const&) = delete;
-
-  struct Options {
-    PS5RumbleOptions rumble;
-    PS5TriggerOptions left_trigger;
-    PS5TriggerOptions right_trigger;
-    PS5LEDOptions leds;
-  };
 
   void init();
 
@@ -67,7 +75,10 @@ private:
   PS5ControllerHandler();
   ~PS5ControllerHandler();
 
-  void handle_controller(DS5W::DeviceContext& context, const Options& options);
+  void thread_main(bool is_driver);
+
+  void handle_controller_input(DS5W::DeviceContext& context, InputState* input);
+  void handle_controller_output(DS5W::DeviceContext& context, const OutputState& ouput);
 
   int driver_id = 0;
   int aux_id = 1;
@@ -75,8 +86,26 @@ private:
   DS5W::DeviceContext driver_context;
   DS5W::DeviceContext aux_context;
 
-  Options driver_options;
-  Options aux_options;
+  std::thread driver_thread;
+  std::thread aux_thread;
+
+  InputState driver_input;
+  InputState aux_input;
+
+  bool new_driver_input = false;
+  bool new_aux_input = false;
+
+  std::mutex driver_input_mutex;
+  std::mutex aux_input_mutex;
+
+  OutputState driver_output;
+  OutputState aux_output;
+
+  bool new_driver_output = false;
+  bool new_aux_output = false;
+
+  std::mutex driver_output_mutex;
+  std::mutex aux_output_mutex;
 
   bool valid_driver = false;
   bool valid_aux = false;
