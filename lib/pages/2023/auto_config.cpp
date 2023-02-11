@@ -12,6 +12,26 @@ AutoConfigPage::~AutoConfigPage() = default;
 
 void AutoConfigPage::init() { }
 
+void AutoConfigPage::apply_save_data(const SaveData& save_data) {
+  set_doing_auto(std::atoi(save_data.at("Doing_Auto").c_str()));
+  set_starting_location((StartingLocation)std::atoi(save_data.at("Starting_Location").c_str()));
+  set_starting_gamepiece((GamePiece)std::atoi(save_data.at("Starting_GamePiece").c_str()));
+  set_starting_action(std::atoi(save_data.at("Starting_Action").c_str()));
+  set_field_gamepiece((GamePiece)std::atoi(save_data.at("Field_GamePiece").c_str()));
+  set_final_action(std::atoi(save_data.at("Final_Action").c_str()));
+}
+
+frc1511::Page::SaveData AutoConfigPage::get_save_data() const {
+  return {
+    { "Doing_Auto", std::to_string(doing_auto) },
+    { "Starting_Location", std::to_string(starting_location) },
+    { "Starting_GamePiece", std::to_string(starting_gamepiece) },
+    { "Starting_Action", std::to_string(starting_action) },
+    { "Field_GamePiece", std::to_string(field_gamepiece) },
+    { "Final_Action", std::to_string(final_action) }
+  };
+}
+
 void AutoConfigPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_FirstUseEver);
 

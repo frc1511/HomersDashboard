@@ -15,6 +15,9 @@ public:
   AutoConfigPage& operator=(AutoConfigPage const&) = delete;
 
   void init() override;
+  inline const char* get_save_name() const override { return "2023_Auto_Config"; }
+  void apply_save_data(const SaveData& save_data) override;
+  SaveData get_save_data() const override;
   void present(bool* running) override;
 
   enum StartingLocation {

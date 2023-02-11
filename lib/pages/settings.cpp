@@ -1,12 +1,33 @@
 #include <HomersDashboard/pages/settings.h>
 #include <ThunderDashboard/nt_handler.h>
+#ifdef THUNDER_WINDOWS
 #include <HomersDashboard/ps5_contoller_handler.h>
+#endif
 
 #define COL_WIDTH 150
 
 SettingsPage::SettingsPage() = default;
 
 SettingsPage::~SettingsPage() = default;
+
+void SettingsPage::apply_save_data(const SaveData& save_data) {
+  set_team_number(std::atoi(save_data.at("Team_Number").c_str()));
+#ifdef THUNDER_WINDOWS
+  int driver_id = std::atoi(save_data.at("PS5_Driver_ID").c_str());
+  int aux_id = std::atoi(save_data.at("PS5_Aux_ID").c_str());
+  PS5ControllerHandler::get()->set_controller_ids(driver_id, aux_id);
+#endif
+}
+
+frc1511::Page::SaveData SettingsPage::get_save_data() const {
+  return {
+    { "Team_Number", std::to_string(team_number) },
+#ifdef THUNDER_WINDOWS
+    { "PS5_Driver_ID", std::to_string(PS5ControllerHandler::get()->get_driver_id()) },
+    { "PS5_Aux_ID", std::to_string(PS5ControllerHandler::get()->get_aux_id()) }
+#endif
+  };
+}
 
 void SettingsPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
@@ -33,6 +54,7 @@ void SettingsPage::present(bool* running) {
   ImGui::Columns(1);
   ImGui::PopID();
 
+#ifdef THUNDER_WINDOWS
   auto [old_driver_id, old_aux_id] = PS5ControllerHandler::get()->get_controller_ids();
   int driver_id = old_driver_id;
   int aux_id = old_aux_id;
@@ -113,6 +135,7 @@ void SettingsPage::present(bool* running) {
 
   ImGui::Columns(1);
   ImGui::PopID();
+#endif
   
   ImGui::End();
 }

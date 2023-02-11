@@ -36,7 +36,25 @@ ThunderDashboard* get_dashboard() {
 } // namespace frc1511
 
 HomersDashboard::HomersDashboard()
-: frc1511::ThunderDashboard("Homer") { }
+: frc1511::ThunderDashboard("Homer"),
+  all_pages({
+    AutoChooserPage::get(),
+    BlinkyBlinkyPage::get(),
+    IntakeCameraPage::get(),
+    LimelightPage::get(),
+    MotionProfilePage::get(),
+    NetworkTablesPage::get(),
+    RobotPositionPage::get(),
+    SettingsPage::get(),
+    MatchTimerPage::get(),
+    CompInfoPage::get(),
+    PressureGaugePage::get(),
+    y2022::BallCountPage::get(),
+    y2022::ShooterPositionPage::get(),
+    y2023::AutoConfigPage::get(),
+    y2023::AutoPreviewPage::get(),
+    y2023::NodeSelectorPage::get(),
+  }) { }
 
 HomersDashboard::~HomersDashboard() = default;
 
@@ -74,22 +92,9 @@ void HomersDashboard::present() {
     PS5ControllerHandler::get()->init();
 #endif
 
-    AutoChooserPage::get()->init();
-    BlinkyBlinkyPage::get()->init();
-    IntakeCameraPage::get()->init();
-    LimelightPage::get()->init();
-    MotionProfilePage::get()->init();
-    NetworkTablesPage::get()->init();
-    RobotPositionPage::get()->init();
-    SettingsPage::get()->init();
-    MatchTimerPage::get()->init();
-    CompInfoPage::get()->init();
-    PressureGaugePage::get()->init();
-    y2022::BallCountPage::get()->init();
-    y2022::ShooterPositionPage::get()->init();
-    y2023::NodeSelectorPage::get()->init();
-    y2023::AutoConfigPage::get()->init();
-    y2023::AutoPreviewPage::get()->init();
+    for (frc1511::Page* page : all_pages) {
+      page->init();
+    }
   }
 
   frc1511::NTHandler::get()->update();
@@ -98,8 +103,8 @@ void HomersDashboard::present() {
 
   bool item_close = false;
 
-  bool was_showing_intake_camera = show_intake_camera,
-       was_showing_limelight = show_limelight;
+  bool was_showing_intake_camera = page_states & (1ull << 2),
+       was_showing_limelight     = page_states & (1ull << 3);
 
 #ifdef DASHBOARD_MACOS
 # define CTRL_STR "Cmd+"
@@ -108,6 +113,12 @@ void HomersDashboard::present() {
 # define CTRL_STR "Ctrl+"
 # define CTRL_SHIFT_STR "Ctrl+Shift+"
 #endif
+
+  auto menu_item = [&](const char* label, uint64_t page_index) {
+    if (ImGui::MenuItem(label, nullptr, page_states & (1ull << page_index))) {
+      page_states ^= (1ull << page_index);
+    }
+  };
   
   if (ImGui::BeginMenuBar()) {
     if (ImGui::BeginMenu("File")) {
@@ -116,32 +127,32 @@ void HomersDashboard::present() {
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Tools")) {
-      ImGui::MenuItem(ICON_FA_CAMERA         "  Intake Camera",  nullptr, &show_intake_camera);
-      ImGui::MenuItem(ICON_FA_LEMON          "  Limelight",      nullptr, &show_limelight);
-      ImGui::MenuItem(ICON_FA_TH_LIST        "  Network Tables", nullptr, &show_network_tables);
-      ImGui::MenuItem(" " ICON_FA_BOLT       "   Auto Chooser",  nullptr, &show_auto_chooser);
-      ImGui::MenuItem(" " ICON_FA_LIGHTBULB  "   Blinky Blinky", nullptr, &show_blinky_blinky);
-      ImGui::MenuItem(ICON_FA_MAP_MARKED_ALT "  Robot Position", nullptr, &show_robot_position);
-      ImGui::MenuItem(ICON_FA_CHART_LINE     "  Motion Profile", nullptr, &show_motion_profile);
-      ImGui::MenuItem(ICON_FA_CLOCK          "  Match Timer",    nullptr, &show_match_timer);
-      ImGui::MenuItem(" " ICON_FA_INFO       "   Competition Info", nullptr, &show_comp_info);
-      ImGui::MenuItem(ICON_FA_SKULL          "  Pressure Gauge", nullptr, &show_pressure_gauge);
+      menu_item(ICON_FA_CAMERA         "  Intake Camera",     2);
+      menu_item(ICON_FA_LEMON          "  Limelight",         3);
+      menu_item(ICON_FA_TH_LIST        "  Network Tables",    5);
+      menu_item(" " ICON_FA_BOLT       "   Auto Chooser",     0);
+      menu_item(" " ICON_FA_LIGHTBULB  "   Blinky Blinky",    1);
+      menu_item(ICON_FA_MAP_MARKED_ALT "  Robot Position",    6);
+      menu_item(ICON_FA_CHART_LINE     "  Motion Profile",    4);
+      menu_item(ICON_FA_CLOCK          "  Match Timer",       8);
+      menu_item(" " ICON_FA_INFO       "   Competition Info", 9);
+      menu_item(ICON_FA_SKULL          "  Pressure Gauge",    10);
       if (ImGui::BeginMenu("2022")) {
-        ImGui::MenuItem(ICON_FA_BASEBALL_BALL "  Ball Count",    nullptr, &show_2022_ball_count);
-        ImGui::MenuItem(ICON_FA_METEOR        "  Shooter Position",    nullptr, &show_2022_shooter_pos);
+        menu_item(ICON_FA_BASEBALL_BALL "  Ball Count",       11);
+        menu_item(ICON_FA_METEOR        "  Shooter Position", 12);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("2023")) {
-        ImGui::MenuItem(" " ICON_FA_BOLT "   Auto Config",    nullptr, &show_2023_auto_config);
-        ImGui::MenuItem(ICON_FA_CHART_LINE "  Auto Preview",    nullptr, &show_2023_auto_preview);
-        ImGui::MenuItem(ICON_FA_FILM     "  Node Selector",    nullptr, &show_2023_node_selector);
+        menu_item(" " ICON_FA_BOLT       "   Auto Config",     13);
+        menu_item(" " ICON_FA_CHART_LINE "  Auto Preview",     14);
+        menu_item(" " ICON_FA_FILM       "  Node Selector",    15);
         ImGui::EndMenu();
       }
 
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Settings")) {
-      ImGui::MenuItem(ICON_FA_COG "  Settings", nullptr, &show_settings);
+      menu_item(ICON_FA_COGS "  Settings", 7);
 
       ImGui::EndMenu();
     }
@@ -155,29 +166,23 @@ void HomersDashboard::present() {
   PS5ControllerHandler::get()->process();
 #endif
 
-  if (show_settings) SettingsPage::get()->present(&show_settings);
-  if (show_blinky_blinky) BlinkyBlinkyPage::get()->present(&show_blinky_blinky);
-  if (show_auto_chooser) AutoChooserPage::get()->present(&show_auto_chooser);
-  if (show_intake_camera) IntakeCameraPage::get()->present(&show_intake_camera);
-  if (show_limelight) LimelightPage::get()->present(&show_limelight);
-  if (show_network_tables) NetworkTablesPage::get()->present(&show_network_tables);
-  if (show_motion_profile) MotionProfilePage::get()->present(&show_motion_profile);
-  if (show_robot_position) RobotPositionPage::get()->present(&show_robot_position);
-  if (show_match_timer) MatchTimerPage::get()->present(&show_match_timer);
-  if (show_comp_info) CompInfoPage::get()->present(&show_comp_info);
-  if (show_pressure_gauge) PressureGaugePage::get()->present(&show_pressure_gauge);
-  if (show_2022_ball_count) y2022::BallCountPage::get()->present(&show_2022_ball_count);
-  if (show_2022_shooter_pos) y2022::ShooterPositionPage::get()->present(&show_2022_shooter_pos);
-  if (show_2023_node_selector) y2023::NodeSelectorPage::get()->present(&show_2023_node_selector);
-  if (show_2023_auto_config) y2023::AutoConfigPage::get()->present(&show_2023_auto_config);
-  if (show_2023_auto_preview) y2023::AutoPreviewPage::get()->present(&show_2023_auto_preview);
-
-  if (show_intake_camera != was_showing_intake_camera) {
-    IntakeCameraPage::get()->set_running(show_intake_camera);
+  for (int i = 0; i < all_pages.size(); i++) {
+    bool showing_page = page_states & (1ull << i);
+    bool was_showing_page = showing_page;
+    if (showing_page) {
+      all_pages.at(i)->present(&showing_page);
+      page_states ^= (was_showing_page ^ showing_page) << i; // xor is awful
+    }
   }
 
-  if (show_limelight != was_showing_limelight) {
-    LimelightPage::get()->set_running(show_limelight);
+  bool showing_intake_camera = page_states & (1ull << 2);
+  if (was_showing_intake_camera != showing_intake_camera) {
+    IntakeCameraPage::get()->set_running(showing_intake_camera);
+  }
+
+  bool showing_limelight = page_states & (1ull << 3);
+  if (was_showing_limelight != showing_limelight) {
+    LimelightPage::get()->set_running(showing_limelight);
   }
 
   handle_state();
@@ -204,191 +209,74 @@ void HomersDashboard::handle_keyboard(int key, int scancode, int action, int mod
   }
 }
 
-unsigned HomersDashboard::get_page_states() const {
-  unsigned states = 0;
-
-  if (show_network_tables) states |= PAGE_NETWORK_TABLES;
-  if (show_robot_position) states |= PAGE_ROBOT_POSITION;
-  if (show_auto_chooser)   states |= PAGE_AUTO_CHOOSER;
-  if (show_motion_profile) states |= PAGE_MOTION_PROFILE;
-  if (show_intake_camera)  states |= PAGE_INTAKE_CAMERA;
-  if (show_limelight)      states |= PAGE_LIMELIGHT;
-  if (show_blinky_blinky)  states |= PAGE_BLINKY_BLINKY;
-  if (show_settings)       states |= PAGE_SETTINGS;
-  if (show_match_timer)    states |= PAGE_MATCH_TIMER;
-  if (show_comp_info)      states |= PAGE_COMP_INFO;
-  if (show_pressure_gauge) states |= PAGE_PRESSURE_GAUGE;
-  if (show_2022_ball_count) states |= PAGE_2022_BALL_COUNT;
-  if (show_2022_shooter_pos) states |= PAGE_2022_SHOOTER_POS;
-  if (show_2023_node_selector) states |= PAGE_2023_NODE_SELECTOR;
-  if (show_2023_auto_config) states |= PAGE_2023_AUTO_CONFIG;
-  if (show_2023_auto_preview) states |= PAGE_2023_AUTO_PREVIEW;
-
-  return states;
-}
-
-void HomersDashboard::set_page_states(unsigned states) {
-  show_network_tables = states & PAGE_NETWORK_TABLES;
-  show_robot_position = states & PAGE_ROBOT_POSITION;
-  show_auto_chooser   = states & PAGE_AUTO_CHOOSER;
-  show_motion_profile = states & PAGE_MOTION_PROFILE;
-  show_intake_camera  = states & PAGE_INTAKE_CAMERA;
-  show_limelight      = states & PAGE_LIMELIGHT;
-  show_blinky_blinky  = states & PAGE_BLINKY_BLINKY;
-  show_settings       = states & PAGE_SETTINGS;
-  show_match_timer    = states & PAGE_MATCH_TIMER;
-  show_comp_info      = states & PAGE_COMP_INFO;
-  show_pressure_gauge = states & PAGE_PRESSURE_GAUGE;
-  show_2022_ball_count = states & PAGE_2022_BALL_COUNT;
-  show_2022_shooter_pos = states & PAGE_2022_SHOOTER_POS;
-  show_2023_node_selector = states & PAGE_2023_NODE_SELECTOR;
-  show_2023_auto_config = states & PAGE_2023_AUTO_CONFIG;
-  show_2023_auto_preview = states & PAGE_2023_AUTO_PREVIEW;
-
-  IntakeCameraPage::get()->set_running(show_intake_camera);
-  LimelightPage::get()->set_running(show_limelight);
+void HomersDashboard::update_page_states() {
+  IntakeCameraPage::get()->set_running(page_states & (1ull << 2));
+  LimelightPage::get()->set_running(page_states & (1ull << 3));
 }
 
 // --- User Data ---
-
-#define SECTION_APP_STATE "AppState"
-#define KEY_PAGE_STATES "PageStates"
-
-#define SECTION_SETTINGS "Settings"
-#define KEY_TEAM_NUMBER "TeamNumber"
-#define KEY_DRIVER_PS5_ID "DriverPS5ID"
-#define KEY_AUX_PS5_ID "AuxPS5ID"
-
-#define SECTION_AUTO_CHOOSER "AutoChooser"
-#define KEY_AUTO_MODE "AutoMode"
-#define KEY_AUTO_DELAY "AutoDelay"
-
-#define SECTION_BLINKY_BLINKY "BlinkyBlinky"
-#define KEY_LED_MODE "LedMode"
-#define KEY_LED_CUSTOM_R "CustomR"
-#define KEY_LED_CUSTOM_G "CustomG"
-#define KEY_LED_CUSTOM_B "CustomB"
-
-#define SECTION_2023_AUTO_CONFIG "AutoConfig2023"
-#define KEY_2023_AUTO_DOING "DoingAuto"
-#define KEY_2023_AUTO_STARTING_LOCATION "StartingLocation"
-#define KEY_2023_AUTO_STARTING_GAMEPIECE "StartingGamePiece"
-#define KEY_2023_AUTO_STARTING_ACTION "StartingAction"
-#define KEY_2023_AUTO_FIELD_GAMEPIECE "FieldGamePiece"
-#define KEY_2023_AUTO_FINAL_ACTION "FinalAction"
-
-#define SECTION_WINDOW_STUFF "WindowSize"
-#define KEY_WIN_WIDTH "Width"
-#define KEY_WIN_HEIGHT "Height"
-#define KEY_WIN_XPOS "XPos"
-#define KEY_WIN_YPOS "YPos"
 
 void HomersDashboard::data_clear() {
   data_map.clear();
 }
 
 bool HomersDashboard::data_should_open(const char* name) {
-  bool res = true;
+  app_section = std::string_view(name) == "App_State";
+  if (app_section) return true;
 
-  if (std::strcmp(name, SECTION_APP_STATE) &&
-      std::strcmp(name, SECTION_SETTINGS) &&
-      std::strcmp(name, SECTION_AUTO_CHOOSER) &&
-      std::strcmp(name, SECTION_BLINKY_BLINKY) &&
-      std::strcmp(name, SECTION_WINDOW_STUFF) &&
-      std::strcmp(name, SECTION_2023_AUTO_CONFIG)) {
-    res = false;
-  }
+  current_page = std::find_if(all_pages.cbegin(), all_pages.cend(), [&](const auto& page) {
+    return std::string_view(page->get_save_name()) == name;
+  });
 
-  return res;
+  return current_page != all_pages.cend();
 }
 
-void HomersDashboard::data_read_line(const char* line) {
-  data_map.insert(line);
+void HomersDashboard::data_read_line(const char* _line) {
+  std::string line = _line;
+  std::size_t del = line.find("=");
+  std::string section_name = app_section ? "App_State" : (*current_page)->get_save_name();
+  data_map[section_name][line.substr(0, del)] = line.substr(del + 1, line.size());
 }
 
 void HomersDashboard::data_apply(const char* type_name) {
-  std::size_t del;
-  std::string key;
-  std::string val;
-  for (auto& line : data_map) {
-    del = line.find("=");
-    key = line.substr(0, del);
-    val = line.substr(del + 1, line.size());
-    
-    if (std::strcmp(type_name, get_data_name()) == 0) {
-      if (key == KEY_PAGE_STATES) {
-        set_page_states(std::atoll(val.c_str()));
-      }
-      if (key == KEY_TEAM_NUMBER) {
-        SettingsPage::get()->set_team_number(std::atol(val.c_str()));
-      }
-      if (key == KEY_DRIVER_PS5_ID) {
-#ifdef THUNDER_WINDOWS
-        auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
-        PS5ControllerHandler::get()->set_controller_ids(std::atoi(val.c_str()), aux_id);
-#endif
-      }
-      if (key == KEY_AUX_PS5_ID) {
-#ifdef THUNDER_WINDOWS
-        auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
-        PS5ControllerHandler::get()->set_controller_ids(driver_id, std::atoi(val.c_str()));
-#endif
-      }
-      if (key == KEY_AUTO_MODE) {
-        AutoChooserPage::get()->set_auto_mode(std::atoi(val.c_str()));
-      }
-      if (key == KEY_AUTO_DELAY) {
-        AutoChooserPage::get()->set_auto_delay(std::atof(val.c_str()));
-      }
-      if (key == KEY_LED_MODE) {
-        BlinkyBlinkyPage::get()->set_led_mode(std::atoi(val.c_str()));
-      }
-      if (key == KEY_LED_CUSTOM_R) {
-        BlinkyBlinkyPage::get()->set_custom_r(std::atof(val.c_str()));
-      }
-      if (key == KEY_LED_CUSTOM_G) {
-        BlinkyBlinkyPage::get()->set_custom_g(std::atof(val.c_str()));
-      }
-      if (key == KEY_LED_CUSTOM_B) {
-        BlinkyBlinkyPage::get()->set_custom_b(std::atof(val.c_str()));
-      }
-      if (key == KEY_2023_AUTO_DOING) {
-        y2023::AutoConfigPage::get()->set_doing_auto(std::atoi(val.c_str()));
-      }
-      if (key == KEY_2023_AUTO_STARTING_LOCATION) {
-        y2023::AutoConfigPage::get()->set_starting_location((y2023::AutoConfigPage::StartingLocation)std::atoi(val.c_str()));
-      }
-      if (key == KEY_2023_AUTO_STARTING_GAMEPIECE) {
-        y2023::AutoConfigPage::get()->set_starting_gamepiece((y2023::AutoConfigPage::GamePiece)std::atoi(val.c_str()));
-      }
-      if (key == KEY_2023_AUTO_STARTING_ACTION) {
-        y2023::AutoConfigPage::get()->set_starting_action(std::atoi(val.c_str()));
-      }
-      if (key == KEY_2023_AUTO_FIELD_GAMEPIECE) {
-        y2023::AutoConfigPage::get()->set_field_gamepiece((y2023::AutoConfigPage::GamePiece)std::atoi(val.c_str()));
-      }
-      if (key == KEY_2023_AUTO_FINAL_ACTION) {
-        y2023::AutoConfigPage::get()->set_final_action(std::atoi(val.c_str()));
-      }
+  for (const auto& [section, data] : data_map) {
+    if (section == "App_State") {
+      for (const auto& [key, value] : data) {
+        // Whether pages are open or not.
+        if (key == "Page_States") {
+          page_states = std::atoll(value.c_str());
+          update_page_states();
+        }
 
-      int width, height;
-      glfwGetWindowSize(get_window(), &width, &height);
+        // Window dimensions.
+        int width, height;
+        glfwGetWindowSize(get_window(), &width, &height);
 
-      if (key == KEY_WIN_WIDTH) {
-        glfwSetWindowSize(get_window(), std::atoi(val.c_str()), height);
-      }
-      if (key == KEY_WIN_HEIGHT) {
-        glfwSetWindowSize(get_window(), width, std::atoi(val.c_str()));
-      }
+        if (key == "Window_Width") {
+          glfwSetWindowSize(get_window(), std::atoi(value.c_str()), height);
+        }
+        if (key == "Window_Height") {
+          glfwSetWindowSize(get_window(), width, std::atoi(value.c_str()));
+        }
 
-      int xpos, ypos;
-      glfwGetWindowPos(get_window(), &xpos, &ypos);
+        // Window position.
+        int xpos, ypos;
+        glfwGetWindowPos(get_window(), &xpos, &ypos);
 
-      if (key == KEY_WIN_XPOS) {
-        glfwSetWindowPos(get_window(), std::atoi(val.c_str()), ypos);
+        if (key == "Window_XPos") {
+          glfwSetWindowPos(get_window(), std::atoi(value.c_str()), ypos);
+        }
+        if (key == "Window_YPos") {
+          glfwSetWindowPos(get_window(), xpos, std::atoi(value.c_str()));
+        }
       }
-      if (key == KEY_WIN_YPOS) {
-        glfwSetWindowPos(get_window(), xpos, std::atoi(val.c_str()));
+    }
+    else {
+      auto page = std::find_if(all_pages.cbegin(), all_pages.cend(), [&section = section](const auto& page) {
+        return std::string_view(page->get_save_name()) == section;
+      });
+      if (page != all_pages.cend()) {
+        (*page)->apply_save_data(data);
       }
     }
   }
@@ -402,57 +290,30 @@ void HomersDashboard::data_write(const char* type_name, ImGuiTextBuffer* buf) {
   auto end_section = [&]() {
     buf->append("\n");
   };
-  
-  auto add_entry = [&](const char* key, const char* val_format, auto ...args) {
-    std::string format(std::string("%s=") + val_format + '\n');
-    buf->appendf(format.c_str(), key, args...);
-  };
-  
-  if (std::strcmp(type_name, get_data_name()) == 0) {
-    begin_section(SECTION_APP_STATE);
-    add_entry(KEY_PAGE_STATES, "%lld", get_page_states());
-    end_section();
 
-    begin_section(SECTION_SETTINGS);
-    add_entry(KEY_TEAM_NUMBER, "%lu", SettingsPage::get()->get_team_number());
-#ifdef THUNDER_WINDOWS
-    auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
-    add_entry(KEY_DRIVER_PS5_ID, "%d", driver_id);
-    add_entry(KEY_AUX_PS5_ID, "%d", aux_id);
-#endif
-    end_section();
+  begin_section("App_State");
+  buf->appendf("Page_States=%llu\n", page_states);
+  int width, height;
+  glfwGetWindowSize(get_window(), &width, &height);
+  buf->appendf("Window_Width=%d\n", width);
+  buf->appendf("Window_Height=%d\n", height);
+  int xpos, ypos;
+  glfwGetWindowPos(get_window(), &xpos, &ypos);
+  buf->appendf("Window_XPos=%d\n", xpos);
+  buf->appendf("Window_YPos=%d\n", ypos);
+  end_section();
 
-    begin_section(SECTION_AUTO_CHOOSER);
-    add_entry(KEY_AUTO_MODE, "%d", AutoChooserPage::get()->get_auto_mode());
-    add_entry(KEY_AUTO_DELAY, "%f", AutoChooserPage::get()->get_auto_delay());
-    end_section();
+  std::string_view save_name;
+  std::map<std::string, std::string> write_data;
+  for (auto& page : all_pages) {
+    write_data = page->get_save_data();
+    save_name = page->get_save_name();
+    if (write_data.empty() || save_name.empty()) continue;
 
-    begin_section(SECTION_BLINKY_BLINKY);
-    add_entry(KEY_LED_MODE, "%d", BlinkyBlinkyPage::get()->get_led_mode());
-    auto color(BlinkyBlinkyPage::get()->get_custom_color());
-    add_entry(KEY_LED_CUSTOM_R, "%f", std::get<0>(color));
-    add_entry(KEY_LED_CUSTOM_G, "%f", std::get<1>(color));
-    add_entry(KEY_LED_CUSTOM_B, "%f", std::get<2>(color));
-    end_section();
-
-    begin_section(SECTION_2023_AUTO_CONFIG);
-    add_entry(KEY_2023_AUTO_DOING, "%d", y2023::AutoConfigPage::get()->get_doing_auto());
-    add_entry(KEY_2023_AUTO_STARTING_LOCATION, "%d", y2023::AutoConfigPage::get()->get_starting_location());
-    add_entry(KEY_2023_AUTO_STARTING_GAMEPIECE, "%d", y2023::AutoConfigPage::get()->get_starting_gamepiece());
-    add_entry(KEY_2023_AUTO_STARTING_ACTION, "%d", y2023::AutoConfigPage::get()->get_starting_action());
-    add_entry(KEY_2023_AUTO_FIELD_GAMEPIECE, "%d", y2023::AutoConfigPage::get()->get_field_gamepiece());
-    add_entry(KEY_2023_AUTO_FINAL_ACTION, "%d", y2023::AutoConfigPage::get()->get_final_action());
-    end_section();
-
-    begin_section(SECTION_WINDOW_STUFF);
-    int width, height;
-    glfwGetWindowSize(get_window(), &width, &height);
-    add_entry(KEY_WIN_WIDTH, "%d", width);
-    add_entry(KEY_WIN_HEIGHT, "%d", height);
-    int xpos, ypos;
-    glfwGetWindowPos(get_window(), &xpos, &ypos);
-    add_entry(KEY_WIN_XPOS, "%d", xpos);
-    add_entry(KEY_WIN_YPOS, "%d", ypos);
+    begin_section(save_name.data());
+    for (auto& [key, val] : write_data) {
+      buf->appendf("%s=%s\n", key.c_str(), val.c_str());
+    }
     end_section();
   }
 }

@@ -12,6 +12,9 @@ public:
   BlinkyBlinkyPage(BlinkyBlinkyPage const&) = delete;
   BlinkyBlinkyPage& operator=(BlinkyBlinkyPage const&) = delete;
 
+  inline const char* get_save_name() const override { return "Blinky_Blinky"; }
+  void apply_save_data(const SaveData& save_data) override;
+  SaveData get_save_data() const override;
   void present(bool* running) override;
 
   constexpr int get_led_mode() const { return led_mode; }

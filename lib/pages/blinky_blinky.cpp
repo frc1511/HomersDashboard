@@ -7,6 +7,22 @@ BlinkyBlinkyPage::BlinkyBlinkyPage() = default;
 
 BlinkyBlinkyPage::~BlinkyBlinkyPage() = default;
 
+void BlinkyBlinkyPage::apply_save_data(const SaveData& save_data) {
+  set_custom_r(std::atof(save_data.at("Custom_R").c_str()));
+  set_custom_g(std::atof(save_data.at("Custom_G").c_str()));
+  set_custom_b(std::atof(save_data.at("Custom_B").c_str()));
+  set_led_mode(std::atoi(save_data.at("LED_Mode").c_str()));
+}
+
+frc1511::Page::SaveData BlinkyBlinkyPage::get_save_data() const {
+  return {
+    { "Custom_R", std::to_string(custom_color[0]) },
+    { "Custom_G", std::to_string(custom_color[1]) },
+    { "Custom_B", std::to_string(custom_color[2]) },
+    { "LED_Mode", std::to_string(led_mode) }
+  };
+}
+
 void BlinkyBlinkyPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
 

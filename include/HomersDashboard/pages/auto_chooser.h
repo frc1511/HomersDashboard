@@ -14,7 +14,9 @@ public:
   AutoChooserPage& operator=(AutoChooserPage const&) = delete;
 
   void init() override;
-  
+  inline const char* get_save_name() const override { return "Auto_Chooser"; }
+  void apply_save_data(const SaveData& save_data) override;
+  SaveData get_save_data() const override;
   void present(bool* running) override;
 
   constexpr int get_auto_mode() const { return auto_mode; }

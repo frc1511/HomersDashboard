@@ -12,6 +12,9 @@ public:
   SettingsPage(SettingsPage const&) = delete;
   SettingsPage& operator=(SettingsPage const&) = delete;
   
+  inline const char* get_save_name() const override { return "Settings"; }
+  void apply_save_data(const SaveData& save_data) override;
+  SaveData get_save_data() const override;
   void present(bool* running) override;
   
   constexpr std::size_t get_team_number() const { return team_number; }
