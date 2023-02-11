@@ -15,4 +15,6 @@ add_dashboard_sources(
   "${HD_LIB_DIR}/pages/2023/node_selector.cpp"
   "${HD_LIB_DIR}/pages/2023/auto_config.cpp"
   "${HD_LIB_DIR}/pages/2023/auto_preview.cpp"
+  "${HD_LIB_DIR}/pages/2023/lift.cpp"
+  "${HD_LIB_DIR}/pages/2023/grabber.cpp"
 )

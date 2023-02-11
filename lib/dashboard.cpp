@@ -23,6 +23,8 @@
 #include <HomersDashboard/pages/2023/node_selector.h>
 #include <HomersDashboard/pages/2023/auto_config.h>
 #include <HomersDashboard/pages/2023/auto_preview.h>
+#include <HomersDashboard/pages/2023/lift.h>
+#include <HomersDashboard/pages/2023/grabber.h>
 #ifdef THUNDER_WINDOWS
 # include <HomersDashboard/ps5_contoller_handler.h>
 #endif
@@ -54,6 +56,8 @@ HomersDashboard::HomersDashboard()
     y2023::AutoConfigPage::get(),
     y2023::AutoPreviewPage::get(),
     y2023::NodeSelectorPage::get(),
+    y2023::LiftPage::get(),
+    y2023::GrabberPage::get(),
   }) { }
 
 HomersDashboard::~HomersDashboard() = default;
@@ -143,9 +147,11 @@ void HomersDashboard::present() {
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("2023")) {
-        menu_item(" " ICON_FA_BOLT       "   Auto Config",     13);
-        menu_item(" " ICON_FA_CHART_LINE "  Auto Preview",     14);
-        menu_item(" " ICON_FA_FILM       "  Node Selector",    15);
+        menu_item(" " ICON_FA_BOLT       "   Auto Config",  13);
+        menu_item(" " ICON_FA_CHART_LINE "  Auto Preview",  14);
+        menu_item(" " ICON_FA_FILM       "  Lift",          16);
+        menu_item(" " ICON_FA_FILM       "  Grabber",       17);
+        menu_item(" " ICON_FA_FILM       "  Node Selector", 15);
         ImGui::EndMenu();
       }
 
