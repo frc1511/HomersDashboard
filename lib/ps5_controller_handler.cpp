@@ -40,7 +40,6 @@ void PS5ControllerHandler::init() {
 void PS5ControllerHandler::process() {
   if (valid_driver) {
     OutputState output;
-    ZeroMemory(&output, sizeof(output));
     {
       std::lock_guard<std::mutex> lock(output_mutex);
       output = driver_output;
@@ -61,7 +60,6 @@ void PS5ControllerHandler::process() {
 
   if (valid_aux) {
     OutputState output;
-    ZeroMemory(&output, sizeof(output));
     {
       std::lock_guard<std::mutex> lock(output_mutex);
       output = aux_output;
@@ -145,7 +143,7 @@ SOCKET_CREATE:
 
   sockaddr_in server_addr;
   server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(5804); // TODO: Make port configurable.
+  server_addr.sin_port = htons(5809); // TODO: Make port configurable.
   server_addr.sin_addr.s_addr = inet_addr("10.15.11.20"); // TODO: Make IP configurable.
 
 SOCKET_CONNECT:
@@ -180,7 +178,7 @@ SOCKET_CONNECT:
   std::cout << "Connected to server :D" << std::endl;
 
   char input_buf[sizeof(InputMessage)];
-  char output_buf[sizeof(OutputMessage)];
+  char output_buf[256];
 
   // Clear socket.
   recv(client_socket, output_buf, sizeof(output_buf), 0);
@@ -200,9 +198,10 @@ SOCKET_READ:
         closesocket(client_socket);
         goto SOCKET_CREATE;
       }
-      if (strlen(output_buf)) {
+      if (bytes_received > 0) {
         // You've got mail!!!
 
+        fmt::print("Received {} bytes\n", recv_res);
         {
           OutputMessage msg;
           std::memcpy(&msg, output_buf, sizeof(OutputMessage));
@@ -229,7 +228,6 @@ SOCKET_READ:
     {
       std::lock_guard<std::mutex> lock(input_mutex);
       _new_input = new_input;
-      new_input = false;
     }
 
     // Send input.
@@ -241,9 +239,9 @@ SOCKET_READ:
         msg.auxInputState = aux_input;
         new_input = false;
       }
-      std::memcpy(input_buf, msg, sizeof(InputMessage));
+      std::memcpy(input_buf, &msg, sizeof(InputMessage));
 
-      if (send(client_socket, input_buf, sizeof(InputState), 0) == SOCKET_ERROR) {
+      if (send(client_socket, input_buf, sizeof(InputMessage), 0) == SOCKET_ERROR) {
         int err = WSAGetLastError();
         if (err != WSAEWOULDBLOCK) {
           std::cout << "send() failed: " << err << '\n';
