@@ -20,11 +20,14 @@ void SettingsPage::apply_save_data(const SaveData& save_data) {
 }
 
 frc1511::Page::SaveData SettingsPage::get_save_data() const {
+#ifdef THUNDER_WINDOWS
+  auto [driver_id, aux_id] = PS5ControllerHandler::get()->get_controller_ids();
+#endif
   return {
     { "Team_Number", std::to_string(team_number) },
 #ifdef THUNDER_WINDOWS
-    { "PS5_Driver_ID", std::to_string(PS5ControllerHandler::get()->get_driver_id()) },
-    { "PS5_Aux_ID", std::to_string(PS5ControllerHandler::get()->get_aux_id()) }
+    { "PS5_Driver_ID", std::to_string(driver_id) },
+    { "PS5_Aux_ID", std::to_string(aux_id) }
 #endif
   };
 }

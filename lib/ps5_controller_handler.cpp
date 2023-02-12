@@ -100,7 +100,7 @@ void PS5ControllerHandler::process() {
     }
 
     InputState _new_aux_input;
-    handle_controller_input(driver_context, &_new_aux_input);
+    handle_controller_input(aux_context, &_new_aux_input);
 
     std::lock_guard<std::mutex> lock(aux_output_mutex);
     aux_input = _new_aux_input;
@@ -151,23 +151,55 @@ void PS5ControllerHandler::thread_main(bool is_driver) {
   using namespace std::chrono_literals;
 
 SOCKET_CREATE:
-  SOCKET client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (client_socket == INVALID_SOCKET) {
-    fmt::print("socket() failed with error: {}\n", WSAGetLastError());
+	SOCKET client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (client_socket == INVALID_SOCKET) {
+		std::cout << "socket() failed." << std::endl;
     std::this_thread::sleep_for(1s);
-    goto SOCKET_CREATE;
-  }
+		goto SOCKET_CREATE;
+	}
+
+	u_long non_blocking_mode = 1;
+	if (ioctlsocket(client_socket, FIONBIO, &non_blocking_mode) == SOCKET_ERROR) {
+		std::cout << "ioctlsocket() failed." << std::endl;
+		closesocket(client_socket);
+		goto SOCKET_CREATE;
+	}
+
+	sockaddr_in server_addr;
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(is_driver ? 5809 : 5808);
+	server_addr.sin_addr.s_addr = inet_addr("10.15.11.20");
 
 SOCKET_CONNECT:
-  sockaddr_in server_addr;
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(is_driver ? 5809 : 5808);
-  server_addr.sin_addr.s_addr = inet_addr("roborio-1511-FRC.local");
-  if (connect(client_socket, (SOCKADDR*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
-    fmt::print("connect() failed with error: {}\n", WSAGetLastError());
-    std::this_thread::sleep_for(0.5s);
-    goto SOCKET_CONNECT;
-  }
+	if (connect(client_socket, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
+		int err = WSAGetLastError();
+		if (err != WSAEWOULDBLOCK) {
+			std::cout << "connect() failed " << WSAGetLastError() << std::endl;
+			closesocket(client_socket);
+			goto SOCKET_CREATE;
+		}
+		
+		// Wait for the connection to succeed.
+		fd_set write_set;
+		FD_ZERO(&write_set);
+		FD_SET(client_socket, &write_set);
+		timeval timeout;
+		timeout.tv_sec = 5;
+		timeout.tv_usec = 0;
+		int select_res = select(0, NULL, &write_set, NULL, &timeout);
+		if (select_res == 0) {
+			std::cout << "select() timed out." << std::endl;
+			closesocket(client_socket);
+			goto SOCKET_CREATE;
+		}
+		else if (select_res == SOCKET_ERROR) {
+			std::cout << "select() failed: " << WSAGetLastError() << std::endl;
+			closesocket(client_socket);
+			goto SOCKET_CREATE;
+		}
+	}
+
+	std::cout << "Connected to server :D" << std::endl;
 
   bool* new_input;
   bool* new_output;
@@ -195,7 +227,45 @@ SOCKET_CONNECT:
   char input_buf[sizeof(InputState)];
   char output_buf[sizeof(OutputState)];
 
-  while (true) {
+	// Clear socket.
+	recv(client_socket, output_buf, 256, 0);
+	ZeroMemory(output_buf, 256);
+
+	std::size_t bytes_received = 0;
+	while (true) {
+
+    // --- Recieve output ---
+
+SOCKET_READ:
+    int recv_res = recv(client_socket, output_buf + bytes_received, 256 - bytes_received, 0);
+		if (recv_res == SOCKET_ERROR) {
+			int err = WSAGetLastError();
+			if (err != WSAEWOULDBLOCK) {
+				std::cout << "recv() failed: " << err << '\n';
+				closesocket(client_socket);
+				goto SOCKET_CREATE;
+			}
+			if (strlen(output_buf)) {
+				// You've got mail!!!
+
+        {
+          // Handle recieving output.
+          std::lock_guard<std::mutex> lock(*output_mutex);
+          std::memcpy(output_state, output_buf, sizeof(OutputState));
+          *new_output = true;
+        }
+
+				ZeroMemory(output_buf, 256);
+				bytes_received = 0;
+			}
+		}
+		else {
+			bytes_received += recv_res;
+			goto SOCKET_READ;
+		}
+
+    // --- Send input ---
+
     bool _new_input = false;
 
     {
@@ -213,32 +283,11 @@ SOCKET_CONNECT:
       }
 
       if (send(client_socket, input_buf, sizeof(InputState), 0) == SOCKET_ERROR) {
-        fmt::print("send() failed with error: {}\n", WSAGetLastError());
-        goto SOCKET_CREATE;
-      }
-    }
-
-    // Receive output.
-    {
-      fd_set read_set;
-      FD_ZERO(&read_set);
-      FD_SET(client_socket, &read_set);
-      timeval timeout;
-      timeout.tv_sec = 0;
-      timeout.tv_usec = 1000; // 1 ms
-      int res = select(0, &read_set, NULL, NULL, &timeout);
-      if (res == SOCKET_ERROR) {
-        fmt::print("select() failed with error: {}\n", WSAGetLastError());
-        goto SOCKET_CREATE;
-      }
-      else if (!res) {
-        if (recv(client_socket, output_buf, sizeof(OutputState), 0) == SOCKET_ERROR) {
-          fmt::print("recv() failed with error: {}\n", WSAGetLastError());
-        }
-        else {
-          std::lock_guard<std::mutex> lock(*output_mutex);
-          std::memcpy(output_state, output_buf, sizeof(OutputState));
-          *new_output = true;
+        int err = WSAGetLastError();
+        if (err != WSAEWOULDBLOCK) {
+          std::cout << "send() failed: " << err << '\n';
+          closesocket(client_socket);
+          goto SOCKET_CREATE;
         }
       }
     }
