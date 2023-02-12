@@ -47,7 +47,18 @@ extern "C" {
         uint32_t pad : 28;
     }; // 16 bytes
     typedef struct OutputState OutputState;
-}
+
+    struct InputMessage {
+        InputState driverInputState;
+        InputState auxInputState;
+    }; // 48 bytes
+    typedef struct InputMessage InputMessage;
+
+    struct OutputMessage {
+        OutputState driverOutputState;
+        OutputState auxOutputState;
+    }; // 32 bytes
+} // extern "C"
 
 class PS5ControllerHandler {
 public:
@@ -59,9 +70,7 @@ public:
   PS5ControllerHandler& operator=(PS5ControllerHandler const&) = delete;
 
   void init();
-
   void process();
-
   bool reload_connections();
 
   void set_controller_ids(int driver, int aux);
@@ -75,7 +84,7 @@ private:
   PS5ControllerHandler();
   ~PS5ControllerHandler();
 
-  void thread_main(bool is_driver);
+  void thread_main();
 
   void handle_controller_input(DS5W::DeviceContext& context, InputState* input);
   void handle_controller_output(DS5W::DeviceContext& context, const OutputState& ouput);
@@ -86,26 +95,21 @@ private:
   DS5W::DeviceContext driver_context;
   DS5W::DeviceContext aux_context;
 
-  std::thread driver_thread;
-  std::thread aux_thread;
+  std::thread networking_thread;
 
   InputState driver_input;
   InputState aux_input;
 
-  bool new_driver_input = false;
-  bool new_aux_input = false;
+  bool new_input = false;
 
-  std::mutex driver_input_mutex;
-  std::mutex aux_input_mutex;
+  std::mutex input_mutex;
 
   OutputState driver_output;
   OutputState aux_output;
 
-  bool new_driver_output = false;
-  bool new_aux_output = false;
+  bool new_output = false;
 
-  std::mutex driver_output_mutex;
-  std::mutex aux_output_mutex;
+  std::mutex output_mutex;
 
   bool valid_driver = false;
   bool valid_aux = false;

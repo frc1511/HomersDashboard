@@ -1,7 +1,4 @@
 #include <HomersDashboard/ps5_contoller_handler.h>
-// #include <winsock2.h>
-// #include <winsock.h>
-// #include <ws2tcpip.h>
 #define _WINSOCKAPI_
 #include <Windows.h>
 
@@ -33,78 +30,59 @@ void PS5ControllerHandler::init() {
     return;
   }
 
-  driver_thread = std::thread([this]() {
-    this->thread_main(true);
-  });
-
-  aux_thread = std::thread([this]() {
-    this->thread_main(false);
+  networking_thread = std::thread([this]() {
+    this->thread_main();
   });
 
   has_init = true;
 }
 
 void PS5ControllerHandler::process() {
-  OutputState* _new_driver_output = nullptr;
-  OutputState* _new_aux_output = nullptr;
-  {
-    std::lock_guard<std::mutex> lock(driver_output_mutex);
-    _new_driver_output = new_driver_output ? &driver_output : nullptr;
-  }
-  {
-    std::lock_guard<std::mutex> lock(aux_output_mutex);
-    _new_aux_output = new_aux_output ? &aux_output : nullptr;
-  }
-
   if (valid_driver) {
-    if (_new_driver_output || testing_driver) {
-      OutputState output;
-      ZeroMemory(&output, sizeof(output));
-      if (_new_driver_output) {
-        std::lock_guard<std::mutex> lock(driver_output_mutex);
-        output = *_new_driver_output;
-        new_driver_output = false;
-      }
-      if (testing_driver) {
-        output.rumbleLeft = 0xFF;
-        output.rumbleRight = 0xFF;
-      }
-
-      handle_controller_output(driver_context, output);
+    OutputState output;
+    ZeroMemory(&output, sizeof(output));
+    {
+      std::lock_guard<std::mutex> lock(output_mutex);
+      output = driver_output;
     }
+    if (testing_driver) {
+      output.rumbleLeft = 0xFF;
+      output.rumbleRight = 0xFF;
+    }
+
+    handle_controller_output(driver_context, output);
 
     InputState _new_driver_input;
     handle_controller_input(driver_context, &_new_driver_input);
 
-    std::lock_guard<std::mutex> lock(driver_output_mutex);
+    std::lock_guard<std::mutex> lock(input_mutex);
     driver_input = _new_driver_input;
-    new_driver_input = true;
   }
 
   if (valid_aux) {
-    if (_new_aux_output || testing_aux) {
-      OutputState output;
-      ZeroMemory(&output, sizeof(output));
-
-      if (_new_aux_output) {
-        std::lock_guard<std::mutex> lock(aux_output_mutex);
-        output = *_new_aux_output;
-        new_aux_output = false;
-      }
-      if (testing_aux) {
-        output.rumbleLeft = 0xFF;
-        output.rumbleRight = 0xFF;
-      }
-
-      handle_controller_output(aux_context, output);
+    OutputState output;
+    ZeroMemory(&output, sizeof(output));
+    {
+      std::lock_guard<std::mutex> lock(output_mutex);
+      output = aux_output;
     }
+    if (testing_aux) {
+      output.rumbleLeft = 0xFF;
+      output.rumbleRight = 0xFF;
+    }
+
+    handle_controller_output(aux_context, output);
 
     InputState _new_aux_input;
     handle_controller_input(aux_context, &_new_aux_input);
 
-    std::lock_guard<std::mutex> lock(aux_output_mutex);
+    std::lock_guard<std::mutex> lock(input_mutex);
     aux_input = _new_aux_input;
-    new_aux_input = true;
+  }
+
+  {
+    std::lock_guard<std::mutex> lock(input_mutex);
+    new_input = true;
   }
 }
 
@@ -147,140 +125,123 @@ void PS5ControllerHandler::set_controller_ids(int driver, int aux) {
   reload_connections();
 }
 
-void PS5ControllerHandler::thread_main(bool is_driver) {
+void PS5ControllerHandler::thread_main() {
   using namespace std::chrono_literals;
 
 SOCKET_CREATE:
-	SOCKET client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (client_socket == INVALID_SOCKET) {
-		std::cout << "socket() failed." << std::endl;
+  SOCKET client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (client_socket == INVALID_SOCKET) {
+    std::cout << "socket() failed." << std::endl;
     std::this_thread::sleep_for(1s);
-		goto SOCKET_CREATE;
-	}
+    goto SOCKET_CREATE;
+  }
 
-	u_long non_blocking_mode = 1;
-	if (ioctlsocket(client_socket, FIONBIO, &non_blocking_mode) == SOCKET_ERROR) {
-		std::cout << "ioctlsocket() failed." << std::endl;
-		closesocket(client_socket);
-		goto SOCKET_CREATE;
-	}
+  u_long non_blocking_mode = 1;
+  if (ioctlsocket(client_socket, FIONBIO, &non_blocking_mode) == SOCKET_ERROR) {
+    std::cout << "ioctlsocket() failed." << std::endl;
+    closesocket(client_socket);
+    goto SOCKET_CREATE;
+  }
 
-	sockaddr_in server_addr;
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(is_driver ? 5809 : 5808);
-	server_addr.sin_addr.s_addr = inet_addr("10.15.11.20");
+  sockaddr_in server_addr;
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(5804); // TODO: Make port configurable.
+  server_addr.sin_addr.s_addr = inet_addr("10.15.11.20"); // TODO: Make IP configurable.
 
 SOCKET_CONNECT:
-	if (connect(client_socket, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
-		int err = WSAGetLastError();
-		if (err != WSAEWOULDBLOCK) {
-			std::cout << "connect() failed " << WSAGetLastError() << std::endl;
-			closesocket(client_socket);
-			goto SOCKET_CREATE;
-		}
-		
-		// Wait for the connection to succeed.
-		fd_set write_set;
-		FD_ZERO(&write_set);
-		FD_SET(client_socket, &write_set);
-		timeval timeout;
-		timeout.tv_sec = 5;
-		timeout.tv_usec = 0;
-		int select_res = select(0, NULL, &write_set, NULL, &timeout);
-		if (select_res == 0) {
-			std::cout << "select() timed out." << std::endl;
-			closesocket(client_socket);
-			goto SOCKET_CREATE;
-		}
-		else if (select_res == SOCKET_ERROR) {
-			std::cout << "select() failed: " << WSAGetLastError() << std::endl;
-			closesocket(client_socket);
-			goto SOCKET_CREATE;
-		}
-	}
-
-	std::cout << "Connected to server :D" << std::endl;
-
-  bool* new_input;
-  bool* new_output;
-  std::mutex* input_mutex;
-  std::mutex* output_mutex;
-  InputState* input_state;
-  OutputState* output_state;
-  if (is_driver) {
-    new_input = &new_driver_input;
-    new_output = &new_driver_output;
-    input_mutex = &driver_input_mutex;
-    output_mutex = &driver_output_mutex;
-    input_state = &driver_input;
-    output_state = &driver_output;
-  }
-  else {
-    new_input = &new_aux_input;
-    new_output = &new_aux_output;
-    input_mutex = &aux_input_mutex;
-    output_mutex = &aux_output_mutex;
-    input_state = &aux_input;
-    output_state = &aux_output;
+  if (connect(client_socket, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
+    int err = WSAGetLastError();
+    if (err != WSAEWOULDBLOCK) {
+      std::cout << "connect() failed " << WSAGetLastError() << std::endl;
+      closesocket(client_socket);
+      goto SOCKET_CREATE;
+    }
+    
+    // Wait for the connection to succeed.
+    fd_set write_set;
+    FD_ZERO(&write_set);
+    FD_SET(client_socket, &write_set);
+    timeval timeout;
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+    int select_res = select(0, NULL, &write_set, NULL, &timeout);
+    if (select_res == 0) {
+      std::cout << "select() timed out." << std::endl;
+      closesocket(client_socket);
+      goto SOCKET_CREATE;
+    }
+    else if (select_res == SOCKET_ERROR) {
+      std::cout << "select() failed: " << WSAGetLastError() << std::endl;
+      closesocket(client_socket);
+      goto SOCKET_CREATE;
+    }
   }
 
-  char input_buf[sizeof(InputState)];
-  char output_buf[sizeof(OutputState)];
+  std::cout << "Connected to server :D" << std::endl;
 
-	// Clear socket.
-	recv(client_socket, output_buf, 256, 0);
-	ZeroMemory(output_buf, 256);
+  char input_buf[sizeof(InputMessage)];
+  char output_buf[sizeof(OutputMessage)];
 
-	std::size_t bytes_received = 0;
-	while (true) {
+  // Clear socket.
+  recv(client_socket, output_buf, sizeof(output_buf), 0);
+  ZeroMemory(output_buf, sizeof(output_buf));
+
+  std::size_t bytes_received = 0;
+  while (true) {
 
     // --- Recieve output ---
 
 SOCKET_READ:
-    int recv_res = recv(client_socket, output_buf + bytes_received, 256 - bytes_received, 0);
-		if (recv_res == SOCKET_ERROR) {
-			int err = WSAGetLastError();
-			if (err != WSAEWOULDBLOCK) {
-				std::cout << "recv() failed: " << err << '\n';
-				closesocket(client_socket);
-				goto SOCKET_CREATE;
-			}
-			if (strlen(output_buf)) {
-				// You've got mail!!!
+    int recv_res = recv(client_socket, output_buf + bytes_received, sizeof(output_buf) - bytes_received, 0);
+    if (recv_res == SOCKET_ERROR) {
+      int err = WSAGetLastError();
+      if (err != WSAEWOULDBLOCK) {
+        std::cout << "recv() failed: " << err << '\n';
+        closesocket(client_socket);
+        goto SOCKET_CREATE;
+      }
+      if (strlen(output_buf)) {
+        // You've got mail!!!
 
         {
+          OutputMessage msg;
+          std::memcpy(&msg, output_buf, sizeof(OutputMessage));
+
           // Handle recieving output.
-          std::lock_guard<std::mutex> lock(*output_mutex);
-          std::memcpy(output_state, output_buf, sizeof(OutputState));
-          *new_output = true;
+          std::lock_guard<std::mutex> lock(output_mutex);
+          driver_output = msg.driverOutputState;
+          aux_output = msg.auxOutputState;
         }
 
-				ZeroMemory(output_buf, 256);
-				bytes_received = 0;
-			}
-		}
-		else {
-			bytes_received += recv_res;
-			goto SOCKET_READ;
-		}
+        ZeroMemory(output_buf, sizeof(output_buf));
+        bytes_received = 0;
+      }
+    }
+    else {
+      bytes_received += recv_res;
+      goto SOCKET_READ;
+    }
 
     // --- Send input ---
 
     bool _new_input = false;
 
     {
-      std::lock_guard<std::mutex> lock(*input_mutex);
-      _new_input = *new_input;
-      *new_input = false;
+      std::lock_guard<std::mutex> lock(input_mutex);
+      _new_input = new_input;
+      new_input = false;
     }
 
     // Send input.
     if (_new_input) {
+      InputMessage msg;
       {
-        std::lock_guard<std::mutex> lock(*input_mutex);
-        std::memcpy(input_buf, input_state, sizeof(InputState));
-        *new_input = false;
+        std::lock_guard<std::mutex> lock(input_mutex);
+        msg.driverInputState = driver_input;
+        msg.auxInputState = aux_input;
+        new_input = false;
       }
+      std::memcpy(input_buf, msg, sizeof(InputMessage));
 
       if (send(client_socket, input_buf, sizeof(InputState), 0) == SOCKET_ERROR) {
         int err = WSAGetLastError();
@@ -295,35 +256,35 @@ SOCKET_READ:
 }
 
 void PS5ControllerHandler::handle_controller_input(DS5W::DeviceContext& context, InputState* input) {
-    DS5W::DS5InputState input_state;
-	
-		// Retrieve data
-		if (DS5W_FAILED(DS5W::getDeviceInputState(&context, &input_state))) {
-      return;
-    }
+  DS5W::DS5InputState input_state;
 
-    input->axisLeftX = input_state.leftStick.x;
-    input->axisLeftY = input_state.leftStick.y;
+  // Retrieve data
+  if (DS5W_FAILED(DS5W::getDeviceInputState(&context, &input_state))) {
+    return;
+  }
 
-    input->axisRightX = input_state.rightStick.x;
-    input->axisRightY = input_state.rightStick.y;
+  input->axisLeftX = input_state.leftStick.x;
+  input->axisLeftY = input_state.leftStick.y;
 
-    input->axisLeftTrigger = input_state.leftTrigger;
-    input->axisRightTrigger = input_state.rightTrigger;
+  input->axisRightX = input_state.rightStick.x;
+  input->axisRightY = input_state.rightStick.y;
 
-    input->buttonsAndDPad = input_state.buttonsAndDpad;
-    input->buttonsA = input_state.buttonsA;
-    input->buttonsB = input_state.buttonsB;
+  input->axisLeftTrigger = input_state.leftTrigger;
+  input->axisRightTrigger = input_state.rightTrigger;
 
-    auto accel = input_state.accelerometer;
-    input->accelX = accel.x;
-    input->accelY = accel.y;
-    input->accelZ = accel.z;
+  input->buttonsAndDPad = input_state.buttonsAndDpad;
+  input->buttonsA = input_state.buttonsA;
+  input->buttonsB = input_state.buttonsB;
 
-    auto gyro = input_state.gyroscope;
-    input->gyroX = gyro.x;
-    input->gyroY = gyro.y;
-    input->gyroZ = gyro.z;
+  auto accel = input_state.accelerometer;
+  input->accelX = accel.x;
+  input->accelY = accel.y;
+  input->accelZ = accel.z;
+
+  auto gyro = input_state.gyroscope;
+  input->gyroX = gyro.x;
+  input->gyroY = gyro.y;
+  input->gyroZ = gyro.z;
 }
 
 void PS5ControllerHandler::handle_controller_output(DS5W::DeviceContext& context, const OutputState& output) {
