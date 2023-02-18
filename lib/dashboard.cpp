@@ -5,7 +5,8 @@
 
 #include <ThunderDashboard/platform/platform.h>
 #include <ThunderDashboard/nt_handler.h>
-#include <HomersDashboard/gyro.h>
+#include <HomersDashboard/services/gyro.h>
+#include <HomersDashboard/services/2023/arduino.h>
 #include <HomersDashboard/popups/startup.h>
 #include <HomersDashboard/pages/auto_chooser.h>
 #include <HomersDashboard/pages/robot_position.h>
@@ -58,6 +59,10 @@ HomersDashboard::HomersDashboard()
     y2023::NodeSelectorPage::get(),
     y2023::LiftPage::get(),
     y2023::GrabberPage::get(),
+  }),
+  all_services({
+    GyroService::get(),
+    y2023::ArduinoService::get(),
   }) { }
 
 HomersDashboard::~HomersDashboard() = default;
@@ -99,11 +104,17 @@ void HomersDashboard::present() {
     for (frc1511::Page* page : all_pages) {
       page->init();
     }
+
+    for (frc1511::Service* service : all_services) {
+      service->init();
+    }
   }
 
   frc1511::NTHandler::get()->update();
 
-  GyroHandler::get()->handle_calibration();
+  for (frc1511::Service* service : all_services) {
+    service->process();
+  }
 
   bool item_close = false;
 

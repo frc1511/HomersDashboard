@@ -1,14 +1,16 @@
-#include <HomersDashboard/gyro.h>
+#include <HomersDashboard/services/gyro.h>
 #include <imgui_internal.h>
 #include <ThunderDashboard/font_manager.h>
 
 #define COL_WIDTH 100
 
-GyroHandler::GyroHandler() = default;
+GyroService::GyroService() = default;
 
-GyroHandler::~GyroHandler() = default;
+GyroService::~GyroService() = default;
 
-void GyroHandler::handle_calibration() {
+void GyroService::init() { }
+
+void GyroService::process() {
   using namespace std::chrono_literals;
 
   bool needs_cal = static_cast<bool>(frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_gyro", 0.0));
@@ -45,4 +47,4 @@ void GyroHandler::handle_calibration() {
   }
 }
 
-GyroHandler GyroHandler::instance;
+GyroService GyroService::instance;

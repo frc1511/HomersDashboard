@@ -2,6 +2,7 @@
 
 #include <ThunderDashboard/dashboard.h>
 #include <ThunderDashboard/pages/page.h>
+#include <ThunderDashboard/services/service.h>
 #include <unordered_set>
 
 class HomersDashboard : public frc1511::ThunderDashboard {
@@ -42,11 +43,11 @@ private:
   uint64_t page_states = 0;
 
   void update_page_states();
-
   
   std::map<std::string, std::map<std::string, std::string>> data_map;
 
   const std::vector<frc1511::Page*> all_pages;
+  const std::vector<frc1511::Service*> all_services;
 
   bool app_section = false;
   decltype(all_pages)::const_iterator current_page = all_pages.cend();

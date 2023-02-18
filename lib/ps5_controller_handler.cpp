@@ -144,7 +144,7 @@ SOCKET_CREATE:
   sockaddr_in server_addr;
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(5809); // TODO: Make port configurable.
-  server_addr.sin_addr.s_addr = inet_addr("10.15.11.20"); // TODO: Make IP configurable.
+  server_addr.sin_addr.s_addr = inet_addr("10.15.11.2"); // TODO: Make IP configurable.
 
 SOCKET_CONNECT:
   if (connect(client_socket, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
@@ -201,7 +201,7 @@ SOCKET_READ:
       if (bytes_received > 0) {
         // You've got mail!!!
 
-        fmt::print("Received {} bytes\n", recv_res);
+        std::cout << "Received " << recv_res << " bytes\n";
         {
           OutputMessage msg;
           std::memcpy(&msg, output_buf, sizeof(OutputMessage));
