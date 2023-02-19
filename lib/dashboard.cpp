@@ -5,8 +5,6 @@
 
 #include <ThunderDashboard/platform/platform.h>
 #include <ThunderDashboard/nt_handler.h>
-#include <HomersDashboard/services/gyro.h>
-#include <HomersDashboard/services/2023/arduino.h>
 #include <HomersDashboard/popups/startup.h>
 #include <HomersDashboard/pages/auto_chooser.h>
 #include <HomersDashboard/pages/robot_position.h>
@@ -26,7 +24,10 @@
 #include <HomersDashboard/pages/2023/auto_preview.h>
 #include <HomersDashboard/pages/2023/lift.h>
 #include <HomersDashboard/pages/2023/grabber.h>
+#include <HomersDashboard/services/gyro.h>
+
 #ifdef THUNDER_WINDOWS
+# include <HomersDashboard/services/2023/arduino.h>
 # include <HomersDashboard/ps5_contoller_handler.h>
 #endif
 
@@ -62,7 +63,9 @@ HomersDashboard::HomersDashboard()
   }),
   all_services({
     GyroService::get(),
+#ifdef THUNDER_WINDOWS
     y2023::ArduinoService::get(),
+#endif
   }) { }
 
 HomersDashboard::~HomersDashboard() = default;
