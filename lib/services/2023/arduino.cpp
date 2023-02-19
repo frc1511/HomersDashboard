@@ -12,8 +12,11 @@ ArduinoService::~ArduinoService() {
 }
 
 void ArduinoService::init() {
-  serial_handle = CreateFile("\\\\.\\COM3", GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-  
+  serial_handle = CreateFile("\\\\.\\COM7", GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  if (serial_handle <= 0) {
+    std::cout << "CreateFile() failed D:\n";
+  }
+
   // Do some basic settings
   DCB serial_params = { 0 };
   serial_params.DCBlength = sizeof(serial_params);
@@ -21,7 +24,7 @@ void ArduinoService::init() {
   GetCommState(serial_handle, &serial_params);
   serial_params.BaudRate = 9600;
   serial_params.ByteSize = 8;
-  serial_params.StopBits = TWOSTOPBITS;
+  serial_params.StopBits = ONESTOPBIT;
   serial_params.Parity = NOPARITY;
   SetCommState(serial_handle, &serial_params);
 
@@ -69,7 +72,7 @@ void ArduinoService::process() {
 
   // Structure: "<ALLIANCE,MATCH_PERCENT>
 
-  std::string _output = fmt::format("<{},{:.2f}>", alliance == frc1511::NTHandler::Alliance::RED ? "R" : "B", match_pct);
+  std::string _output = fmt::format("<{},{}>", alliance == frc1511::NTHandler::Alliance::RED ? "R" : "B", match_pct);
 
   {
     std::lock_guard<std::mutex> lock(com_mutex);
@@ -79,7 +82,7 @@ void ArduinoService::process() {
 }
 
 void ArduinoService::thread_main() {
-  char buf[16];
+  char buf[32];
   std::size_t buf_size = 0;
   while (true) {
     {
@@ -87,13 +90,15 @@ void ArduinoService::thread_main() {
       if (!new_output) continue;
 
       buf_size = output.size();
-      std::memcpy(buf, output.c_str(), buf_size);
+      std::memcpy(buf, output.c_str(), buf_size + 1);
       new_output = false;
     }
 
     // Write to the serial port
     DWORD bytes_written = 0;
     WriteFile(serial_handle, buf, buf_size, &bytes_written, nullptr);
+    std::cout << "Wrote " << bytes_written << " to Arduino\n";
+
   }
 }
 
