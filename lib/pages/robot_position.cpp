@@ -1,12 +1,7 @@
 #include <HomersDashboard/pages/robot_position.h>
-#include <glad/glad.h>
-#include <stb_image.h>
+#include <HomersDashboard/utils.h>
 
 #include <_2022_field_png.h>
-
-// Field dimensions (meters).
-#define FIELD_X 15.5702 // 54' 1"
-#define FIELD_Y 8.1026 // 26' 7"
 
 RobotPositionPage::RobotPositionPage() = default;
 
@@ -14,22 +9,7 @@ RobotPositionPage::~RobotPositionPage() = default;
 
 void RobotPositionPage::init() {
   int width, height, nr_channels;
-  unsigned char* img_data = stbi_load_from_memory(_2022_field_png, _2022_field_png_size, &width, &height, &nr_channels, 0);
-
-  assert(img_data); // Failed to load texture from memory.
-
-  int tex_channels(nr_channels == 3 ? GL_RGB : GL_RGBA);
-
-  glGenTextures(1, &field_tex);
-  glBindTexture(GL_TEXTURE_2D, field_tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, tex_channels, width, height, 0, tex_channels, GL_UNSIGNED_BYTE, img_data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  stbi_image_free(img_data);
+  int field_tex = Utils::generate_texture_from_memory(_2022_field_png, _2022_field_png_size, &width, &height, &nr_channels);
 
   field_ar = static_cast<double>(width) / static_cast<double>(height);
 }

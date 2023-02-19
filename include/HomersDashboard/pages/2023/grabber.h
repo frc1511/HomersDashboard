@@ -21,6 +21,8 @@ private:
   GrabberPage();
   ~GrabberPage();
 
+  unsigned int cube_tex, cone_tex, cube_none_tex, cone_none_tex, gp_none_tex;
+
   static GrabberPage instance;
 };
 
