@@ -42,7 +42,7 @@ void BlinkyBlinkyPage::present(bool* running) {
   const char* led_modes = "Robot State\0Alliance\0Custom\0Off\0";
 
   if (ImGui::Combo("##LED Mode", &led_mode, led_modes, 4)) {
-    frc1511::NTHandler::get()->get_smart_dashboard()->PutNumber("LED_Mode", led_mode);
+    frc1511::NTHandler::get()->set_double("LED_Mode", led_mode);
   }
   
   ImGui::Columns(1);

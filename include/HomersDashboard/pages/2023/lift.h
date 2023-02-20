@@ -20,6 +20,8 @@ public:
 private:
   LiftPage();
   ~LiftPage();
+
+  void show_lift();
   
   static LiftPage instance;
 };

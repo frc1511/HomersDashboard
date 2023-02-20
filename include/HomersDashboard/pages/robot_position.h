@@ -29,8 +29,8 @@ private:
   unsigned int field_tex;
   double field_ar = 1.0;
 
-  ImVec2 min { 0.116f, 0.16f },
-         max { 0.885f, 0.84f };
+  ImVec2 min { 0.02800000086426735, 0.018844246864318848 },
+         max { 0.9739999771118164, 0.9825640916824341 };
 
   ImRect bb;
   

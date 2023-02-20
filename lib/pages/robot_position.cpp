@@ -1,7 +1,7 @@
 #include <HomersDashboard/pages/robot_position.h>
 #include <HomersDashboard/utils.h>
 
-#include <_2022_field_png.h>
+#include <_2023_field_png.h>
 
 RobotPositionPage::RobotPositionPage() = default;
 
@@ -9,7 +9,7 @@ RobotPositionPage::~RobotPositionPage() = default;
 
 void RobotPositionPage::init() {
   int width, height, nr_channels;
-  int field_tex = Utils::generate_texture_from_memory(_2022_field_png, _2022_field_png_size, &width, &height, &nr_channels);
+  field_tex = Utils::generate_texture_from_memory(_2023_field_png, _2023_field_png_size, &width, &height, &nr_channels);
 
   field_ar = static_cast<double>(width) / static_cast<double>(height);
 }

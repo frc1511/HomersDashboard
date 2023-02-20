@@ -33,7 +33,7 @@ void AutoChooserPage::init() {
 
 void AutoChooserPage::apply_save_data(const SaveData& save_data) {
   set_auto_mode(std::atoi(save_data.at("Auto_Mode").c_str()));
-  auto_delay = std::atof(save_data.at("Auto_Delay").c_str());
+  set_auto_delay(std::atof(save_data.at("Auto_Delay").c_str()));
 }
 
 frc1511::Page::SaveData AutoChooserPage::get_save_data() const {

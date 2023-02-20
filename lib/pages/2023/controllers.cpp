@@ -21,16 +21,14 @@ void ControllerPage::init() {
   aux_tex = Utils::generate_texture_from_memory(_2023_controller_aux_png, _2023_controller_aux_png_size, &width, &height, &nr_channels);
   aux_manual_tex = Utils::generate_texture_from_memory(_2023_controller_aux_manual_png, _2023_controller_aux_manual_png_size, &width, &height, &nr_channels);
 
-  aspect_ratio = static_cast<double>(width) / static_cast<double>(height * 3);
+  aspect_ratio = static_cast<double>(width) / static_cast<double>(height);
 }
 
 void ControllerPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 
   if (!ImGui::Begin("2023 Controller Reference", running, 
-                    ImGuiWindowFlags_NoCollapse
-                  | ImGuiWindowFlags_NoScrollbar
-                  | ImGuiWindowFlags_NoScrollWithMouse)) {
+                    ImGuiWindowFlags_NoCollapse)) {
     ImGui::End();
     return;
   }

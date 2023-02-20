@@ -165,10 +165,10 @@ void HomersDashboard::present() {
       if (ImGui::BeginMenu("2023")) {
         menu_item(" " ICON_FA_BOLT       "   Auto Config",  13);
         menu_item(" " ICON_FA_CHART_LINE "  Auto Preview",  14);
-        menu_item(" " ICON_FA_FILM       "  Lift",          16);
-        menu_item(" " ICON_FA_FILM       "  Grabber",       17);
+        menu_item(" " ICON_FA_WRENCH     "  Lift",          16);
+        menu_item("  " ICON_FA_CHILD     "  Grabber",       17);
         menu_item(" " ICON_FA_FILM       "  Node Selector", 15);
-        menu_item(" " ICON_FA_FILM       "  Controller Reference", 18);
+        menu_item(ICON_FA_GAMEPAD        "  Controller Reference", 18);
         ImGui::EndMenu();
       }
 
