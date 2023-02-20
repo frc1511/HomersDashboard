@@ -83,6 +83,9 @@ build_dashboard_resource("${HD_RES_DIR}/images/2023/cone.png"       "_2023_cone_
 build_dashboard_resource("${HD_RES_DIR}/images/2023/cube_none.png"  "_2023_cube_none_png")
 build_dashboard_resource("${HD_RES_DIR}/images/2023/cone_none.png"  "_2023_cone_none_png")
 build_dashboard_resource("${HD_RES_DIR}/images/2023/gp_none.png"    "_2023_gp_none_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2023/controller_driver.png"     "_2023_controller_driver_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2023/controller_aux.png"        "_2023_controller_aux_png")
+build_dashboard_resource("${HD_RES_DIR}/images/2023/controller_aux_manual.png" "_2023_controller_aux_manual_png")
 
 # --- Thirdparty ---
 

@@ -24,6 +24,7 @@
 #include <HomersDashboard/pages/2023/auto_preview.h>
 #include <HomersDashboard/pages/2023/lift.h>
 #include <HomersDashboard/pages/2023/grabber.h>
+#include <HomersDashboard/pages/2023/controllers.h>
 #include <HomersDashboard/services/gyro.h>
 
 #ifdef THUNDER_WINDOWS
@@ -60,6 +61,7 @@ HomersDashboard::HomersDashboard()
     y2023::NodeSelectorPage::get(),
     y2023::LiftPage::get(),
     y2023::GrabberPage::get(),
+    y2023::ControllerPage::get(),
   }),
   all_services({
     GyroService::get(),
@@ -166,6 +168,7 @@ void HomersDashboard::present() {
         menu_item(" " ICON_FA_FILM       "  Lift",          16);
         menu_item(" " ICON_FA_FILM       "  Grabber",       17);
         menu_item(" " ICON_FA_FILM       "  Node Selector", 15);
+        menu_item(" " ICON_FA_FILM       "  Controller Reference", 18);
         ImGui::EndMenu();
       }
 
