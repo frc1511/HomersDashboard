@@ -42,7 +42,7 @@ void BlinkyBlinkyPage::present(bool* running) {
   const char* led_modes = "Robot State\0Alliance\0Custom\0Off\0";
 
   if (ImGui::Combo("##LED Mode", &led_mode, led_modes, 4)) {
-    frc1511::NTHandler::get()->set_double("LED_Mode", led_mode);
+    set_led_mode(led_mode);
   }
   
   ImGui::Columns(1);
@@ -70,22 +70,22 @@ void BlinkyBlinkyPage::present(bool* running) {
 
 void BlinkyBlinkyPage::set_led_mode(int mode) {
   led_mode = mode;
-  frc1511::NTHandler::get()->set_double("LED_Mode", mode);
+  frc1511::NTHandler::get()->set_double("thunderdashboard_led_mode", mode);
 }
 
 void BlinkyBlinkyPage::set_custom_r(float r) {
   custom_color[0] = r;
-  frc1511::NTHandler::get()->set_double("LED_Custom_Color_R", r);
+  frc1511::NTHandler::get()->set_double("thunderdashboard_led_custom_r", r);
 }
 
 void BlinkyBlinkyPage::set_custom_g(float g) {
   custom_color[1] = g;
-  frc1511::NTHandler::get()->set_double("LED_Custom_Color_G", g);
+  frc1511::NTHandler::get()->set_double("thunderdashboard_led_custom_g", g);
 }
 
 void BlinkyBlinkyPage::set_custom_b(float b) {
   custom_color[2] = b;
-  frc1511::NTHandler::get()->set_double("LED_Custom_Color_B", b);
+  frc1511::NTHandler::get()->set_double("thunderdashboard_led_custom_b", b);
 }
 
 BlinkyBlinkyPage BlinkyBlinkyPage::instance;

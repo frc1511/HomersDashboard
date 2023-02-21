@@ -48,10 +48,10 @@ void PressureGaugePage::show_pressure_gauge() {
 
   draw_list->AddCircleFilled(bb.GetCenter(), 3.0f, ImColor(252, 186, 3, 255), 0);
 
-  double low = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("airpressure_low", 0.0);
-  double high = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("airpressure_high", 130.0);
-  double current = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("airpressure", 0.0);
-  double iters = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("airpressure_iters", 20.0);
+  double low = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_airpressure_low", 0.0);
+  double high = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_airpressure_high", 130.0);
+  double current = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_airpressure", 0.0);
+  double iters = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_airpressure_iters", 20.0);
 
   auto get_pt = [&](double angle, double extra_dist = 0) -> ImVec2 {
     return ImVec2(

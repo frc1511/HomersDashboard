@@ -26,18 +26,6 @@ const std::map<int, float> col_coords = {
   { 8, 0.08 + 0.0935 * 8 + 0.009 },
 };
 
-const std::map<int, float> cone_row_coords = {
-  { 0, 0.08 },
-  { 1, 0.26 },
-  { 2, 0.50 },
-};
-
-const std::map<int, float> cube_row_coords = {
-  { 0, 0.10 },
-  { 1, 0.27 },
-  { 2, 0.52 },
-};
-
 void NodeSelectorPage::init() {
   int width, height, nr_channels;
   red_grid_tex = Utils::generate_texture_from_memory(_2023_grid_red_png, _2023_grid_red_png_size, &width, &height, &nr_channels);
@@ -101,18 +89,20 @@ void NodeSelectorPage::show_node_selector() {
 
   draw_list->AddImage(reinterpret_cast<void*>(tex), bb.Min, bb.Max);
 
-  int group = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_group", 1.0);
-  int column = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_column", 1.0);
-  int row = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_row", 0.0);
+  int group = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid", -1.0);
+  int column = frc1511::NTHandler::get()->get_smart_dashboard()->GetNumber("thunderdashboard_score_grid_column", -1.0);
+
+  if (group == -1) return;
 
   group = group > 2 ? 2 : group < 0 ? 0 : group;
-  column = column > 2 ? 2 : column < 0 ? 0 : column;
-  column += group * 3;
-  row = row > 2 ? 2 : row < 0 ? 0 : row;
 
   draw_list->AddRect(bb.Min + ImVec2(col_coords.at(group * 3), 0.0f) * canvas, bb.Min + ImVec2(col_coords.at(group * 3 + 2) + 0.084f, 1.0f) * canvas, ImColor(255, 255, 255, 255), 10.0f, 0, 5.0f);
+
+  if (column == -1) return;
+
+  column = column > 2 ? 2 : column < 0 ? 0 : column;
+  column += group * 3;
   draw_list->AddRect(bb.Min + ImVec2(col_coords.at(column), 0.0f) * canvas, bb.Min + ImVec2(col_coords.at(column) + 0.084f, 1.0f) * canvas, ImColor(252, 186, 3, 255), 10.0f, 0, 5.0f);
-  draw_list->AddRect(bb.Min + ImVec2(col_coords.at(column), cone_row_coords.at(row)) * canvas, bb.Min + ImVec2(col_coords.at(column) + 0.084f, cone_row_coords.at(row) + 0.23f) * canvas, ImColor(0, 255, 0, 255), 10.0f, 0, 5.0f);
 }
 
 NodeSelectorPage NodeSelectorPage::instance;

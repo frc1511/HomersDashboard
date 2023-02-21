@@ -89,7 +89,7 @@ void AutoChooserPage::present(bool* running) {
       auto_delay = 10.0f;
     }
     
-    frc1511::NTHandler::get()->set_double("Auto_Delay", auto_delay);
+    set_auto_delay(auto_delay);
   }
   
   ImGui::Columns(1);
@@ -125,7 +125,7 @@ void AutoChooserPage::set_auto_delay(double delay) {
     auto_delay = 10.0;
   }
 
-  frc1511::NTHandler::get()->set_double("Auto_Delay", auto_delay);
+  frc1511::NTHandler::get()->set_double("thunderdashboard_auto_start_delay", auto_delay);
 }
 
 AutoChooserPage AutoChooserPage::instance;
