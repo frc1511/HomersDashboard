@@ -55,47 +55,83 @@ void LiftPage::show_lift() {
     return pt;
   };
 
-  draw_list->AddRect(fix_pt(ImVec2(0, 0)), fix_pt(ImVec2(0.15, 0.35)), ImColor(255, 255, 255, 255), 0.0f, 0, 5.0f);
-
   ImVec2 pivot_point(0.15 / 2, 0.35 - 0.15 / 2);
 
-  draw_list->AddCircle(fix_pt(pivot_point), 5.0f, ImColor(255, 255, 255, 255));
+  static double angle_percent = 1.0;
+  static double extension_percent = 1.0;
 
-  double angle = M_PI_4;
+  static bool pivot_up = false;
+  static bool extension_up = false;
 
-  // Stage 1
+  if (pivot_up) {
+    angle_percent += 0.01;
+    if (angle_percent > 1.0) {
+      angle_percent = 1.0;
+      pivot_up = false;
+    }
+  } else {
+    angle_percent -= 0.01;
+    if (angle_percent < 0.0) {
+      angle_percent = 0.0;
+      pivot_up = true;
+    }
+  }
 
-  ImVec2 start_top(std::cos(angle + M_PI_2) * 0.1 + pivot_point.x, std::sin(angle + M_PI_2) * 0.1 + pivot_point.y);
-  ImVec2 start_bottom(std::cos(angle - M_PI_2) * 0.1 + pivot_point.x, std::sin(angle - M_PI_2) * 0.1 + pivot_point.y);
-  draw_list->AddLine(fix_pt(pivot_point), fix_pt(start_top), ImColor(0, 255, 0, 128), 5.0f);
-  draw_list->AddLine(fix_pt(pivot_point), fix_pt(start_bottom), ImColor(255, 0, 0, 128), 5.0f);
+  if (extension_up) {
+    extension_percent += 0.01;
+    if (extension_percent > 1.0) {
+      extension_percent = 1.0;
+      extension_up = false;
+    }
+  } else {
+    extension_percent -= 0.01;
+    if (extension_percent < 0.0) {
+      extension_percent = 0.0;
+      extension_up = true;
+    }
+  }
 
-  ImVec2 end_top(std::cos(angle) * 0.4 + start_top.x, std::sin(angle) * 0.4 + start_top.y);
-  ImVec2 end_bottom(std::cos(angle) * 0.4 + start_bottom.x, std::sin(angle) * 0.4 + start_bottom.y);
-  draw_list->AddLine(fix_pt(start_top), fix_pt(end_top), ImColor(0, 255, 0, 128), 5.0f);
-  draw_list->AddLine(fix_pt(start_bottom), fix_pt(end_bottom), ImColor(255, 0, 0, 128), 5.0f);
+  // angle range from -20 to 20 degrees
+  double angle = (angle_percent * 40 - 20) * M_PI / 180.0;
 
-  // Stage 2
-  start_top = ImVec2(std::cos(angle + M_PI_2) * 0.06 + pivot_point.x, std::sin(angle + M_PI_2) * 0.06 + pivot_point.y);
-  start_bottom = ImVec2(std::cos(angle - M_PI_2) * 0.06 + pivot_point.x, std::sin(angle - M_PI_2) * 0.06 + pivot_point.y);
-  draw_list->AddLine(fix_pt(pivot_point), fix_pt(start_top), ImColor(0, 255, 0, 128), 5.0f);
-  draw_list->AddLine(fix_pt(pivot_point), fix_pt(start_bottom), ImColor(255, 0, 0, 128), 5.0f);
+  const double stage_1_width = 0.05;
+  const double stage_2_width = 0.035;
+  const double stage_3_width = 0.02;
+  const double stage_1_length = 0.4;
 
-  end_top = ImVec2(std::cos(angle) * 0.7 + start_top.x, std::sin(angle) * 0.7 + start_top.y);
-  end_bottom = ImVec2(std::cos(angle) * 0.7 + start_bottom.x, std::sin(angle) * 0.7 + start_bottom.y);
-  draw_list->AddLine(fix_pt(start_top), fix_pt(end_top), ImColor(0, 255, 0, 128), 5.0f);
-  draw_list->AddLine(fix_pt(start_bottom), fix_pt(end_bottom), ImColor(255, 0, 0, 128), 5.0f);
+  const double stage_2_length = stage_1_length + 0.05 + 0.2 * extension_percent;
+  const double stage_3_length = stage_1_length + 0.05 + 0.35 * extension_percent;
+
+  ImGuiStyle& style = ImGui::GetStyle();
 
   // Stage 3
-  start_top = ImVec2(std::cos(angle + M_PI_2) * 0.03 + pivot_point.x, std::sin(angle + M_PI_2) * 0.03 + pivot_point.y);
-  start_bottom = ImVec2(std::cos(angle - M_PI_2) * 0.03 + pivot_point.x, std::sin(angle - M_PI_2) * 0.03 + pivot_point.y);
-  draw_list->AddLine(fix_pt(pivot_point), fix_pt(start_top), ImColor(0, 255, 0, 128), 5.0f);
-  draw_list->AddLine(fix_pt(pivot_point), fix_pt(start_bottom), ImColor(255, 0, 0, 128), 5.0f);
+  ImVec2 start_top(std::cos(angle + M_PI_2) * stage_3_width + pivot_point.x, std::sin(angle + M_PI_2) * stage_3_width + pivot_point.y);
+  ImVec2 start_bottom(std::cos(angle - M_PI_2) * stage_3_width + pivot_point.x, std::sin(angle - M_PI_2) * stage_3_width + pivot_point.y);
+  ImVec2 end_top(std::cos(angle) * stage_3_length + start_top.x, std::sin(angle) * stage_3_length + start_top.y);
+  ImVec2 end_bottom(std::cos(angle) * stage_3_length + start_bottom.x, std::sin(angle) * stage_3_length + start_bottom.y);
+  draw_list->AddQuadFilled(fix_pt(start_top), fix_pt(start_bottom), fix_pt(end_bottom), fix_pt(end_top), ImColor(style.Colors[ImGuiCol_WindowBg]));
+  draw_list->AddQuad(fix_pt(start_top), fix_pt(start_bottom), fix_pt(end_bottom), fix_pt(end_top), ImColor(255, 255, 255, 255), 5.0f);
 
-  end_top = ImVec2(std::cos(angle) * 0.9 + start_top.x, std::sin(angle) * 0.9 + start_top.y);
-  end_bottom = ImVec2(std::cos(angle) * 0.9 + start_bottom.x, std::sin(angle) * 0.9 + start_bottom.y);
-  draw_list->AddLine(fix_pt(start_top), fix_pt(end_top), ImColor(0, 255, 0, 128), 5.0f);
-  draw_list->AddLine(fix_pt(start_bottom), fix_pt(end_bottom), ImColor(255, 0, 0, 128), 5.0f);
+  // Stage 2
+  start_top = ImVec2(std::cos(angle + M_PI_2) * stage_2_width + pivot_point.x, std::sin(angle + M_PI_2) * stage_2_width + pivot_point.y);
+  start_bottom = ImVec2(std::cos(angle - M_PI_2) * stage_2_width + pivot_point.x, std::sin(angle - M_PI_2) * stage_2_width + pivot_point.y);
+  end_top = ImVec2(std::cos(angle) * stage_2_length + start_top.x, std::sin(angle) * stage_2_length + start_top.y);
+  end_bottom = ImVec2(std::cos(angle) * stage_2_length + start_bottom.x, std::sin(angle) * stage_2_length + start_bottom.y);
+  draw_list->AddQuadFilled(fix_pt(start_top), fix_pt(start_bottom), fix_pt(end_bottom), fix_pt(end_top), ImColor(style.Colors[ImGuiCol_WindowBg]));
+  draw_list->AddQuad(fix_pt(start_top), fix_pt(start_bottom), fix_pt(end_bottom), fix_pt(end_top), ImColor(255, 255, 255, 255), 5.0f);
+
+  // Stage 1
+  start_top = ImVec2(std::cos(angle + M_PI_2) * stage_1_width + pivot_point.x, std::sin(angle + M_PI_2) * stage_1_width + pivot_point.y);
+  start_bottom = ImVec2(std::cos(angle - M_PI_2) * stage_1_width + pivot_point.x, std::sin(angle - M_PI_2) * stage_1_width + pivot_point.y);
+  end_top = ImVec2(std::cos(angle) * stage_1_length + start_top.x, std::sin(angle) * stage_1_length + start_top.y);
+  end_bottom = ImVec2(std::cos(angle) * stage_1_length + start_bottom.x, std::sin(angle) * stage_1_length + start_bottom.y);
+  draw_list->AddQuadFilled(fix_pt(start_top), fix_pt(start_bottom), fix_pt(end_bottom), fix_pt(end_top), ImColor(style.Colors[ImGuiCol_WindowBg]));
+  draw_list->AddQuad(fix_pt(start_top), fix_pt(start_bottom), fix_pt(end_bottom), fix_pt(end_top), ImColor(255, 255, 255, 255), 5.0f);
+
+  draw_list->AddRectFilled(fix_pt(ImVec2(0, 0)), fix_pt(ImVec2(0.15, 0.35)), ImColor(style.Colors[ImGuiCol_WindowBg]));
+  draw_list->AddRect(fix_pt(ImVec2(0, 0)), fix_pt(ImVec2(0.15, 0.35)), ImColor(255, 255, 255, 255), 0.0f, 0, 5.0f);
+
+  draw_list->AddCircle(fix_pt(pivot_point), 5.0f, ImColor(255, 255, 255, 255));
 }
 
 LiftPage LiftPage::instance;
