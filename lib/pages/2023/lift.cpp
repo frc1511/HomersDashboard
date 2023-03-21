@@ -105,7 +105,7 @@ void LiftPage::show_lift() {
 
     draw_arm(target_angle, { 0.4, 0.4 + 0.05 + 0.2 * target_extension_percent, 0.4 + 0.05 + 0.35 * target_extension_percent }, style.Colors[ImGuiCol_Border], 5.0f);
 
-    if (angle_percent == target_angle_percent && extension_percent == target_extension_percent) {
+    if (std::abs(target_angle_percent - angle_percent) < 0.01 && std::abs(target_extension_percent - extension_percent) < 0.01) {
       color = ImColor(0, 255, 0, 255);
     }
   }
