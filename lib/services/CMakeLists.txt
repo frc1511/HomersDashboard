@@ -1,5 +1,5 @@
 add_dashboard_sources(
-  "${HD_LIB_DIR}/services/gyro.cpp"
+  "${HD_LIB_DIR}/services/alert.cpp"
 )
 
 if(TD_WINDOWS)

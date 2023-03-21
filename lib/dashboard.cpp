@@ -25,7 +25,7 @@
 #include <HomersDashboard/pages/2023/lift.h>
 #include <HomersDashboard/pages/2023/grabber.h>
 #include <HomersDashboard/pages/2023/controllers.h>
-#include <HomersDashboard/services/gyro.h>
+#include <HomersDashboard/services/alert.h>
 
 #ifdef THUNDER_WINDOWS
 # include <HomersDashboard/services/2023/arduino.h>
@@ -64,7 +64,7 @@ HomersDashboard::HomersDashboard()
     y2023::ControllerPage::get(),
   }),
   all_services({
-    GyroService::get(),
+    AlertService::get(),
 #ifdef THUNDER_WINDOWS
     y2023::ArduinoService::get(),
 #endif

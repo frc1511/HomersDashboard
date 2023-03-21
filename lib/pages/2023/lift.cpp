@@ -1,5 +1,6 @@
 #include <HomersDashboard/pages/2023/lift.h>
 #include <imgui_internal.h>
+#include <array>
 
 #define COL_WIDTH 100
 

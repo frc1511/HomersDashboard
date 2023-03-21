@@ -34,11 +34,29 @@ private:
   
   float auto_delay = 0.0;
   
-  std::map<int, std::string> auto_modes;
+  std::map<int, std::string> blue_auto_modes {
+    { 0, "Do Nothing"      },
+    { 1, "Left: 2GP"    },
+    { 2, "Left: 2GP+CS" },
+    { 3, "Center: 1GP"     },
+    { 4, "Center: 1GP+CS"  },
+    { 5, "Right: 1GP"       },
+    { 6, "Right: 1GP+MOB"   },
+  };
   
+  std::map<int, std::string> red_auto_modes { 
+    { 0, "Do Nothing"      },
+    { 1, "Right: 2GP"    },
+    { 2, "Right: 2GP+CS" },
+    { 3, "Center: 1GP"     },
+    { 4, "Center: 1GP+CS"  },
+    { 5, "Left: 1GP"       },
+    { 6, "Left: 1GP+MOB"   },
+  };
+
   std::mutex modes_mutex;
-  nt::StringSubscriber mode_sub;
-  NT_Listener mode_listener;
+  // nt::StringSubscriber mode_sub;
+  // NT_Listener mode_listener;
   
   static AutoChooserPage instance;
 };

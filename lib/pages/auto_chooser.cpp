@@ -8,27 +8,27 @@ AutoChooserPage::AutoChooserPage() = default;
 AutoChooserPage::~AutoChooserPage() = default;
 
 void AutoChooserPage::init() {
-  mode_sub = frc1511::NTHandler::get()->get_smart_dashboard()->GetStringTopic("thunderdashboard_auto_list").Subscribe("");
-  mode_listener = frc1511::NTHandler::get()->get_instance().AddListener(
-    mode_sub,
-    nt::EventFlags::kValueAll,
-    // Updates the auto modes when the list entry is changed.
-    [&](const nt::Event& event) {
-      std::lock_guard lk(modes_mutex);
-      auto_modes.clear();
-      std::string auto_list(event.GetValueEventData()->value.GetString());
+  // mode_sub = frc1511::NTHandler::get()->get_smart_dashboard()->GetStringTopic("thunderdashboard_auto_list").Subscribe("");
+  // mode_listener = frc1511::NTHandler::get()->get_instance().AddListener(
+  //   mode_sub,
+  //   nt::EventFlags::kValueAll,
+  //   // Updates the auto modes when the list entry is changed.
+  //   [&](const nt::Event& event) {
+  //     std::lock_guard lk(modes_mutex);
+  //     auto_modes.clear();
+  //     std::string auto_list(event.GetValueEventData()->value.GetString());
       
-      std::stringstream ss(auto_list);
-      while (ss.good()) {
-        std::string sub;
-        getline(ss, sub, ',');
-        if (sub == "") continue;
+  //     std::stringstream ss(auto_list);
+  //     while (ss.good()) {
+  //       std::string sub;
+  //       getline(ss, sub, ',');
+  //       if (sub == "") continue;
         
-        std::string desc(frc1511::NTHandler::get()->get_smart_dashboard()->GetString("thunderdashboard_auto_" + sub, ""));
-        auto_modes.insert({ std::atoi(sub.c_str()), sub + ": " + desc });
-      }
-    }
-  );
+  //       std::string desc(frc1511::NTHandler::get()->get_smart_dashboard()->GetString("thunderdashboard_auto_" + sub, ""));
+  //       auto_modes.insert({ std::atoi(sub.c_str()), sub + ": " + desc });
+  //     }
+  //   }
+  // );
 }
 
 void AutoChooserPage::apply_save_data(const SaveData& save_data) {
@@ -61,12 +61,13 @@ void AutoChooserPage::present(bool* running) {
   ImGui::NextColumn();
   
   if (ImGui::BeginCombo("##Auto Mode", auto_mode_str.c_str())) {
-    std::lock_guard lk(modes_mutex);
-    for (auto& [num, name] : auto_modes) {
+    std::map<int, std::string>* auto_modes = (frc1511::NTHandler::get()->get_alliance() == frc1511::NTHandler::Alliance::RED) ? &red_auto_modes : &blue_auto_modes;
+    // std::lock_guard lk(modes_mutex);
+    for (auto& [num, name] : *auto_modes) {
       if (ImGui::Selectable(name.c_str(), auto_mode == num)) {
-        frc1511::NTHandler::get()->set_double("Auto_Mode", auto_mode);
         auto_mode = num;
         auto_mode_str = name;
+        frc1511::NTHandler::get()->set_double("Auto_Mode", auto_mode);
       }
     }
     ImGui::EndCombo();
@@ -103,8 +104,8 @@ void AutoChooserPage::set_auto_mode(int mode) {
 
   int sz;
   {
-    std::lock_guard lk(modes_mutex);
-    sz = auto_modes.size();
+    // std::lock_guard lk(modes_mutex);
+    sz = blue_auto_modes.size();
   }
   
   if (auto_mode < 0 || auto_mode >= sz) {
