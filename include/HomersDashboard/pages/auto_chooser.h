@@ -35,23 +35,31 @@ private:
   float auto_delay = 0.0;
   
   std::map<int, std::string> blue_auto_modes {
-    { 0, "Do Nothing"      },
-    { 1, "Left: 2GP"    },
-    { 2, "Left: 2GP+CS" },
-    { 3, "Center: 1GP"     },
-    { 4, "Center: 1GP+CS"  },
-    { 5, "Right: 1GP"       },
-    { 6, "Right: 1GP+MOB"   },
+    { 0,  "Do Nothing"     },
+    { 1,  "Drive Forwards" },
+    { 2,  "Score"          },
+    { 3,  "Left: 2GP"      },
+    { 4,  "Left: 2GP+CS"   },
+    { 5,  "Left: 3GP"      },
+    { 6,  "Center: 1GP"    },
+    { 7,  "Center: 1GP+CS" },
+    { 8,  "Right: 2GP"     },
+    { 9,  "Right: 2GP+CS"  },
+    { 10, "Right: 3GP"     },
   };
   
   std::map<int, std::string> red_auto_modes { 
-    { 0, "Do Nothing"      },
-    { 1, "Right: 2GP"    },
-    { 2, "Right: 2GP+CS" },
-    { 3, "Center: 1GP"     },
-    { 4, "Center: 1GP+CS"  },
-    { 5, "Left: 1GP"       },
-    { 6, "Left: 1GP+MOB"   },
+    { 0,  "Do Nothing"     },
+    { 1,  "Drive Forwards" },
+    { 2,  "Score"          },
+    { 3,  "Right: 2GP"     },
+    { 4,  "Right: 2GP+CS"  },
+    { 5,  "Right: 3GP"     },
+    { 6,  "Center: 1GP"    },
+    { 7,  "Center: 1GP+CS" },
+    { 8,  "Left: 2GP"      },
+    { 9,  "Left: 2GP+CS"   },
+    { 10, "Left: 3GP"      },
   };
 
   std::mutex modes_mutex;
