@@ -40,26 +40,18 @@ private:
     { 2,  "Score"          },
     { 3,  "Left: 2GP"      },
     { 4,  "Left: 2GP+CS"   },
-    { 5,  "Left: 3GP"      },
-    { 6,  "Center: 1GP"    },
-    { 7,  "Center: 1GP+CS" },
-    { 8,  "Right: 2GP"     },
-    { 9,  "Right: 2GP+CS"  },
-    { 10, "Right: 3GP"     },
+    { 5,  "Center: 1GP+CS" },
+    { 6,  "Right: 2GP"     },
   };
   
   std::map<int, std::string> red_auto_modes { 
     { 0,  "Do Nothing"     },
     { 1,  "Drive Forwards" },
     { 2,  "Score"          },
-    { 3,  "Right: 2GP"     },
-    { 4,  "Right: 2GP+CS"  },
-    { 5,  "Right: 3GP"     },
-    { 6,  "Center: 1GP"    },
-    { 7,  "Center: 1GP+CS" },
-    { 8,  "Left: 2GP"      },
-    { 9,  "Left: 2GP+CS"   },
-    { 10, "Left: 3GP"      },
+    { 3,  "Right: 2GP"      },
+    { 4,  "Right: 2GP+CS"   },
+    { 5,  "Center: 1GP+CS" },
+    { 6,  "Left: 2GP"     },
   };
 
   std::mutex modes_mutex;
