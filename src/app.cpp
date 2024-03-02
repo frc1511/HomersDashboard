@@ -22,8 +22,11 @@ void App::setup_dockspace(ImGuiID dockspace_id) {
     auto dockspace_id_left = ImGui::DockBuilderSplitNode(
         dockspace_id, ImGuiDir_Left, 0.3875f, nullptr, &dockspace_id);
 
-    const auto dockspace_id_hang = ImGui::DockBuilderSplitNode(
+    auto dockspace_id_hang = ImGui::DockBuilderSplitNode(
         dockspace_id_left, ImGuiDir_Left, 0.2839f, nullptr, &dockspace_id_left);
+
+    auto dockspace_id_gp = ImGui::DockBuilderSplitNode(
+        dockspace_id_hang, ImGuiDir_Down, 0.3f, nullptr, &dockspace_id_hang);
 
     const auto dockspace_id_arm = ImGui::DockBuilderSplitNode(
         dockspace_id_left, ImGuiDir_Down, 0.6971f, nullptr, &dockspace_id_left);
@@ -47,6 +50,7 @@ void App::setup_dockspace(ImGuiID dockspace_id) {
     ImGui::DockBuilderDockWindow(m_2024_hang_page.name(), dockspace_id_hang);
     ImGui::DockBuilderDockWindow(m_2024_arm_page.name(), dockspace_id_arm);
     ImGui::DockBuilderDockWindow(m_2024_shooter_page.name(), dockspace_id_shooter);
+    ImGui::DockBuilderDockWindow(m_2024_gamepiece_page.name(), dockspace_id_gp);
 
     m_network_tables_page.set_open(true);
     m_robot_position_page.set_open(true);
@@ -56,6 +60,7 @@ void App::setup_dockspace(ImGuiID dockspace_id) {
     m_2024_hang_page.set_open(true);
     m_2024_arm_page.set_open(true);
     m_2024_shooter_page.set_open(true);
+    m_2024_gamepiece_page.set_open(true);
   }
 }
 

@@ -20,5 +20,6 @@ add_dashboard_sources(
   "${HD_PAGES_DIR}/2024/arm_page.cpp"
   "${HD_PAGES_DIR}/2024/shooter_page.cpp"
   "${HD_PAGES_DIR}/2024/hang_page.cpp"
+  "${HD_PAGES_DIR}/2024/gamepiece_page.cpp"
 )
 
