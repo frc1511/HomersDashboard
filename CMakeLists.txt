@@ -151,22 +151,26 @@ build_dashboard_resource("${HD_RES_DIR}/images/2024/field.png" "_2024_field_png"
 # Thirdparty libraries.
 #
 
-# glfw
-option(GLFW_BUILD_EXAMPLES OFF)
-option(GLFW_BUILD_TESTS OFF)
-option(GLFW_BUILD_DOCS OFF)
-option(GLFW_INSTALL OFF)
-add_subdirectory("${HD_THIRDPARTY_DIR}/glfw")
+if(NOT HD_WINDOWS)
+  # glfw
+  option(GLFW_BUILD_EXAMPLES OFF)
+  option(GLFW_BUILD_TESTS OFF)
+  option(GLFW_BUILD_DOCS OFF)
+  option(GLFW_INSTALL OFF)
+  add_subdirectory("${HD_THIRDPARTY_DIR}/glfw")
+
+  # glad OpenGL loader
+  add_subdirectory("${HD_THIRDPARTY_DIR}/glad")
+endif()
 
 # others
 add_subdirectory("${HD_THIRDPARTY_DIR}/imgui")
 add_subdirectory("${HD_THIRDPARTY_DIR}/stb_image")
-add_subdirectory("${HD_THIRDPARTY_DIR}/glad")
 add_subdirectory("${HD_THIRDPARTY_DIR}/IconFontCppHeaders")
 
 # ps5 controllers.
 if(HD_WINDOWS)
-  add_subdirectory("${HD_THIRDPARTY_DIR}/DualSense-Windows")
+  # add_subdirectory("${HD_THIRDPARTY_DIR}/DualSense-Windows")
 endif()
 
 # allwpilib
@@ -221,7 +225,13 @@ if(HD_DOWNLOAD_WPILIB) # Download from internet.
   endfunction()
 
   foreach(MODULE ${HD_WPILIB_MODULES})
-    if(NOT EXISTS "${HD_WPILIB_DOWNLOAD_DIR}/${MODULE}/${HD_DOWNLOAD_OS}/${HD_DOWNLOAD_ARCH}/static/lib${MODULE}.a")
+    set(MODULE_LIB_DIR "${HD_WPILIB_DOWNLOAD_DIR}/${MODULE}/${HD_DOWNLOAD_OS}/${HD_DOWNLOAD_ARCH}/static")
+    if(HD_WINDOWS)
+      set(MODULE_LIB_NAME "${MODULE}.lib")
+    else()
+      set(MODULE_LIB_NAME "lib${MODULE}.a")
+    endif()
+    if(NOT EXISTS "${MODULE_LIB_DIR}/${MODULE_LIB_NAME}")
       download_extract_lib(${MODULE})
     endif()
     
@@ -229,7 +239,7 @@ if(HD_DOWNLOAD_WPILIB) # Download from internet.
       download_extract_headers(${MODULE})
     endif()
 
-    link_directories("${HD_WPILIB_DOWNLOAD_DIR}/${MODULE}/${HD_DOWNLOAD_OS}/${HD_DOWNLOAD_ARCH}/static")
+    link_directories("${MODULE_LIB_DIR}")
     include_directories("${HD_WPILIB_DOWNLOAD_DIR}/${MODULE}_include")
   endforeach()
 
@@ -280,14 +290,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/
 # Link libraries.
 #
 
-target_link_libraries(${PROJECT_NAME} glfw)
 target_link_libraries(${PROJECT_NAME} imgui)
 target_link_libraries(${PROJECT_NAME} icons_font_awesome)
-target_link_libraries(${PROJECT_NAME} glad)
 target_link_libraries(${PROJECT_NAME} stb_image)
 
 if(HD_WINDOWS)
-  target_link_libraries(${PROJECT_NAME} DualSense-Windows)
+  #target_link_libraries(${PROJECT_NAME} DualSense-Windows)
+else()
+  target_link_libraries(${PROJECT_NAME} glfw)
+  target_link_libraries(${PROJECT_NAME} glad)
 endif()
 
 if(HD_WITH_CS)

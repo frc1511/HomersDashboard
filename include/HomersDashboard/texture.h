@@ -3,7 +3,11 @@
 #include <HomersDashboard/homers_dashboard.h>
 
 class Texture {
-  unsigned int m_texture_id;
+#ifdef HD_WINDOWS
+  ID3D11ShaderResourceView* m_texture = nullptr;
+#else
+  unsigned int m_texture;
+#endif
 
   int m_width, m_height, m_nr_channels;
 
@@ -17,7 +21,7 @@ public:
   int height() const { return m_height; }
   int nr_channels() const { return m_nr_channels; }
 
-  ImTextureID id() const { return reinterpret_cast<void*>(m_texture_id); }
+  ImTextureID id() const { return reinterpret_cast<void*>(m_texture); }
 
 private:
   void setup();

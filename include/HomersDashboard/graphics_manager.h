@@ -2,12 +2,8 @@
 
 #include <HomersDashboard/homers_dashboard.h>
 
-struct GLFWwindow;
-
 class GraphicsManager { // singleton
   GraphicsManager() = default;
-
-  GLFWwindow* m_window;
 
 public:
   static GraphicsManager& get() {
@@ -34,5 +30,9 @@ public:
 
   void set_window_size(int width, int height);
   void set_window_pos(int x, int y);
+
+#ifdef HD_WINDOWS
+  ID3D11Device* device();
+#endif
 };
 

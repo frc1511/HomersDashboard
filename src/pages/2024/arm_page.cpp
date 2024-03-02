@@ -129,7 +129,7 @@ void ArmPage::draw_arm() {
   if (!no_target) {
     draw_arm_angle(target_angle_rad, TARGET_COLOR);
 
-    at_target = std::fabsf(angle_deg - target_angle_deg) < 5.f;
+    at_target = std::fabs(angle_deg - target_angle_deg) < 5.f;
   }
 
   //

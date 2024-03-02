@@ -1,6 +1,4 @@
 #include <HomersDashboard/pages/camera_page.h>
-#include <glad/glad.h>
-#include <stb_image.h>
 
 #include <no_camera_png.h>
 

@@ -5,9 +5,11 @@ void IntakeCameraPage::init(bool host_local) {
   const char* name = "intake_camera";
 
   if (host_local) {
+#ifdef HD_WITH_CS
     url = "http://127.0.0.1:1181/stream.mjpg";
     m_local_camera = frc::CameraServer::StartAutomaticCapture(0);
     m_local_stream = frc::CameraServer::PutVideo(name, 320, 240);
+#endif
   }
 
   CameraPage::init(name, url);

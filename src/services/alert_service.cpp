@@ -23,7 +23,7 @@ void AlertService::process() {
                       m_nt_handler.smart_dashboard()->GetBoolean(
                           "thunderdashboard_alert_orange", false);
 
-  const auto now = std::chrono::high_resolution_clock::now();
+  const auto now = std::chrono::steady_clock::now();
 
   if (m_nt_handler.instance().IsConnected() && (red || yellow || orange)) {
     const size_t dur_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
