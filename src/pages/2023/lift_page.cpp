@@ -1,10 +1,11 @@
 #include <HomersDashboard/pages/2023/lift_page.h>
 
-const double LINE_WIDTHS[] = {0.05, 0.035, 0.02};
-const ImVec2 PIVOT_POINT(0.15 / 2, 0.35 - 0.15 / 2);
+static const double STAGE_WIDTHS[] = {0.05, 0.035, 0.02};
+static const ImVec2 PIVOT_POINT(0.15 / 2, 0.35 - 0.15 / 2);
 
-const ImColor BASE_COLOR(255, 255, 255, 255);
-const ImColor AT_TARGET_COLOR(0, 255, 0, 255);
+static const ImColor BASE_COLOR(255, 255, 255, 255);
+static const ImColor AT_TARGET_COLOR(0, 255, 0, 255);
+static const ImColor TARGET_COLOR(43, 46, 54, 255);
 
 using namespace y2023;
 
@@ -98,7 +99,7 @@ void LiftPage::draw_lift() {
         (target_angle_percent * 40 - 20) * (std::numbers::pi / 180.0);
 
     draw_arm(target_angle, get_stage_lengths(target_extension_percent),
-             style.Colors[ImGuiCol_Border], 5.0f);
+             TARGET_COLOR, 5.0f);
 
     if (std::abs(target_angle_percent - angle_percent) < 0.01 &&
         std::abs(target_extension_percent - extension_percent) < 0.01) {
@@ -135,10 +136,10 @@ void LiftPage::draw_arm(double angle, std::array<double, 3> stage_lengths,
 
   // Draw the arm stages.
   for (int i = 2; i >= 0; i--) {
-    ImVec2 start_top(cos_angle_top * LINE_WIDTHS[i] + PIVOT_POINT.x,
-                     sin_angle_top * LINE_WIDTHS[i] + PIVOT_POINT.y);
-    ImVec2 start_bottom(cos_angle_bottom * LINE_WIDTHS[i] + PIVOT_POINT.x,
-                        sin_angle_bottom * LINE_WIDTHS[i] + PIVOT_POINT.y);
+    ImVec2 start_top(cos_angle_top * STAGE_WIDTHS[i] + PIVOT_POINT.x,
+                     sin_angle_top * STAGE_WIDTHS[i] + PIVOT_POINT.y);
+    ImVec2 start_bottom(cos_angle_bottom * STAGE_WIDTHS[i] + PIVOT_POINT.x,
+                        sin_angle_bottom * STAGE_WIDTHS[i] + PIVOT_POINT.y);
     ImVec2 end_top(cos_angle * stage_lengths[i] + start_top.x,
                    sin_angle * stage_lengths[i] + start_top.y);
     ImVec2 end_bottom(cos_angle * stage_lengths[i] + start_bottom.x,

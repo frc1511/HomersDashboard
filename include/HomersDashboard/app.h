@@ -23,6 +23,9 @@
 #include <HomersDashboard/pages/2023/grabber_page.h>
 #include <HomersDashboard/pages/2023/lift_page.h>
 
+#include <HomersDashboard/pages/2024/arm_page.h>
+#include <HomersDashboard/pages/2024/shooter_page.h>
+
 struct GLFWwindow;
 
 class Page;
@@ -96,7 +99,11 @@ class App {
       &m_2023_controller_page,
   };
 
-  const std::set<Page*> m_2024_pages {};
+  y2024::ArmPage m_2024_arm_page {m_nt_handler};
+
+  const std::set<Page*> m_2024_pages {
+      &m_2024_arm_page,
+  };
 
   // Every page goes in here.
   const std::set<Page*> m_all_pages {
@@ -109,6 +116,8 @@ class App {
 
       &m_2023_lift_page,       &m_2023_grabber_page,
       &m_2023_controller_page,
+
+      &m_2024_arm_page,
   };
 
   //
