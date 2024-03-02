@@ -5,15 +5,15 @@
 
 namespace y2024 {
 
-class ShooterPage : public Page {
+class HangPage : public Page {
   NTHandler& m_nt_handler;
 
 public:
-  ShooterPage(NTHandler& nt_handler)
+  HangPage(NTHandler& nt_handler)
     : m_nt_handler(nt_handler) {}
 
-  const char* name() const override { return "2024 Shooter"; }
-  const char* short_name() const override { return "Shooter"; }
+  const char* name() const override { return "2024 Hang"; }
+  const char* short_name() const override { return "Hang"; }
   void present(bool* running) override;
 };
 

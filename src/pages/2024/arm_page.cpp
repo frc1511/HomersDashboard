@@ -95,41 +95,42 @@ void ArmPage::draw_arm() {
   const ImVec2 canvas(dim_x, dim_y);
 
   m_bb = ImRect(win->DC.CursorPos, win->DC.CursorPos + canvas);
-  ImGui::ItemSize(m_bb);
-  if (!ImGui::ItemAdd(m_bb, 0)) return;
+  /* ImGui::ItemSize(m_bb); */
+  /* if (!ImGui::ItemAdd(m_bb, 0)) return; */
 
   //
   // Get angle.
   //
+  float angle_deg = m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_2024_arm_pivot_deg", 0.0);
 
-  float angle_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_arm_pivot_percent", 0.0);
+  angle_deg = std::clamp(angle_deg, 0.f, 85.f);
 
-  angle_percent = std::clamp(angle_percent, 0.f, 1.f);
+  float target_angle_deg = m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_2024_arm_pivot_target_deg", -1.0);
 
-  float target_angle_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_arm_pivot_target_percent", -1.0);
-
-  const bool no_target = float_eq(target_angle_percent, -1.f);
+  const bool no_target = float_eq(target_angle_deg, -1.f);
   if (!no_target) {
-    target_angle_percent = std::clamp(target_angle_percent, 0.f, 1.f);
+    target_angle_deg = std::clamp(target_angle_deg, 0.f, 85.f);
   }
 
-  const auto to_rad = [](float percent) {
-    return percent * 1.48353f + 0.0872665f;
+  const auto to_rad = [](float deg) {
+    return (deg + 5.f) * 3.14159f / 180.f;
   };
 
-  const float angle_rad = to_rad(angle_percent);
-  const float target_angle_rad = to_rad(target_angle_percent);
+  const float angle_rad = to_rad(angle_deg);
+  const float target_angle_rad = to_rad(target_angle_deg);
+
+  bool at_target = false;
 
   //
   // Draw target.
   //
   if (!no_target) {
     draw_arm_angle(target_angle_rad, TARGET_COLOR);
-  }
 
-  const bool at_target = std::fabsf(angle_rad - target_angle_rad) < 0.087;
+    at_target = std::fabsf(angle_deg - target_angle_deg) < 5.f;
+  }
 
   //
   // Draw current.
@@ -160,6 +161,18 @@ void ArmPage::draw_arm() {
 
   m_draw_list->AddRectFilled(fix_pt(BUMPERS_RECT.Min), fix_pt(BUMPERS_RECT.Max),
                              bumper_color, 5.f, 0);
+
+  //
+  // Draw text.
+  //
+  ImGui::SameLine(win_size.x - 80);
+  ImGui::Text("Current: %.1f°", angle_deg);
+  if (!no_target) {
+    ImGui::Dummy(ImVec2(0, 0));
+    ImGui::SameLine(win_size.x - 80);
+    ImGui::Text("Target: %.1f°", target_angle_deg);
+  }
+
 }
 
 void ArmPage::draw_polygon(const ImVec2* pts, size_t num_pts, ImVec2 offset,

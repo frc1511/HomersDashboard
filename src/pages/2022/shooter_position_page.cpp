@@ -22,7 +22,7 @@ void ShooterPositionPage::present(bool* running) {
     const double rpm =
         m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_rpm", 0.0);
 
-    const double rpm_pct = rpm / rpm_max;
+    const double rpm_pct = float_eq(rpm_max, 0.0f) ? 0.f : rpm / rpm_max;
 
     const std::string buf = std::to_string(rpm);
     ImGui::ProgressBar(rpm_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30),
@@ -41,7 +41,7 @@ void ShooterPositionPage::present(bool* running) {
     const double hood =
         m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_hood", 0.0);
 
-    const double hood_pct = (hood - hood_min) / (hood_max - hood_min);
+    const double hood_pct = hood_max != hood_min ? (hood - hood_min) / (hood_max - hood_min) : 0.0;
 
     std::string buf = std::to_string(hood - hood_min);
     ImGui::ProgressBar(hood_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30),

@@ -19,26 +19,43 @@ void App::setup_dockspace(ImGuiID dockspace_id) {
     auto dockspace_id_down = ImGui::DockBuilderSplitNode(
         dockspace_id, ImGuiDir_Down, 0.22f, nullptr, &dockspace_id);
 
-    auto dockspace_id_left_1 = ImGui::DockBuilderSplitNode(
-        dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+    auto dockspace_id_left = ImGui::DockBuilderSplitNode(
+        dockspace_id, ImGuiDir_Left, 0.3875f, nullptr, &dockspace_id);
 
-    auto dockspace_id_left_2 = ImGui::DockBuilderSplitNode(
-        dockspace_id, ImGuiDir_Left, 0.15f, nullptr, &dockspace_id);
+    const auto dockspace_id_hang = ImGui::DockBuilderSplitNode(
+        dockspace_id_left, ImGuiDir_Left, 0.2839f, nullptr, &dockspace_id_left);
+
+    const auto dockspace_id_arm = ImGui::DockBuilderSplitNode(
+        dockspace_id_left, ImGuiDir_Down, 0.6971f, nullptr, &dockspace_id_left);
+
+    const auto dockspace_id_shooter = ImGui::DockBuilderSplitNode(
+        dockspace_id_left, ImGuiDir_Down, 0.435f, nullptr, &dockspace_id_left);
+
+    const auto dockspace_id_timer = dockspace_id_left;
+
+    const auto dockspace_id_comp_info = ImGui::DockBuilderSplitNode(
+        dockspace_id_down, ImGuiDir_Right, 0.4f, nullptr, &dockspace_id_down);
+
+    const auto dockspace_id_auto = dockspace_id_down;
 
     ImGui::DockBuilderDockWindow(m_network_tables_page.name(), dockspace_id);
     ImGui::DockBuilderDockWindow(m_robot_position_page.name(), dockspace_id);
 
-    ImGui::DockBuilderDockWindow(m_comp_info_page.name(), dockspace_id_left_1);
-    ImGui::DockBuilderDockWindow(m_match_timer_page.name(),
-                                 dockspace_id_left_2);
-
-    ImGui::DockBuilderDockWindow(m_auto_chooser_page.name(), dockspace_id_down);
+    ImGui::DockBuilderDockWindow(m_comp_info_page.name(), dockspace_id_comp_info);
+    ImGui::DockBuilderDockWindow(m_match_timer_page.name(), dockspace_id_timer);
+    ImGui::DockBuilderDockWindow(m_auto_chooser_page.name(), dockspace_id_auto);
+    ImGui::DockBuilderDockWindow(m_2024_hang_page.name(), dockspace_id_hang);
+    ImGui::DockBuilderDockWindow(m_2024_arm_page.name(), dockspace_id_arm);
+    ImGui::DockBuilderDockWindow(m_2024_shooter_page.name(), dockspace_id_shooter);
 
     m_network_tables_page.set_open(true);
     m_robot_position_page.set_open(true);
     m_comp_info_page.set_open(true);
     m_match_timer_page.set_open(true);
     m_auto_chooser_page.set_open(true);
+    m_2024_hang_page.set_open(true);
+    m_2024_arm_page.set_open(true);
+    m_2024_shooter_page.set_open(true);
   }
 }
 
