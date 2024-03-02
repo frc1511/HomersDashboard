@@ -4,8 +4,10 @@
 
 class LimelightCameraPage : public CameraPage {
 public:
-  LimelightCameraPage();
+  LimelightCameraPage() = default;
   ~LimelightCameraPage() = default;
+
+  void init();
 
   void present(bool* running) override;
   const char* name() const override { return "Limelight Camera"; }

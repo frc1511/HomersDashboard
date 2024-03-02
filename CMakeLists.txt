@@ -172,7 +172,7 @@ endif()
 # allwpilib
 set(HD_WPILIB_MODULES "wpiutil;wpinet;ntcore")
 if(HD_WITH_CS)
-  list(APPEND HD_WPILIB_MODULES "cscore")
+  list(APPEND HD_WPILIB_MODULES "cscore;cameraserver")
 endif()
 
 if(HD_DOWNLOAD_WPILIB) # Download from internet.

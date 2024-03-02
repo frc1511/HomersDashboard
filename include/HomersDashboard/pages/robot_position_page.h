@@ -2,12 +2,13 @@
 
 #include <HomersDashboard/nt_handler.h>
 #include <HomersDashboard/pages/page.h>
+#include <HomersDashboard/texture.h>
 
 class RobotPositionPage : public Page {
   NTHandler& m_nt_handler;
 
-  unsigned int m_field_tex;
-  double m_field_ar = 1.0;
+  const Texture m_field_tex;
+  double m_field_ar;
 
   ImRect m_bb;
 

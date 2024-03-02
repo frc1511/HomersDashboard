@@ -8,36 +8,16 @@
 #define CAMERA_RES_X 320
 #define CAMERA_RES_Y 240
 
-static void setup_tex(unsigned int& tex) {
-  glGenTextures(1, &tex);
-  glBindTexture(GL_TEXTURE_2D, tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
+void CameraPage::init(std::string_view name, std::string_view url) {
+  assert(!m_init);
 
-CameraPage::CameraPage(std::string_view name, std::string_view url)
-  : m_name(name),
-    m_url(url) {
-  int width, height, nr_channels;
-  unsigned char* img_data = stbi_load_from_memory(
-      no_camera_png, no_camera_png_size, &width, &height, &nr_channels, 0);
+  m_name = name;
+  m_url = url;
+  m_no_cam_tex = std::make_unique<Texture>(no_camera_png, no_camera_png_size);
+  m_frame_tex = std::make_unique<Texture>();
 
-  assert(img_data); // Failed to load texture from memory.
-
-  int tex_channels(nr_channels == 3 ? GL_RGB : GL_RGBA);
-
-  setup_tex(m_no_cam_tex);
-  glTexImage2D(GL_TEXTURE_2D, 0, tex_channels, width, height, 0, tex_channels,
-               GL_UNSIGNED_BYTE, img_data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-  setup_tex(m_frame_tex);
-
-  stbi_image_free(img_data);
-
-  m_no_cam_ar = static_cast<float>(width) / static_cast<float>(height);
+  m_no_cam_ar =
+      static_cast<float>(m_no_cam_tex->width()) / m_no_cam_tex->height();
 
   m_camera_thread = std::thread([&]() { thread_start(); });
 
@@ -49,21 +29,18 @@ CameraPage::~CameraPage() {
 
   terminate();
   m_camera_thread.join();
-  glDeleteTextures(1, &m_no_cam_tex);
-  glDeleteTextures(1, &m_frame_tex);
 }
 
-unsigned int CameraPage::get_frame_texture() {
+Texture CameraPage::get_frame_texture() {
   std::lock_guard lk(m_camera_mutex);
 
   if (m_new_frame) {
-    glBindTexture(GL_TEXTURE_2D, m_frame_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_frame.cols, m_frame.rows, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, m_frame.data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+#ifdef HD_WITH_CS
+    m_frame_tex->set_data(m_frame.data, m_frame.cols, m_frame.rows, 3);
+#endif
   }
 
-  return m_has_frame ? m_frame_tex : m_no_cam_tex;
+  return m_has_frame ? *m_frame_tex : *m_no_cam_tex;
 }
 
 double CameraPage::get_frame_aspect_ratio() {
@@ -157,4 +134,4 @@ void CameraPage::thread_start() {
   }
 #endif
 }
- 
+

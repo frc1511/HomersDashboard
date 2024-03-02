@@ -180,6 +180,9 @@ void App::startup() {
   m_nt_handler.init(result.nt_version, result.ds_running,
                     result.local_nt_server);
 
+  m_intake_camera_page.init(result.host_camera_server);
+  m_limelight_camera_page.init();
+
   for (Service* service : m_services) {
     service->init();
   }

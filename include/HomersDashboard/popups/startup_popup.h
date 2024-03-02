@@ -8,6 +8,7 @@ struct StartupSettings {
   NTHandler::Version nt_version = NTHandler::Version::V4;
   bool ds_running = true;
   bool local_nt_server = false;
+  bool host_camera_server = false;
 };
 
 class StartupPopup : public Popup {

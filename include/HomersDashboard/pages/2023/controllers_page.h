@@ -2,11 +2,12 @@
 
 #include <HomersDashboard/nt_handler.h>
 #include <HomersDashboard/pages/page.h>
+#include <HomersDashboard/texture.h>
 
 namespace y2023 {
 
 class ControllerPage : public Page {
-  unsigned int m_driver_tex, m_aux_tex, m_aux_manual_tex;
+  const Texture m_driver_tex, m_aux_tex, m_aux_manual_tex;
   double m_aspect_ratio;
 
 public:

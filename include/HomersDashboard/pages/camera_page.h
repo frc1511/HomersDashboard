@@ -2,6 +2,7 @@
 
 #include <HomersDashboard/homers_dashboard.h>
 #include <HomersDashboard/pages/page.h>
+#include <HomersDashboard/texture.h>
 
 #ifdef HD_WITH_CS
 #include <cscore.h>
@@ -10,7 +11,7 @@
 #endif
 
 class CameraPage : public Page {
-  const std::string m_name, m_url;
+  std::string m_name, m_url;
 
   std::thread m_camera_thread;
   std::mutex m_camera_mutex;
@@ -19,8 +20,8 @@ class CameraPage : public Page {
   cv::Mat m_frame;
 #endif
 
-  // OpenGL textures.
-  unsigned int m_no_cam_tex, m_frame_tex;
+  std::unique_ptr<Texture> m_no_cam_tex = nullptr;
+  std::unique_ptr<Texture> m_frame_tex = nullptr;
 
   // Aspect ratios.
   double m_no_cam_ar, m_frame_ar;
@@ -33,10 +34,12 @@ class CameraPage : public Page {
 
 protected:
   // Media must be MJPG stream (Content-Type "multipart/x-mixed-replace").
-  CameraPage(std::string_view name, std::string_view url);
+  CameraPage() = default;
   virtual ~CameraPage();
 
-  unsigned int get_frame_texture();
+  void init(std::string_view name, std::string_view url);
+
+  Texture get_frame_texture();
   double get_frame_aspect_ratio();
 
   void terminate();

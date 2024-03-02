@@ -1,7 +1,5 @@
 #include <HomersDashboard/pages/robot_position_page.h>
 
-#include <HomersDashboard/opengl_utils.h>
-
 #include <_2024_field_png.h>
 
 static const ImRect FIELD_RECT(ImVec2(0.080078125f, 0.07861328125f),
@@ -10,14 +8,10 @@ static const ImRect FIELD_RECT(ImVec2(0.080078125f, 0.07861328125f),
 static const ImVec2 FIELD_SIZE(16.54175f, 8.0137f); // meters.
 
 RobotPositionPage::RobotPositionPage(NTHandler& nt_handler)
-  : m_nt_handler(nt_handler) {
-
-  int width, height, nr_channels;
-  m_field_tex = generate_texture_from_memory(
-      _2024_field_png, _2024_field_png_size, &width, &height, &nr_channels);
-
-  m_field_ar = static_cast<double>(width) / static_cast<double>(height);
-}
+  : m_nt_handler(nt_handler),
+    m_field_tex(_2024_field_png, _2024_field_png_size),
+    m_field_ar(static_cast<double>(m_field_tex.width()) /
+               m_field_tex.height()) {}
 
 void RobotPositionPage::present(bool* running) {
   ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
@@ -63,7 +57,7 @@ void RobotPositionPage::show_robot_position() {
   ImGui::ItemSize(m_bb);
   if (!ImGui::ItemAdd(m_bb, 0)) return;
 
-  draw_list->AddImage(reinterpret_cast<void*>(m_field_tex), m_bb.Min, m_bb.Max);
+  draw_list->AddImage(m_field_tex.id(), m_bb.Min, m_bb.Max);
 
   const ImVec2 pt(m_nt_handler.smart_dashboard()->GetNumber(
                       "thunderdashboard_drive_x_pos", 0.0),

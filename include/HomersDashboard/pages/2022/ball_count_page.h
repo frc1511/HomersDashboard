@@ -2,13 +2,14 @@
 
 #include <HomersDashboard/nt_handler.h>
 #include <HomersDashboard/pages/page.h>
+#include <HomersDashboard/texture.h>
 
 namespace y2022 {
 
 class BallCountPage : public Page {
   NTHandler& m_nt_handler;
 
-  unsigned int m_no_cargo_tex, m_red_cargo_tex, m_blue_cargo_tex;
+  const Texture m_no_cargo_tex, m_red_cargo_tex, m_blue_cargo_tex;
 
 public:
   BallCountPage(NTHandler& nt_handler);

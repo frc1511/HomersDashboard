@@ -27,7 +27,7 @@ void StartupPopup::present(bool* running) {
 
     ImGui::Checkbox("##DS Running", &m_settings.ds_running);
   }
-  if (ImGui::TreeNodeEx("Advanced")) {
+  if (ImGui::TreeNodeEx("Advanced/Debug")) {
     {
       ImGuiScopedField field("Local NT Server", COLUMN_WIDTH);
       bool hovered = ImGui::IsItemHovered();
@@ -37,6 +37,18 @@ void StartupPopup::present(bool* running) {
       if (hovered) {
         ImGui::BeginTooltip();
         ImGui::TextUnformatted("Look for NT server at 127.0.0.1");
+        ImGui::EndTooltip();
+      }
+    }
+    {
+      ImGuiScopedField field("Host Camera Server", COLUMN_WIDTH);
+      bool hovered = ImGui::IsItemHovered();
+      ImGui::Checkbox("##Host Camera Server", &m_settings.host_camera_server);
+      hovered |= ImGui::IsItemHovered();
+      if (hovered) {
+        ImGui::BeginTooltip();
+        ImGui::TextUnformatted("Host a camera server on this computer (port 1181).");
+        ImGui::TextUnformatted("Visible in place of the robot's Intake Camera");
         ImGui::EndTooltip();
       }
     }
