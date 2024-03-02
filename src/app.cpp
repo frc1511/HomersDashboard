@@ -1,6 +1,6 @@
 #include <HomersDashboard/app.h>
 
-#include <GLFW/glfw3.h>
+#include <HomersDashboard/graphics_manager.h>
 #include <IconsFontAwesome5.h>
 
 void App::setup_dockspace(ImGuiID dockspace_id) {
@@ -44,12 +44,14 @@ void App::setup_dockspace(ImGuiID dockspace_id) {
     ImGui::DockBuilderDockWindow(m_network_tables_page.name(), dockspace_id);
     ImGui::DockBuilderDockWindow(m_robot_position_page.name(), dockspace_id);
 
-    ImGui::DockBuilderDockWindow(m_comp_info_page.name(), dockspace_id_comp_info);
+    ImGui::DockBuilderDockWindow(m_comp_info_page.name(),
+                                 dockspace_id_comp_info);
     ImGui::DockBuilderDockWindow(m_match_timer_page.name(), dockspace_id_timer);
     ImGui::DockBuilderDockWindow(m_auto_chooser_page.name(), dockspace_id_auto);
     ImGui::DockBuilderDockWindow(m_2024_hang_page.name(), dockspace_id_hang);
     ImGui::DockBuilderDockWindow(m_2024_arm_page.name(), dockspace_id_arm);
-    ImGui::DockBuilderDockWindow(m_2024_shooter_page.name(), dockspace_id_shooter);
+    ImGui::DockBuilderDockWindow(m_2024_shooter_page.name(),
+                                 dockspace_id_shooter);
     ImGui::DockBuilderDockWindow(m_2024_gamepiece_page.name(), dockspace_id_gp);
 
     m_network_tables_page.set_open(true);
@@ -243,26 +245,26 @@ void App::data_read_line(const char* _line) {
 void App::data_apply() {
   // Window data.
   for (const auto& [key, value] : m_window_data) {
-    // Window dimensions.
-    int width, height;
-    glfwGetWindowSize(m_window, &width, &height);
+    int val = std::atoi(value.c_str());
 
+    // Window dimensions.
+    const ImVec2 size = GraphicsManager::get().window_size();
     if (key == "Window_Width") {
-      glfwSetWindowSize(m_window, std::stoi(value), height);
+      if (!val) continue;
+      GraphicsManager::get().set_window_size(val, size.y);
     }
     if (key == "Window_Height") {
-      glfwSetWindowSize(m_window, width, std::stoi(value));
+      if (!val) continue;
+      GraphicsManager::get().set_window_size(size.x, val);
     }
 
     // Window position.
-    int xpos, ypos;
-    glfwGetWindowPos(m_window, &xpos, &ypos);
-
+    const ImVec2 pos = GraphicsManager::get().window_pos();
     if (key == "Window_XPos") {
-      glfwSetWindowPos(m_window, std::stoi(value), ypos);
+      GraphicsManager::get().set_window_pos(val, pos.y);
     }
     if (key == "Window_YPos") {
-      glfwSetWindowPos(m_window, xpos, std::stoi(value));
+      GraphicsManager::get().set_window_pos(pos.x, val);
     }
   }
 
@@ -283,15 +285,13 @@ void App::data_write(const char* type_name, ImGuiTextBuffer* buf) {
   {
     begin_section("Window_State");
 
-    int width, height;
-    glfwGetWindowSize(m_window, &width, &height);
-    buf->appendf("Window_Width=%d\n", width);
-    buf->appendf("Window_Height=%d\n", height);
+    const ImVec2 size = GraphicsManager::get().window_size();
+    buf->appendf("Window_Width=%d\n", int(size.x));
+    buf->appendf("Window_Height=%d\n", int(size.y));
 
-    int xpos, ypos;
-    glfwGetWindowPos(m_window, &xpos, &ypos);
-    buf->appendf("Window_XPos=%d\n", xpos);
-    buf->appendf("Window_YPos=%d\n", ypos);
+    const ImVec2 pos = GraphicsManager::get().window_pos();
+    buf->appendf("Window_XPos=%d\n", int(pos.x));
+    buf->appendf("Window_YPos=%d\n", int(pos.y));
 
     end_section();
   }

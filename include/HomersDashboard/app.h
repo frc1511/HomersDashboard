@@ -24,16 +24,13 @@
 #include <HomersDashboard/pages/2023/lift_page.h>
 
 #include <HomersDashboard/pages/2024/arm_page.h>
+#include <HomersDashboard/pages/2024/gamepiece_page.h>
 #include <HomersDashboard/pages/2024/hang_page.h>
 #include <HomersDashboard/pages/2024/shooter_page.h>
-#include <HomersDashboard/pages/2024/gamepiece_page.h>
-
-struct GLFWwindow;
 
 class Page;
 
 class App {
-  GLFWwindow* m_window;
   FontLibrary& m_font_lib;
 
   NTHandler m_nt_handler;
@@ -126,7 +123,7 @@ class App {
       &m_2023_controller_page,
 
       &m_2024_arm_page,        &m_2024_shooter_page,
-      &m_2024_hang_page,      &m_2024_gamepiece_page,
+      &m_2024_hang_page,       &m_2024_gamepiece_page,
   };
 
   //
@@ -146,9 +143,8 @@ class App {
   Page* m_save_page = nullptr;
 
 public:
-  inline App(GLFWwindow* window, FontLibrary& font_lib)
-    : m_window(window),
-      m_font_lib(font_lib) {}
+  inline App(FontLibrary& font_lib)
+    : m_font_lib(font_lib) {}
 
   ~App() = default;
 

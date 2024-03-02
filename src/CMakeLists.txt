@@ -7,5 +7,6 @@ add_dashboard_sources(
   "${HD_SRC_DIR}/app.cpp"
   "${HD_SRC_DIR}/nt_handler.cpp"
   "${HD_SRC_DIR}/texture.cpp"
+  "${HD_SRC_DIR}/graphics_manager.cpp"
 )
 
