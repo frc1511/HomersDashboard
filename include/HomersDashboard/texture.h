@@ -4,7 +4,8 @@
 
 class Texture {
 #ifdef HD_WINDOWS
-  ID3D11ShaderResourceView* m_texture = nullptr;
+  Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture_view;
+  Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture;
 #else
   unsigned int m_texture;
 #endif
@@ -21,9 +22,16 @@ public:
   int height() const { return m_height; }
   int nr_channels() const { return m_nr_channels; }
 
-  ImTextureID id() const { return reinterpret_cast<void*>(m_texture); }
+  ImTextureID id() const {
+    return reinterpret_cast<void*>(
+#ifdef HD_WINDOWS
+        m_texture_view.Get()
+#else
+        m_texture
+#endif
+    );
+  }
 
 private:
   void setup();
 };
-

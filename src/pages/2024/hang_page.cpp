@@ -44,7 +44,7 @@ void HangPage::draw_hang_side(const char* id, float percent, const ImVec2& avail
   const ImVec2 rect_size(avail.x / 2, avail.y - text_size.y);
 
   const ImVec2 rect_start =
-      cursor_pos + ImVec2 {std::max(0.0f, (text_size.x - rect_size.x) / 2), 0};
+      cursor_pos + ImVec2 {max(0.0f, ((text_size.x - rect_size.x) / 2.f)), 0};
 
   draw_list->AddRectFilled(rect_start, rect_start + rect_size,
                            ImGui::GetColorU32(ImGuiCol_FrameBg),

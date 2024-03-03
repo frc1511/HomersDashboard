@@ -34,7 +34,13 @@ Texture CameraPage::get_frame_texture() {
 
   if (m_new_frame) {
 #ifdef HD_WITH_CS
-    m_frame_tex->set_data(m_frame.data, m_frame.cols, m_frame.rows, 3);
+    m_frame_tex->set_data(m_frame.data, m_frame.cols, m_frame.rows, 
+        #ifdef HD_WINDOWS
+                          4
+#else
+                          3
+#endif
+    );
 #endif
   }
 
@@ -95,7 +101,13 @@ void CameraPage::thread_start() {
 
     if (frame_time) {
       // GrabFrame() apparently returns mat in BGR, so convert it to RGB?
-      cv::cvtColor(working_frame, working_frame, cv::COLOR_BGR2RGB);
+      cv::cvtColor(working_frame, working_frame,
+#ifdef HD_WINDOWS
+          cv::COLOR_BGR2RGBA
+#else
+          cv::COLOR_BGR2RGB
+#endif
+      );
 
       // Swap the frame textures.
       {

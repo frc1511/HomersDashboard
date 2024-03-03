@@ -3,111 +3,17 @@
 //
 // Default Window Properties.
 //
-#define WINDOW_WIDTH  1200
-#define WINDOW_HEIGHT 700
-#define WINDOW_TITLE  "1511 Auto Planner"
+#define WINDOW_WIDTH  1300
+#define WINDOW_HEIGHT 800
 
 #ifdef HD_WINDOWS // ------ DirectX 11 ------
+
+#define WINDOW_TITLE L"1511 Dashboard"
 
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
-#include <tchar.h>
-
-// Data
-static ID3D11Device* g_pd3dDevice = nullptr;
-static ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
-static IDXGISwapChain* g_pSwapChain = nullptr;
-static UINT g_ResizeWidth = 0, g_ResizeHeight = 0;
-static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
-
-ID3D11Device* GraphicsManager::device() { return g_pd3dDevice; }
-
-static HWND hwnd;
-static WNDCLASSEXW wc;
-
-//
-// Helper functions (from ImGui Example).
-//
-
-// Forward declarations of helper functions
-bool CreateDeviceD3D(HWND hWnd);
-void CleanupDeviceD3D();
-void CreateRenderTarget();
-void CleanupRenderTarget();
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-bool CreateDeviceD3D(HWND hWnd) {
-  // Setup swap chain
-  DXGI_SWAP_CHAIN_DESC sd;
-  ZeroMemory(&sd, sizeof(sd));
-  sd.BufferCount = 2;
-  sd.BufferDesc.Width = 0;
-  sd.BufferDesc.Height = 0;
-  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  sd.BufferDesc.RefreshRate.Numerator = 60;
-  sd.BufferDesc.RefreshRate.Denominator = 1;
-  sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-  sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-  sd.OutputWindow = hWnd;
-  sd.SampleDesc.Count = 1;
-  sd.SampleDesc.Quality = 0;
-  sd.Windowed = TRUE;
-  sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-  UINT createDeviceFlags = 0;
-  // createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-  D3D_FEATURE_LEVEL featureLevel;
-  const D3D_FEATURE_LEVEL featureLevelArray[2] = {
-      D3D_FEATURE_LEVEL_11_0,
-      D3D_FEATURE_LEVEL_10_0,
-  };
-  HRESULT res = D3D11CreateDeviceAndSwapChain(
-      nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags,
-      featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain,
-      &g_pd3dDevice, &featureLevel, &g_pd3dDeviceContext);
-  if (res == DXGI_ERROR_UNSUPPORTED) // Try high-performance WARP software
-                                     // driver if hardware is not available.
-    res = D3D11CreateDeviceAndSwapChain(
-        nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags,
-        featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain,
-        &g_pd3dDevice, &featureLevel, &g_pd3dDeviceContext);
-  if (res != S_OK) return false;
-
-  CreateRenderTarget();
-  return true;
-}
-
-void CleanupDeviceD3D() {
-  CleanupRenderTarget();
-  if (g_pSwapChain) {
-    g_pSwapChain->Release();
-    g_pSwapChain = nullptr;
-  }
-  if (g_pd3dDeviceContext) {
-    g_pd3dDeviceContext->Release();
-    g_pd3dDeviceContext = nullptr;
-  }
-  if (g_pd3dDevice) {
-    g_pd3dDevice->Release();
-    g_pd3dDevice = nullptr;
-  }
-}
-
-void CreateRenderTarget() {
-  ID3D11Texture2D* pBackBuffer;
-  g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-  g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr,
-                                       &g_mainRenderTargetView);
-  pBackBuffer->Release();
-}
-
-void CleanupRenderTarget() {
-  if (g_mainRenderTargetView) {
-    g_mainRenderTargetView->Release();
-    g_mainRenderTargetView = nullptr;
-  }
-}
+static UINT g_resize_width = 0, g_resize_height = 0;
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd,
@@ -115,15 +21,15 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd,
                                                              WPARAM wParam,
                                                              LPARAM lParam);
 
-// Win32 message handler
+// Win32 message handler.
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
   if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) return true;
 
   switch (msg) {
   case WM_SIZE:
     if (wParam == SIZE_MINIMIZED) return 0;
-    g_ResizeWidth = (UINT)LOWORD(lParam); // Queue resize
-    g_ResizeHeight = (UINT)HIWORD(lParam);
+    g_resize_width = (UINT)LOWORD(lParam); // Queue resize
+    g_resize_height = (UINT)HIWORD(lParam);
     return 0;
   case WM_SYSCOMMAND:
     if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
@@ -137,6 +43,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 #else // ------ OpenGL/GLFW ------
+
+#define WINDOW_TITLE "1511 Dashboard"
 
 #include <glad/glad.h>
 
@@ -162,42 +70,40 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 #define GL_VERSION_MINOR 0
 #endif
 
-static GLFWwindow* glfw_window;
-
 #endif
 
 void GraphicsManager::init() {
-
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
-  // Create application window
+#ifdef HD_WINDOWS
   // ImGui_ImplWin32_EnableDpiAwareness();
-  wc = {sizeof(wc),
-        CS_CLASSDC,
-        WndProc,
-        0L,
-        0L,
-        GetModuleHandle(nullptr),
-        nullptr,
-        nullptr,
-        nullptr,
-        nullptr,
-        L"ImGui Example",
-        nullptr};
-  ::RegisterClassExW(&wc);
-  hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example",
-                         WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr,
-                         nullptr, wc.hInstance, nullptr);
+  m_wc = {sizeof(m_wc),
+          CS_CLASSDC,
+          WndProc,
+          0L,
+          0L,
+          GetModuleHandle(nullptr),
+          nullptr,
+          nullptr,
+          nullptr,
+          nullptr,
+          L"ThunderDashboard",
+          nullptr};
+
+  ::RegisterClassExW(&m_wc);
+
+  m_hwnd = ::CreateWindowW(
+      m_wc.lpszClassName, WINDOW_TITLE, WS_OVERLAPPEDWINDOW, 0, 0, WINDOW_WIDTH,
+      WINDOW_HEIGHT, nullptr, nullptr, m_wc.hInstance, nullptr);
 
   // Initialize Direct3D
-  if (!CreateDeviceD3D(hwnd)) {
-    CleanupDeviceD3D();
-    ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+  if (!init_device()) {
+    deinit_device();
+    ::UnregisterClassW(m_wc.lpszClassName, m_wc.hInstance);
     exit(1);
   }
 
   // Show the window
-  ::ShowWindow(hwnd, SW_SHOWDEFAULT);
-  ::UpdateWindow(hwnd);
+  ::ShowWindow(m_hwnd, SW_SHOWDEFAULT);
+  ::UpdateWindow(m_hwnd);
 
 #else // ------ OpenGL/GLFW ------
   //
@@ -208,23 +114,23 @@ void GraphicsManager::init() {
   });
 
   if (!glfwInit()) {
-    exit(-1);
+    exit(1);
   }
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_VERSION_MAJOR);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
 
-#if defined(HD_MACOS) || defined(HD_TEST_MACOS)
+#if defined(HD_MACOS)
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required on Mac
 #endif
 
   // Initialize window.
-  glfw_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE,
-                                 nullptr, nullptr);
-  if (!glfw_window) exit(-1);
+  m_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE,
+                              nullptr, nullptr);
+  if (!m_window) exit(1);
 
-  glfwMakeContextCurrent(glfw_window);
+  glfwMakeContextCurrent(m_window);
   // VSync.
   glfwSwapInterval(true);
 
@@ -249,18 +155,17 @@ void GraphicsManager::init() {
     io->ConfigWindowsMoveFromTitleBarOnly = true;
   }
 
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
-  ImGui_ImplWin32_Init(hwnd);
-  ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
-
-#else // ------ OpenGL/GLFW ------
-  ImGui_ImplGlfw_InitForOpenGL(glfw_window, true);
+#ifdef HD_WINDOWS
+  ImGui_ImplWin32_Init(m_hwnd);
+  ImGui_ImplDX11_Init(m_device, m_device_context);
+#else
+  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
   ImGui_ImplOpenGL3_Init(GLSL_VERSION);
 #endif
 }
 
 bool GraphicsManager::poll_events() {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
+#ifdef HD_WINDOWS
   MSG msg;
   while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE)) {
     ::TranslateMessage(&msg);
@@ -269,25 +174,25 @@ bool GraphicsManager::poll_events() {
   }
 
   // Handle window resize (we don't resize directly in the WM_SIZE handler)
-  if (g_ResizeWidth != 0 && g_ResizeHeight != 0) {
-    CleanupRenderTarget();
-    g_pSwapChain->ResizeBuffers(0, g_ResizeWidth, g_ResizeHeight,
+  if (g_resize_width != 0 && g_resize_height != 0) {
+    deinit_render_target();
+    m_swap_chain->ResizeBuffers(0, g_resize_width, g_resize_height,
                                 DXGI_FORMAT_UNKNOWN, 0);
-    g_ResizeWidth = g_ResizeHeight = 0;
-    CreateRenderTarget();
+    g_resize_width = g_resize_height = 0;
+    init_render_target();
   }
   return false;
-#else // ------ OpenGL/GLFW ------
+#else
   glfwPollEvents();
-  return glfwWindowShouldClose(glfw_window);
+  return glfwWindowShouldClose(m_window);
 #endif
 }
 
 void GraphicsManager::begin_frame() {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
+#ifdef HD_WINDOWS
   ImGui_ImplDX11_NewFrame();
   ImGui_ImplWin32_NewFrame();
-#else // ------ OpenGL/GLFW ------
+#else
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
 #endif
@@ -297,22 +202,29 @@ void GraphicsManager::begin_frame() {
 
 void GraphicsManager::end_frame() {
   ImGui::Render();
-  ImVec4 clear_color = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
+  const ImVec4 clear_color = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+
+#ifdef HD_WINDOWS
   const float clear_color_with_alpha[4] = {
       clear_color.x * clear_color.w, clear_color.y * clear_color.w,
       clear_color.z * clear_color.w, clear_color.w};
-  g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
-  g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView,
-                                             clear_color_with_alpha);
+  m_device_context->OMSetRenderTargets(1, &m_main_render_target_view, nullptr);
+  m_device_context->ClearRenderTargetView(m_main_render_target_view,
+                                          clear_color_with_alpha);
   ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-  g_pSwapChain->Present(1, 0); // Present with vsync
+  // Update and Render additional Platform Windows
+  if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+  }
 
-#else // ------ OpenGL/GLFW ------
+  m_swap_chain->Present(1, 0); // Present with vsync
+
+#else
   int buf_width, buf_height;
-  glfwGetFramebufferSize(glfw_window, &buf_width, &buf_height);
+  glfwGetFramebufferSize(m_window, &buf_width, &buf_height);
 
   glViewport(0, 0, buf_width, buf_height);
   glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
@@ -328,15 +240,15 @@ void GraphicsManager::end_frame() {
     glfwMakeContextCurrent(backup_current_context);
   }
 
-  glfwSwapBuffers(glfw_window);
+  glfwSwapBuffers(m_window);
 #endif
 }
 
 void GraphicsManager::deinit() {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
+#ifdef HD_WINDOWS
   ImGui_ImplDX11_Shutdown();
   ImGui_ImplWin32_Shutdown();
-#else // ------ OpenGL/GLFW ------
+#else
   // Shutdown ImGui.
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
@@ -344,49 +256,123 @@ void GraphicsManager::deinit() {
 
   ImGui::DestroyContext();
 
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
-  CleanupDeviceD3D();
-  ::DestroyWindow(hwnd);
-  ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-#else // ------ OpenGL/GLFW ------
+#ifdef HD_WINDOWS
+  deinit_device();
+  ::DestroyWindow(m_hwnd);
+  ::UnregisterClassW(m_wc.lpszClassName, m_wc.hInstance);
+#else
   // Shutdown GLFW.
-  glfwDestroyWindow(glfw_window);
+  glfwDestroyWindow(m_window);
   glfwTerminate();
 #endif
 }
 
 ImVec2 GraphicsManager::window_size() const {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
-  return ImVec2(640, 480);
-#else // ------ OpenGL/GLFW ------
+#ifdef HD_WINDOWS
+  return ImVec2(WINDOW_WIDTH, WINDOW_HEIGHT);
+#else
   int width, height;
-  glfwGetWindowSize(glfw_window, &width, &height);
+  glfwGetWindowSize(m_window, &width, &height);
   return ImVec2(width, height);
 #endif
 }
 
 ImVec2 GraphicsManager::window_pos() const {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
+#ifdef HD_WINDOWS
   return ImVec2(0, 0);
-#else // ------ OpenGL/GLFW ------
+#else
   int x, y;
-  glfwGetWindowPos(glfw_window, &x, &y);
+  glfwGetWindowPos(m_window, &x, &y);
 
   return ImVec2(x, y);
 #endif
 }
 
 void GraphicsManager::set_window_size(int width, int height) {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
-#else             // ------ OpenGL/GLFW ------
-  glfwSetWindowSize(glfw_window, width, height);
+#ifdef HD_WINDOWS
+#else
+  glfwSetWindowSize(m_window, width, height);
 #endif
 }
 
 void GraphicsManager::set_window_pos(int x, int y) {
-#ifdef HD_WINDOWS // ------ DirectX 11 ------
-#else             // ------ OpenGL/GLFW ------
-  glfwSetWindowPos(glfw_window, x, y);
+#ifdef HD_WINDOWS
+#else
+  glfwSetWindowPos(m_window, x, y);
 #endif
 }
 
+#ifdef HD_WINDOWS // DirectX 11 helper functions.
+
+bool GraphicsManager::init_device() {
+  // Setup swap chain
+  DXGI_SWAP_CHAIN_DESC sd;
+  ZeroMemory(&sd, sizeof(sd));
+  sd.BufferCount = 2;
+  sd.BufferDesc.Width = 0;
+  sd.BufferDesc.Height = 0;
+  sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+  sd.BufferDesc.RefreshRate.Numerator = 60;
+  sd.BufferDesc.RefreshRate.Denominator = 1;
+  sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+  sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+  sd.OutputWindow = m_hwnd;
+  sd.SampleDesc.Count = 1;
+  sd.SampleDesc.Quality = 0;
+  sd.Windowed = TRUE;
+  sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+  UINT createDeviceFlags = 0;
+  // createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+  D3D_FEATURE_LEVEL featureLevel;
+  const D3D_FEATURE_LEVEL featureLevelArray[2] = {
+      D3D_FEATURE_LEVEL_11_0,
+      D3D_FEATURE_LEVEL_10_0,
+  };
+  HRESULT res = D3D11CreateDeviceAndSwapChain(
+      nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags,
+      featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &m_swap_chain, &m_device,
+      &featureLevel, &m_device_context);
+  if (res == DXGI_ERROR_UNSUPPORTED) // Try high-performance WARP software
+                                     // driver if hardware is not available.
+    res = D3D11CreateDeviceAndSwapChain(
+        nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags,
+        featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &m_swap_chain, &m_device,
+        &featureLevel, &m_device_context);
+  if (res != S_OK) return false;
+
+  init_render_target();
+  return true;
+}
+
+void GraphicsManager::deinit_device() {
+  if (m_swap_chain) {
+    m_swap_chain->Release();
+    m_swap_chain = nullptr;
+  }
+  if (m_device_context) {
+    m_device_context->Release();
+    m_device_context = nullptr;
+  }
+  if (m_device) {
+    m_device->Release();
+    m_device = nullptr;
+  }
+}
+
+void GraphicsManager::init_render_target() {
+  ID3D11Texture2D* pBackBuffer;
+  m_swap_chain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+  m_device->CreateRenderTargetView(pBackBuffer, nullptr,
+                                   &m_main_render_target_view);
+  pBackBuffer->Release();
+}
+
+void GraphicsManager::deinit_render_target() {
+  if (m_main_render_target_view) {
+    m_main_render_target_view->Release();
+    m_main_render_target_view = nullptr;
+  }
+}
+
+#endif

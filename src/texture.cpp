@@ -2,8 +2,7 @@
 
 #include <HomersDashboard/graphics_manager.h>
 
-#ifdef HD_WINDOWS
-#else
+#ifndef HD_WINDOWS
 #include <glad/glad.h>
 #endif
 
@@ -18,43 +17,41 @@ Texture::Texture(unsigned char* img, std::size_t img_size) {
   setup();
   set_data(img_data, m_width, m_height, m_nr_channels);
 
-#ifdef HD_WINDOWS
-    // Create texture
-    D3D11_TEXTURE2D_DESC desc;
-    ZeroMemory(&desc, sizeof(desc));
-    desc.Width = m_width;
-    desc.Height = m_height;
-    desc.MipLevels = 1;
-    desc.ArraySize = 1;
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    desc.CPUAccessFlags = 0;
-
-    ID3D11Texture2D *pTexture = NULL;
-    D3D11_SUBRESOURCE_DATA subResource;
-    subResource.pSysMem = img_data;
-    subResource.SysMemPitch = desc.Width * 4;
-    subResource.SysMemSlicePitch = 0;
-    GraphicsManager::get().device()->CreateTexture2D(&desc, &subResource, &pTexture);
-
-    // Create texture view
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-    ZeroMemory(&srvDesc, sizeof(srvDesc));
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = desc.MipLevels;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    GraphicsManager::get().device()->CreateShaderResourceView(pTexture, &srvDesc, &m_texture);
-    pTexture->Release();
-#endif
-
   stbi_image_free(img_data);
 }
 
 void Texture::setup() {
 #ifdef HD_WINDOWS
+  m_texture = nullptr;
+  m_texture_view = nullptr;
+
+  D3D11_TEXTURE2D_DESC desc;
+  ZeroMemory(&desc, sizeof(desc));
+  desc.Width = m_width;
+  desc.Height = m_height;
+  desc.MipLevels = 1;
+  desc.ArraySize = 1;
+  desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+  desc.SampleDesc.Count = 1;
+  desc.Usage = D3D11_USAGE_DYNAMIC;
+  desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+  desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+  HRESULT hr = GraphicsManager::get().device()->CreateTexture2D(&desc, nullptr,
+                                                                &m_texture);
+  if (FAILED(hr)) return;
+
+  // Create texture view
+  D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+  ZeroMemory(&srvDesc, sizeof(srvDesc));
+  srvDesc.Format = desc.Format;
+  srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+  srvDesc.Texture2D.MostDetailedMip = 0;
+  srvDesc.Texture2D.MipLevels = desc.MipLevels;
+  hr = GraphicsManager::get().device()->CreateShaderResourceView(
+      m_texture.Get(), &srvDesc, &m_texture_view);
+  if (FAILED(hr)) return;
+
 #else
   glGenTextures(1, &m_texture);
   glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -69,11 +66,32 @@ void Texture::setup() {
 void Texture::set_data(unsigned char* data, int width, int height,
                        int nr_channels) {
 #ifdef HD_WINDOWS
-#else
-  m_width = width;
-  m_height = height;
-  m_nr_channels = nr_channels;
+  assert(nr_channels == 4);
+  if (width != m_width || height != m_height) {
+#endif
+    m_width = width;
+    m_height = height;
+    m_nr_channels = nr_channels;
+#ifdef HD_WINDOWS
+    setup();
+  }
 
+  ID3D11DeviceContext* context = GraphicsManager::get().context();
+
+  D3D11_MAPPED_SUBRESOURCE mapped_resource;
+  HRESULT hr = context->Map(m_texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0,
+                            &mapped_resource);
+  if (FAILED(hr)) return;
+
+  for (UINT row = 0; row < m_height; ++row) {
+    memcpy((unsigned char*)mapped_resource.pData +
+               row * mapped_resource.RowPitch,
+           data + row * m_width * 4, m_width * 4);
+  }
+
+  context->Unmap(m_texture.Get(), 0);
+
+#else
   const int tex_channels = (m_nr_channels == 3 ? GL_RGB : GL_RGBA);
 
   glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -82,4 +100,3 @@ void Texture::set_data(unsigned char* data, int width, int height,
   glGenerateMipmap(GL_TEXTURE_2D);
 #endif
 }
-

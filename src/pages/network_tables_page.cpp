@@ -39,7 +39,7 @@ void NetworkTablesPage::present(bool* running) {
   ImGui::End();
 }
 
-void NetworkTablesPage::show_value(const nt::Value& value) {
+void NetworkTablesPage::show_value(const std::string& key, const nt::Value& value) {
   switch (value.type()) {
   case NT_UNASSIGNED:
     ImGui::TextUnformatted("=== NT_UNASSIGNED ===");
@@ -70,7 +70,7 @@ void NetworkTablesPage::show_value(const nt::Value& value) {
   case NT_FLOAT_ARRAY:
   case NT_DOUBLE_ARRAY:
   case NT_BOOLEAN_ARRAY:
-    show_value_array(value);
+    show_value_array(key, value);
     break;
   default:
     assert(false);
@@ -78,7 +78,8 @@ void NetworkTablesPage::show_value(const nt::Value& value) {
   }
 }
 
-void NetworkTablesPage::show_value_array(const nt::Value& value) {
+void NetworkTablesPage::show_value_array(const std::string& key, const nt::Value& value) {
+  ImGui::PushID(key.c_str());
   ImGui::PushID((char*)&value.value());
   if (ImGui::TreeNodeEx("Array")) {
     switch (value.type()) {
@@ -126,6 +127,7 @@ void NetworkTablesPage::show_value_array(const nt::Value& value) {
   }
 
   ImGui::PopID();
+  ImGui::PopID();
 }
 
 void NetworkTablesPage::show_table(std::string_view path,
@@ -152,7 +154,7 @@ void NetworkTablesPage::show_table(std::string_view path,
     ImGui::TextUnformatted(key.c_str());
 
     ImGui::TableNextColumn();
-    show_value(table->GetEntry(key).GetValue());
+    show_value(key, table->GetEntry(key).GetValue());
   }
 
   for (const std::string& subtable : table->GetSubTables()) {

@@ -23,7 +23,7 @@ private:
   void show_table(std::string_view path,
                   std::shared_ptr<nt::NetworkTable> table);
 
-  static void show_value(const nt::Value& value);
-  static void show_value_array(const nt::Value& value);
+  static void show_value(const std::string& key, const nt::Value& value);
+  static void show_value_array(const std::string& key, const nt::Value& value);
 };
   
