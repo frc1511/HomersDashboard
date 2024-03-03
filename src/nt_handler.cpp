@@ -95,11 +95,11 @@ std::string NTHandler::get_game_msg() {
 }
 
 std::size_t NTHandler::get_match_number() {
-  return m_fms_table->GetNumber("MatchNumber", 0.0);
+  return std::size_t(m_fms_table->GetNumber("MatchNumber", 0.0));
 }
 
 std::size_t NTHandler::get_replay_number() {
-  return m_fms_table->GetNumber("ReplayNumber", 0.0);
+  return std::size_t(m_fms_table->GetNumber("ReplayNumber", 0.0));
 }
 
 void NTHandler::set_bool(const std::string& key, bool value) {

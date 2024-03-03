@@ -8,7 +8,7 @@ namespace y2023 {
 
 class ControllerPage : public Page {
   const Texture m_driver_tex, m_aux_tex, m_aux_manual_tex;
-  double m_aspect_ratio;
+  const float m_aspect_ratio;
 
 public:
   ControllerPage();

@@ -63,7 +63,7 @@ void RobotPositionPage::show_robot_position() {
                       "thunderdashboard_drive_x_pos", 0.0),
                   m_nt_handler.smart_dashboard()->GetNumber(
                       "thunderdashboard_drive_y_pos", 0.0));
-  const double ang(m_nt_handler.smart_dashboard()->GetNumber(
+  const float ang(m_nt_handler.smart_dashboard()->GetNumber(
       "thunderdashboard_drive_ang", 0.0));
 
   ImVec2 pt0(to_draw_coord(pt)),
@@ -81,7 +81,7 @@ ImVec2 RobotPositionPage::to_draw_coord(ImVec2 pt) const {
 
   pt.x /= FIELD_SIZE.x;
   pt.y /= FIELD_SIZE.y;
-  pt = ImVec2(pt.x, 1 - pt.y) * (m_bb.Max - m_bb.Min) + m_bb.Min;
+  pt = ImVec2(pt.x, 1.f - pt.y) * (m_bb.Max - m_bb.Min) + m_bb.Min;
 
   return pt;
 }

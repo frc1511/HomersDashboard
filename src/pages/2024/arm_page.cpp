@@ -4,7 +4,7 @@ using namespace y2024;
 
 static const ImVec2 PIVOT_POINT(0.12f, 0.2f);
 
-static const float ARM_LENGTH = 0.67;
+static const float ARM_LENGTH = 0.67f;
 static const float ARM_WIDTH = 0.06f;
 
 static const ImColor BASE_COLOR(255, 255, 255, 255);
@@ -62,9 +62,9 @@ ImVec2 ArmPage::rotate_pt_origin(ImVec2 origin, ImVec2 pt, float angle_rad) {
                 origin.y + diff.x * sin_angle + diff.y * cos_angle);
 }
 
-void ArmPage::rotate_pts_origin(ImVec2 origin, ImVec2* pts, int num_pts,
+void ArmPage::rotate_pts_origin(ImVec2 origin, ImVec2* pts, size_t num_pts,
                                 float angle_rad) {
-  for (int i = 0; i < num_pts; ++i) {
+  for (size_t i = 0; i < num_pts; ++i) {
     pts[i] = rotate_pt_origin(origin, pts[i], angle_rad);
   }
 }
@@ -101,13 +101,13 @@ void ArmPage::draw_arm() {
   //
   // Get angle.
   //
-  float angle_deg = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_2024_arm_pivot_deg", 0.0);
+  float angle_deg(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_2024_arm_pivot_deg", 0.0));
 
   angle_deg = std::clamp(angle_deg, 0.f, 85.f);
 
-  float target_angle_deg = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_2024_arm_pivot_target_deg", -1.0);
+  float target_angle_deg(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_2024_arm_pivot_target_deg", -1.0));
 
   const bool no_target = float_eq(target_angle_deg, -1.f);
   if (!no_target) {

@@ -251,20 +251,20 @@ void App::data_apply() {
     const ImVec2 size = GraphicsManager::get().window_size();
     if (key == "Window_Width") {
       if (!val) continue;
-      GraphicsManager::get().set_window_size(val, size.y);
+      GraphicsManager::get().set_window_size(val, int(size.y));
     }
     if (key == "Window_Height") {
       if (!val) continue;
-      GraphicsManager::get().set_window_size(size.x, val);
+      GraphicsManager::get().set_window_size(int(size.x), val);
     }
 
     // Window position.
     const ImVec2 pos = GraphicsManager::get().window_pos();
     if (key == "Window_XPos") {
-      GraphicsManager::get().set_window_pos(val, pos.y);
+      GraphicsManager::get().set_window_pos(val, int(pos.y));
     }
     if (key == "Window_YPos") {
-      GraphicsManager::get().set_window_pos(pos.x, val);
+      GraphicsManager::get().set_window_pos(int(pos.x), val);
     }
   }
 

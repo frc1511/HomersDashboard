@@ -290,6 +290,8 @@ ImVec2 GraphicsManager::window_pos() const {
 
 void GraphicsManager::set_window_size(int width, int height) {
 #ifdef HD_WINDOWS
+  (void)width;
+  (void)height;
 #else
   glfwSetWindowSize(m_window, width, height);
 #endif
@@ -297,6 +299,8 @@ void GraphicsManager::set_window_size(int width, int height) {
 
 void GraphicsManager::set_window_pos(int x, int y) {
 #ifdef HD_WINDOWS
+  (void)x;
+  (void)y;
 #else
   glfwSetWindowPos(m_window, x, y);
 #endif

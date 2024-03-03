@@ -12,11 +12,11 @@ void HangPage::present(bool* running) {
     return;
   }
 
-  float left_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_2024_hang_left_percent", 0.0);
+  float left_percent(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_2024_hang_left_percent", 0.0));
 
-  float right_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_2024_hang_right_percent", 0.0);
+  float right_percent(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_2024_hang_right_percent", 0.0));
 
   left_percent = std::clamp(left_percent, 0.0f, 1.0f);
   right_percent = std::clamp(right_percent, 0.0f, 1.0f);

@@ -24,7 +24,7 @@ class CameraPage : public Page {
   std::unique_ptr<Texture> m_frame_tex = nullptr;
 
   // Aspect ratios.
-  double m_no_cam_ar, m_frame_ar;
+  float m_no_cam_ar, m_frame_ar;
 
   bool m_thread_running = false;
   bool m_thread_terminated = false;
@@ -40,7 +40,7 @@ protected:
   void init(std::string_view name, std::string_view url);
 
   Texture get_frame_texture();
-  double get_frame_aspect_ratio();
+  float get_frame_aspect_ratio();
 
   void terminate();
 

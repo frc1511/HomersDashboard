@@ -8,7 +8,7 @@ class RobotPositionPage : public Page {
   NTHandler& m_nt_handler;
 
   const Texture m_field_tex;
-  double m_field_ar;
+  const float m_field_ar;
 
   ImRect m_bb;
 

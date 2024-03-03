@@ -13,13 +13,13 @@ void ShooterPage::present(bool* running) {
     return;
   }
 
-  const double rpm_max = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_rpm_max", 2600.0);
+  const float rpm_max(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_rpm_max", 2600.0));
 
-  const double rpm =
-      m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_rpm", 0.0);
+  const float rpm(
+      m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_rpm", 0.0));
 
-  const double rpm_pct = float_eq(rpm_max, 0.0f) ? 0.0f : rpm / rpm_max;
+  const float rpm_pct = float_eq(rpm_max, 0.0f) ? 0.0f : rpm / rpm_max;
 
   {
     ImGuiScopedField field("RPM", COLUMN_WIDTH, [rpm]{

@@ -13,11 +13,11 @@ void LimelightCameraPage::present(bool* running) {
     return;
   }
 
-  const double ar = get_frame_aspect_ratio();
+  const float ar = get_frame_aspect_ratio();
 
   const ImVec2 avail(ImGui::GetContentRegionAvail());
 
-  std::size_t x = avail.x, y = avail.x / ar;
+  const float x(avail.x), y(avail.x / ar);
 
   ImGui::Image(get_frame_texture().id(), ImVec2(x, y));
 

@@ -61,15 +61,15 @@ void AutonomousChooserPage::set_auto_mode(int mode) {
   m_nt_handler.set_double("Auto_Mode", m_auto_mode);
 }
 
-void AutonomousChooserPage::set_auto_delay(double delay) {
+void AutonomousChooserPage::set_auto_delay(float delay) {
   m_auto_delay = delay;
 
-  if (m_auto_delay < 0.0) {
-    m_auto_delay = 0.0;
+  if (m_auto_delay < 0.f) {
+    m_auto_delay = 0.f;
   }
 
-  if (m_auto_delay > 15.0) {
-    m_auto_delay = 15.0;
+  if (m_auto_delay > 15.f) {
+    m_auto_delay = 15.f;
   }
 
   m_nt_handler.set_double("thunderdashboard_auto_start_delay", m_auto_delay);

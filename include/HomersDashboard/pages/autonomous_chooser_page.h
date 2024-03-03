@@ -25,9 +25,9 @@ public:
   void present(bool* running) override;
 
   int auto_mode() const { return m_auto_mode; }
-  double auto_delay() const { return m_auto_delay; }
+  float auto_delay() const { return m_auto_delay; }
   void set_auto_mode(int mode);
-  void set_auto_delay(double delay);
+  void set_auto_delay(float delay);
 
 private:
   void update_auto_modes(const std::string& auto_list);

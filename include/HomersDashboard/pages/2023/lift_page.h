@@ -22,11 +22,11 @@ public:
 private:
   ImVec2 fix_pt(ImVec2 pt) const;
 
-  static std::array<double, 3> get_stage_lengths(double extension_percent);
+  static std::array<float, 3> get_stage_lengths(float extension_percent);
 
   void draw_lift();
-  void draw_arm(double angle, std::array<double, 3> stage_lengths,
-                ImColor color, double width = 5.f);
+  void draw_arm(float angle, std::array<float, 3> stage_lengths,
+                ImColor color, float width = 5.f);
 };
 
 } // namespace y2023

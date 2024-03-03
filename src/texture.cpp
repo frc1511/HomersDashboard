@@ -11,7 +11,7 @@
 Texture::Texture() { setup(); }
 
 Texture::Texture(unsigned char* img, std::size_t img_size) {
-  unsigned char* img_data = stbi_load_from_memory(img, img_size, &m_width,
+  unsigned char* img_data = stbi_load_from_memory(img, int(img_size), &m_width,
                                                   &m_height, &m_nr_channels, 0);
 
   setup();

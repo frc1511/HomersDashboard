@@ -16,13 +16,13 @@ void ShooterPositionPage::present(bool* running) {
   {
     ImGuiScopedField field("RPM", COLUMN_WIDTH);
 
-    const double rpm_max = m_nt_handler.smart_dashboard()->GetNumber(
-        "thunderdashboard_rpm_max", 2600.0);
+    const float rpm_max(m_nt_handler.smart_dashboard()->GetNumber(
+        "thunderdashboard_rpm_max", 2600.0));
 
-    const double rpm =
-        m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_rpm", 0.0);
+    const float rpm(
+        m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_rpm", 0.0));
 
-    const double rpm_pct = float_eq(rpm_max, 0.0f) ? 0.f : rpm / rpm_max;
+    const float rpm_pct = float_eq(rpm_max, 0.0f) ? 0.f : rpm / rpm_max;
 
     const std::string buf = std::to_string(rpm);
     ImGui::ProgressBar(rpm_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30),
@@ -32,16 +32,18 @@ void ShooterPositionPage::present(bool* running) {
   {
     ImGuiScopedField field("Hood", COLUMN_WIDTH);
 
-    const double hood_min = m_nt_handler.smart_dashboard()->GetNumber(
-        "thunderdashboard_hood_min", 0.0);
+    const float hood_min(m_nt_handler.smart_dashboard()->GetNumber(
+        "thunderdashboard_hood_min", 0.0));
 
-    const double hood_max = m_nt_handler.smart_dashboard()->GetNumber(
-        "thunderdashboard_hood_max", 1.0);
+    const float hood_max(m_nt_handler.smart_dashboard()->GetNumber(
+        "thunderdashboard_hood_max", 1.0));
 
-    const double hood =
-        m_nt_handler.smart_dashboard()->GetNumber("thunderdashboard_hood", 0.0);
+    const float hood(m_nt_handler.smart_dashboard()->GetNumber(
+        "thunderdashboard_hood", 0.0));
 
-    const double hood_pct = hood_max != hood_min ? (hood - hood_min) / (hood_max - hood_min) : 0.0;
+    const float hood_pct = float_eq(hood_max, hood_min)
+                               ? 0.f
+                               : (hood - hood_min) / (hood_max - hood_min);
 
     std::string buf = std::to_string(hood - hood_min);
     ImGui::ProgressBar(hood_pct, ImVec2(ImGui::GetContentRegionAvail().x, 30),
@@ -50,4 +52,3 @@ void ShooterPositionPage::present(bool* running) {
 
   ImGui::End();
 }
-

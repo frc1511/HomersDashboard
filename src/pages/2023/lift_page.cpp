@@ -1,7 +1,7 @@
 #include <HomersDashboard/pages/2023/lift_page.h>
 
-static const double STAGE_WIDTHS[] = {0.05, 0.035, 0.02};
-static const ImVec2 PIVOT_POINT(0.15 / 2, 0.35 - 0.15 / 2);
+static const float STAGE_WIDTHS[] = {0.05f, 0.035f, 0.02f};
+static const ImVec2 PIVOT_POINT(0.15f / 2.f, 0.35f - 0.15f / 2.f);
 
 static const ImColor BASE_COLOR(255, 255, 255, 255);
 static const ImColor AT_TARGET_COLOR(0, 255, 0, 255);
@@ -25,17 +25,17 @@ void LiftPage::present(bool* running) {
 }
 
 ImVec2 LiftPage::fix_pt(ImVec2 pt) const {
-  pt.x /= 0.9;
-  pt.y /= 0.6;
-  pt = ImVec2(pt.x, 1 - pt.y) * (m_bb.Max - m_bb.Min) + m_bb.Min;
+  pt.x /= 0.9f;
+  pt.y /= 0.6f;
+  pt = ImVec2(pt.x, 1.f - pt.y) * (m_bb.Max - m_bb.Min) + m_bb.Min;
   return pt;
 }
 
-std::array<double, 3> LiftPage::get_stage_lengths(double extension_percent) {
+std::array<float, 3> LiftPage::get_stage_lengths(float extension_percent) {
   return {
-      0.4,                            // Stage 1
-      0.45 + 0.2 * extension_percent, // Stage 2
-      0.45 + 0.35 * extension_percent // Stage 3
+      0.4f,                             // Stage 1
+      0.45f + 0.2f * extension_percent, // Stage 2
+      0.45f + 0.35f * extension_percent // Stage 3
   };
 }
 
@@ -53,9 +53,9 @@ void LiftPage::draw_lift() {
 
   // Fit the canvas to the window.
   const ImVec2 win_size(ImGui::GetContentRegionAvail());
-  double aspect_ratio = 0.9 / 0.6;
+  const float aspect_ratio = 0.9f / 0.6f;
 
-  double dim_x(win_size.x), dim_y(win_size.y);
+  float dim_x = win_size.x, dim_y = win_size.y;
 
   if ((dim_x / dim_y) > aspect_ratio) {
     dim_x = dim_y * aspect_ratio;
@@ -73,18 +73,18 @@ void LiftPage::draw_lift() {
   // Get angle/extension.
   //
 
-  const double angle_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_lift_pivot_percent", 0.0);
+  const float angle_percent(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_lift_pivot_percent", 0.0));
 
-  const double extension_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_lift_extension_percent", 0.0);
+  const float extension_percent(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_lift_extension_percent", 0.0));
 
-  const double target_angle_percent = m_nt_handler.smart_dashboard()->GetNumber(
-      "thunderdashboard_lift_pivot_target_percent", -1.0);
+  const float target_angle_percent(m_nt_handler.smart_dashboard()->GetNumber(
+      "thunderdashboard_lift_pivot_target_percent", -1.0));
 
-  const double target_extension_percent =
+  const float target_extension_percent(
       m_nt_handler.smart_dashboard()->GetNumber(
-          "thunderdashboard_lift_extension_target_percent", -1.0);
+          "thunderdashboard_lift_extension_target_percent", -1.0));
 
   //
   // Draw arm.
@@ -93,24 +93,24 @@ void LiftPage::draw_lift() {
   ImGuiStyle& style = ImGui::GetStyle();
 
   ImColor arm_color = BASE_COLOR;
-  if (target_extension_percent != -1.0 && target_angle_percent != -1.0) {
+  if (!float_eq(target_extension_percent, -1.f) && !float_eq(target_angle_percent, -1.f)) {
     // -20 to 20 degrees, converted to radians.
-    const double target_angle =
-        (target_angle_percent * 40 - 20) * (std::numbers::pi / 180.0);
+    const float target_angle =
+        (target_angle_percent * 40.f - 20.f) * (std::numbers::pi / 180.f);
 
     draw_arm(target_angle, get_stage_lengths(target_extension_percent),
-             TARGET_COLOR, 5.0f);
+             TARGET_COLOR, 5.f);
 
-    if (std::abs(target_angle_percent - angle_percent) < 0.01 &&
-        std::abs(target_extension_percent - extension_percent) < 0.01) {
+    if (std::abs(target_angle_percent - angle_percent) < 0.01f &&
+        std::abs(target_extension_percent - extension_percent) < 0.01f) {
       arm_color = AT_TARGET_COLOR;
     }
   }
 
   // -20 to 20 degrees, converted to radians.
-  const double angle = (angle_percent * 40 - 20) * (std::numbers::pi / 180.0);
+  const float angle = (angle_percent * 40.f - 20.f) * (std::numbers::pi / 180.f);
 
-  draw_arm(angle, get_stage_lengths(extension_percent), arm_color, 5.0f);
+  draw_arm(angle, get_stage_lengths(extension_percent), arm_color, 5.f);
 
   // Draw the base.
   m_draw_list->AddRectFilled(fix_pt(ImVec2(0, 0)), fix_pt(ImVec2(0.15, 0.35)),
@@ -122,15 +122,15 @@ void LiftPage::draw_lift() {
   m_draw_list->AddCircle(fix_pt(PIVOT_POINT), 5.0f, BASE_COLOR);
 }
 
-void LiftPage::draw_arm(double angle, std::array<double, 3> stage_lengths,
-                        ImColor color, double width) {
+void LiftPage::draw_arm(float angle, std::array<float, 3> stage_lengths,
+                        ImColor color, float width) {
 
-  const double cos_angle_top(std::cos(angle + 0.5 * std::numbers::pi));
-  const double sin_angle_top(std::sin(angle + 0.5 * std::numbers::pi));
-  const double cos_angle_bottom(std::cos(angle - 0.5 * std::numbers::pi));
-  const double sin_angle_bottom(std::sin(angle - 0.5 * std::numbers::pi));
-  const double cos_angle(std::cos(angle));
-  const double sin_angle(std::sin(angle));
+  const float cos_angle_top(std::cos(angle + 0.5f * std::numbers::pi));
+  const float sin_angle_top(std::sin(angle + 0.5f * std::numbers::pi));
+  const float cos_angle_bottom(std::cos(angle - 0.5f * std::numbers::pi));
+  const float sin_angle_bottom(std::sin(angle - 0.5f * std::numbers::pi));
+  const float cos_angle(std::cos(angle));
+  const float sin_angle(std::sin(angle));
 
   const ImGuiStyle& style = ImGui::GetStyle();
 
@@ -154,4 +154,3 @@ void LiftPage::draw_arm(double angle, std::array<double, 3> stage_lengths,
                          fix_pt(end_bottom), fix_pt(end_top), color, width);
   }
 }
-

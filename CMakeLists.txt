@@ -38,7 +38,7 @@ endif()
 
 # Compiler flags.
 if(MSVC)
-  add_compile_options(/W4)
+  #add_compile_options(/W4)
   message(STATUS "MSVC Compiler Detected")
 else()
   add_compile_options(-Wall -Wextra -pedantic)

@@ -41,7 +41,7 @@ public:
     : ImGuiScopedField(id, column_width,
                        [text]() { ImGui::Text("%s", text); }) {}
 
-  inline ImGuiScopedField(const char* id, unsigned int column_width,
+  inline ImGuiScopedField(const char* id, float column_width,
                           std::function<void()> make_left_column) {
     ImGui::PushID(id);
     ImGui::Columns(2, nullptr, false);

@@ -47,7 +47,7 @@ Texture CameraPage::get_frame_texture() {
   return m_has_frame ? *m_frame_tex : *m_no_cam_tex;
 }
 
-double CameraPage::get_frame_aspect_ratio() {
+float CameraPage::get_frame_aspect_ratio() {
   std::lock_guard lk(m_camera_mutex);
 
   return m_has_frame ? m_frame_ar : m_no_cam_ar;
@@ -117,8 +117,8 @@ void CameraPage::thread_start() {
         m_frame = working_frame;
 
         // Aspect ratio.
-        m_frame_ar = static_cast<double>(m_frame.cols) /
-                     static_cast<double>(m_frame.rows);
+        m_frame_ar = static_cast<float>(m_frame.cols) /
+                     static_cast<float>(m_frame.rows);
 
         m_new_frame = true;
         m_has_frame = true;

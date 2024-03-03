@@ -28,7 +28,6 @@ inline bool float_eq(float x, float y) { return std::fabs(x - y) < 1e-6; }
 #ifdef HD_WINDOWS
 #include <Windows.h>
 #include <d3d11.h>
-#include <wrl/client.h>
 #include <tchar.h>
+#include <wrl/client.h>
 #endif
-

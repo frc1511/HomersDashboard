@@ -9,7 +9,7 @@ void CompetitionInfoPage::present(bool* running) {
   }
 
   ImVec4 color;
-  const char* state_str;
+  const char* state_str = "";
   switch (m_nt_handler.get_match_mode()) {
     using enum NTHandler::MatchMode;
   case DISABLED:

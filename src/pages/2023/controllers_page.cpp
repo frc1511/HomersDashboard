@@ -14,7 +14,7 @@ ControllerPage::ControllerPage()
     m_aux_manual_tex(_2023_controller_aux_manual_png,
                      _2023_controller_aux_manual_png_size),
 
-    m_aspect_ratio(static_cast<double>(m_driver_tex.width()) /
+    m_aspect_ratio(static_cast<float>(m_driver_tex.width()) /
                    m_driver_tex.height()) {}
 
 void ControllerPage::present(bool* running) {

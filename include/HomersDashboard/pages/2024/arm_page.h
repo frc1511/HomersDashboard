@@ -35,7 +35,7 @@ private:
   }
 
   ImVec2 rotate_pt_origin(ImVec2 origin, ImVec2 pt, float angle_rad);
-  void rotate_pts_origin(ImVec2 origin, ImVec2* pts, int num_pts, float angle_rad);
+  void rotate_pts_origin(ImVec2 origin, ImVec2* pts, size_t num_pts, float angle_rad);
 
   void draw_arm();
 
