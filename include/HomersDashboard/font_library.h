@@ -7,4 +7,3 @@ struct FontLibrary {
   ImFont* bold_font;
   ImFont* big_font;
 };
-

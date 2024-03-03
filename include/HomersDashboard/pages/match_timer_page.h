@@ -16,4 +16,3 @@ public:
   const char* name() const override { return "Match Timer"; }
   void present(bool* running) override;
 };
-  

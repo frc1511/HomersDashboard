@@ -16,4 +16,3 @@ public:
   void init() override;
   void process() override;
 };
-

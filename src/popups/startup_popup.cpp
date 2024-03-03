@@ -47,7 +47,8 @@ void StartupPopup::present(bool* running) {
       hovered |= ImGui::IsItemHovered();
       if (hovered) {
         ImGui::BeginTooltip();
-        ImGui::TextUnformatted("Host a camera server on this computer (port 1181).");
+        ImGui::TextUnformatted(
+            "Host a camera server on this computer (port 1181).");
         ImGui::TextUnformatted("Visible in place of the robot's Intake Camera");
         ImGui::EndTooltip();
       }
@@ -62,4 +63,3 @@ void StartupPopup::present(bool* running) {
 
   ImGui::EndPopup();
 }
-

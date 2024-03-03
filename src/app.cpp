@@ -327,4 +327,3 @@ void App::process_input() {
     close();
   }
 }
-

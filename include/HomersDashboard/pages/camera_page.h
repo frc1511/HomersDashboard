@@ -49,4 +49,3 @@ private:
 
   void open_changed(bool open) override;
 };
-  

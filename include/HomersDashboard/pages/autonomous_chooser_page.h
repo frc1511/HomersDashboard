@@ -32,4 +32,3 @@ public:
 private:
   void update_auto_modes(const std::string& auto_list);
 };
-

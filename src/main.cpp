@@ -268,4 +268,3 @@ static void setup_data_handler(App& app) {
   ImGuiContext* context = ImGui::GetCurrentContext();
   context->SettingsHandlers.push_back(ini_handler);
 }
-

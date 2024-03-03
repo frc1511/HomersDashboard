@@ -55,4 +55,3 @@ void AlertService::process() {
       style.Colors[ImGuiCol_ChildBg] = style.Colors[ImGuiCol_TableRowBg] =
           style.Colors[ImGuiCol_TableRowBgAlt] = *col;
 }
-

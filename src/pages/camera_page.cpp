@@ -34,8 +34,8 @@ Texture CameraPage::get_frame_texture() {
 
   if (m_new_frame) {
 #ifdef HD_WITH_CS
-    m_frame_tex->set_data(m_frame.data, m_frame.cols, m_frame.rows, 
-        #ifdef HD_WINDOWS
+    m_frame_tex->set_data(m_frame.data, m_frame.cols, m_frame.rows,
+#ifdef HD_WINDOWS
                           4
 #else
                           3
@@ -103,9 +103,9 @@ void CameraPage::thread_start() {
       // GrabFrame() apparently returns mat in BGR, so convert it to RGB?
       cv::cvtColor(working_frame, working_frame,
 #ifdef HD_WINDOWS
-          cv::COLOR_BGR2RGBA
+                   cv::COLOR_BGR2RGBA
 #else
-          cv::COLOR_BGR2RGB
+                   cv::COLOR_BGR2RGB
 #endif
       );
 
@@ -117,8 +117,8 @@ void CameraPage::thread_start() {
         m_frame = working_frame;
 
         // Aspect ratio.
-        m_frame_ar = static_cast<float>(m_frame.cols) /
-                     static_cast<float>(m_frame.rows);
+        m_frame_ar =
+            static_cast<float>(m_frame.cols) / static_cast<float>(m_frame.rows);
 
         m_new_frame = true;
         m_has_frame = true;
@@ -144,4 +144,3 @@ void CameraPage::thread_start() {
   }
 #endif
 }
-

@@ -11,4 +11,3 @@ protected:
   Popup() = default;
   virtual ~Popup() = default;
 };
-

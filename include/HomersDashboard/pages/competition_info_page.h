@@ -19,4 +19,3 @@ public:
   const char* name() const override { return "Competition Info"; }
   void present(bool* running) override;
 };
-

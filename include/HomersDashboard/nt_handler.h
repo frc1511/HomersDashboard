@@ -79,4 +79,3 @@ public:
 private:
   int32_t get_ctrl_word();
 };
-

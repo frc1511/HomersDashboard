@@ -12,4 +12,3 @@ public:
   void present(bool* running) override;
   const char* name() const override { return "Limelight Camera"; }
 };
-

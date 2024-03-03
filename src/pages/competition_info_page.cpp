@@ -75,4 +75,3 @@ void CompetitionInfoPage::present(bool* running) {
 
   ImGui::End();
 }
-

@@ -93,4 +93,3 @@ void AutonomousChooserPage::update_auto_modes(const std::string& auto_list) {
 
   set_auto_mode(m_auto_mode);
 }
-

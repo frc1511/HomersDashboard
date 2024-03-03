@@ -39,7 +39,8 @@ void NetworkTablesPage::present(bool* running) {
   ImGui::End();
 }
 
-void NetworkTablesPage::show_value(const std::string& key, const nt::Value& value) {
+void NetworkTablesPage::show_value(const std::string& key,
+                                   const nt::Value& value) {
   switch (value.type()) {
   case NT_UNASSIGNED:
     ImGui::TextUnformatted("=== NT_UNASSIGNED ===");
@@ -78,7 +79,8 @@ void NetworkTablesPage::show_value(const std::string& key, const nt::Value& valu
   }
 }
 
-void NetworkTablesPage::show_value_array(const std::string& key, const nt::Value& value) {
+void NetworkTablesPage::show_value_array(const std::string& key,
+                                         const nt::Value& value) {
   ImGui::PushID(key.c_str());
   ImGui::PushID((char*)&value.value());
   if (ImGui::TreeNodeEx("Array")) {
@@ -165,4 +167,3 @@ void NetworkTablesPage::show_table(std::string_view path,
     ImGui::TreePop();
   }
 }
-

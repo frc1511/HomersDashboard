@@ -23,4 +23,3 @@ void LimelightCameraPage::present(bool* running) {
 
   ImGui::End();
 }
-

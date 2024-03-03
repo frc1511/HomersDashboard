@@ -30,4 +30,3 @@ void MatchTimerPage::present(bool* running) {
 
   ImGui::End();
 }
-

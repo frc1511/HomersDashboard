@@ -101,4 +101,3 @@ ImVec2 RobotPositionPage::adjust_field_coord(ImVec2 pt) const {
 
   return pt;
 }
-

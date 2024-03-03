@@ -33,4 +33,3 @@ void IntakeCameraPage::present(bool* running) {
 
   ImGui::End();
 }
-

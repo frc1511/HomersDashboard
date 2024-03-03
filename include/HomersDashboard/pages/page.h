@@ -29,4 +29,3 @@ protected:
 
   virtual void open_changed(bool open) { (void)open; };
 };
-

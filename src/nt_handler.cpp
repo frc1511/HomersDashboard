@@ -117,4 +117,3 @@ void NTHandler::set_string(const std::string& key, std::string_view value) {
 int32_t NTHandler::get_ctrl_word() {
   return static_cast<int32_t>(m_fms_table->GetNumber("FMSControlData", 0.0));
 }
-
